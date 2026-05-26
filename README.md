@@ -1,4 +1,4 @@
-# 🎓 English Party
+# 🎓 English Party - Live: https://english-party.web.app/
 
 <div align="center">
 
