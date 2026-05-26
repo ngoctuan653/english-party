@@ -3,6 +3,8 @@ import { useAuthStore } from '@/stores/authStore';
 import { getDailyProgress, generateDailyMissions } from '@/services/gamification';
 import { db } from '@/services/firebase/config';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { getRecentSessions } from '@/services/study';
+import SessionReviewModal from '@/components/study/SessionReviewModal';
 import { Card } from '@/components/ui/Card';
 import { Progress } from '@/components/ui/Progress';
 import { Avatar } from '@/components/ui/Avatar';
@@ -36,6 +38,7 @@ export default function DashboardPage() {
   const [leaderboard, setLeaderboard] = useState<UserProfile[]>([]);
   const [recentSessions, setRecentSessions] = useState<StudySession[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedReviewSession, setSelectedReviewSession] = useState<StudySession | null>(null);
 
   useEffect(() => {
     async function loadDashboardData() {
@@ -57,17 +60,7 @@ export default function DashboardPage() {
         setLeaderboard(topUsers);
 
         // 3. Fetch recent study sessions
-        const sessionsSnap = await getDocs(
-          query(
-            collection(db, 'study_sessions'),
-            orderBy('createdAt', 'desc'),
-            limit(5)
-          )
-        );
-        const sessions: StudySession[] = [];
-        sessionsSnap.forEach((doc) => {
-          sessions.push({ id: doc.id, ...doc.data() } as StudySession);
-        });
+        const sessions = await getRecentSessions(profile.uid, 5);
         setRecentSessions(sessions);
       } catch (err) {
         console.error('Failed to load dashboard data:', err);
@@ -397,7 +390,8 @@ export default function DashboardPage() {
               {recentSessions.map((session) => (
                 <div
                   key={session.id}
-                  className="flex items-start gap-2.5 rounded-xl border border-slate-100 bg-slate-50/50 p-2.5"
+                  onClick={() => setSelectedReviewSession(session)}
+                  className="flex items-start gap-2.5 rounded-xl border border-slate-100 bg-slate-50/50 p-2.5 cursor-pointer hover:bg-slate-100/60 transition-colors"
                 >
                   <span className="text-sm mt-0.5">
                     {session.type === 'listening' ? '🎧' : session.type === 'vocabulary' ? '📚' : '📝'}
@@ -423,6 +417,12 @@ export default function DashboardPage() {
           )}
         </Card>
       </div>
+
+      <SessionReviewModal
+        isOpen={selectedReviewSession !== null}
+        onClose={() => setSelectedReviewSession(null)}
+        session={selectedReviewSession}
+      />
     </div>
   );
 }

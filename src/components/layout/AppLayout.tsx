@@ -3,12 +3,12 @@ import { Sidebar } from './Sidebar';
 import { BottomNav } from './BottomNav';
 import { Header } from './Header';
 import { MobileHeader } from './MobileHeader';
-import { useResponsive } from '@/hooks/useResponsive';
+import { useUIStore } from '@/stores/uiStore';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export function AppLayout() {
-  const { isMobile } = useResponsive();
   const location = useLocation();
+  const { isStudySessionActive } = useUIStore();
 
   return (
     <div className="min-h-screen bg-surface-base text-text-primary font-sans antialiased overflow-x-hidden">
@@ -17,10 +17,10 @@ export function AppLayout() {
 
       {/* Header bars */}
       <Header />
-      <MobileHeader />
+      {!isStudySessionActive && <MobileHeader />}
 
       {/* Main Content Area */}
-      <main className="lg:pl-64 pt-14 lg:pt-16 pb-16 lg:pb-0 min-h-screen flex flex-col">
+      <main className={`lg:pl-64 pt-14 lg:pt-16 pb-16 lg:pb-0 min-h-screen flex flex-col ${isStudySessionActive ? 'session-active' : ''}`}>
         <div className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 relative">
           <AnimatePresence mode="wait">
             <motion.div
@@ -38,7 +38,7 @@ export function AppLayout() {
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <BottomNav />
+      {!isStudySessionActive && <BottomNav />}
     </div>
   );
 }

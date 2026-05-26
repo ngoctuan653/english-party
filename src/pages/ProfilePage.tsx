@@ -11,11 +11,13 @@ import { formatTimestamp, formatDuration, getAccuracyColor } from '@/utils/helpe
 import type { StudySession } from '@/types/study';
 import * as Icons from 'lucide-react';
 import { motion } from 'framer-motion';
+import SessionReviewModal from '@/components/study/SessionReviewModal';
 
 export default function ProfilePage() {
   const { profile } = useAuthStore();
   const [sessions, setSessions] = useState<StudySession[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedReviewSession, setSelectedReviewSession] = useState<StudySession | null>(null);
 
   useEffect(() => {
     async function loadSessions() {
@@ -208,7 +210,8 @@ export default function ProfilePage() {
                 {sessions.map((session) => (
                   <div
                     key={session.id}
-                    className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 rounded-xl border border-slate-200/60 bg-white hover:bg-slate-50 transition-colors gap-3 shadow-sm"
+                    onClick={() => setSelectedReviewSession(session)}
+                    className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 rounded-xl border border-slate-200/60 bg-white hover:bg-slate-50 transition-colors gap-3 shadow-sm cursor-pointer"
                   >
                     <div>
                       <div className="flex items-center gap-2">
@@ -289,6 +292,12 @@ export default function ProfilePage() {
           </Card>
         </div>
       </div>
+
+      <SessionReviewModal
+        isOpen={selectedReviewSession !== null}
+        onClose={() => setSelectedReviewSession(null)}
+        session={selectedReviewSession}
+      />
     </div>
   );
 }

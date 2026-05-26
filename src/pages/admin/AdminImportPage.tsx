@@ -140,7 +140,12 @@ export default function AdminImportPage() {
     const choiceC = row.choiceC || row.choicec || row.C || row.c;
     const choiceD = row.choiceD || row.choiced || row.D || row.d;
     let correctAnswer = row.correctAnswer || row.correctanswer || row.Answer || row.answer;
-    const explanation = row.explanation || '';
+    const explanationEn = row.explanation || '';
+    const explanationVi = row.explanationVi || row.explanationvi || row.explanation_vi || '';
+    // Combine EN + VI with pipe delimiter for bilingual display
+    const explanation = explanationVi
+      ? `${explanationEn} | ${explanationVi}`
+      : explanationEn;
     const part = Number(row.part || 5);
     const topic = row.topic || 'general';
     const difficulty = Number(row.difficulty || 700);
@@ -276,7 +281,7 @@ export default function AdminImportPage() {
               </p>
               {importType === 'questions' ? (
                 <code className="block bg-white p-2 rounded border border-slate-200 font-mono text-[9px] break-all text-slate-700">
-                  question,choiceA,choiceB,choiceC,choiceD,correctAnswer,explanation,part,topic,difficulty
+                  question,choiceA,choiceB,choiceC,choiceD,correctAnswer,explanation,explanationVi,part,topic,difficulty
                 </code>
               ) : (
                 <code className="block bg-white p-2 rounded border border-slate-200 font-mono text-[9px] break-all text-slate-700">

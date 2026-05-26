@@ -8,8 +8,10 @@ export function BottomNav() {
   const navigate = useNavigate();
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 h-16 lg:hidden bg-white/80 backdrop-blur-xl border-t border-slate-200/80 flex items-center justify-around px-2 pb-safe z-30">
-      {NAV_ITEMS.map((item) => {
+    <nav 
+      className="fixed bottom-0 inset-x-0 lg:hidden bg-white/80 backdrop-blur-xl border-t border-slate-200/80 flex items-center justify-around px-2 z-30"
+    >
+      {NAV_ITEMS.filter((item) => item.path !== '/leaderboard').map((item) => {
         const isActive = location.pathname === item.path;
         const Icon = (Icons as any)[item.icon] || Icons.HelpCircle;
 

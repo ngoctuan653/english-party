@@ -15,11 +15,9 @@
     "noEmit": true,
 
     /* Path aliases */
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     },
-    "ignoreDeprecations": "6.0",
 
     /* Strict */
     "strict": true,

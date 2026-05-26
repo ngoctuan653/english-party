@@ -47,7 +47,9 @@ export function MobileHeader() {
   };
 
   return (
-    <header className="h-14 lg:hidden flex items-center justify-between px-4 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 fixed top-0 inset-x-0 z-20">
+    <header 
+      className="lg:hidden flex items-center justify-between px-4 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 fixed top-0 inset-x-0 z-20"
+    >
       {/* Left side: Back or Logo */}
       <div className="flex items-center gap-2">
         {showBackButton() ? (

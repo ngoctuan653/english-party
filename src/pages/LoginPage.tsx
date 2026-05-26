@@ -74,7 +74,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right side: LoginForm container */}
-      <div className="flex-1 flex flex-col justify-center items-center p-6 relative z-10 lg:w-1/2">
+      <div className="flex-1 flex flex-col justify-center items-center p-6 relative z-10 lg:w-1/2 auth-container">
         {/* Mobile Header Branding */}
         <div className="lg:hidden flex flex-col items-center mb-8 text-center">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-[#0071E3] flex items-center justify-center shadow-md mb-4 animate-pulse text-white">

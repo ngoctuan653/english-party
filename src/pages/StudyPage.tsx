@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
+import { useUIStore } from '@/stores/uiStore';
 import { getRecentSessions, fetchQuestions, startStudySession, endStudySession } from '@/services/study';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -13,6 +14,8 @@ import { formatTimestamp, formatDuration, getAccuracyColor } from '@/utils/helpe
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import * as Icons from 'lucide-react';
+import { generateSmartQuizSession } from '@/services/progress';
+import SessionReviewModal from '@/components/study/SessionReviewModal';
 
 interface StudyMode {
   id: string;
@@ -67,10 +70,41 @@ const cardVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.45 } },
 };
 
+const parseExplanation = (explanation: string) => {
+  if (!explanation) return { sentenceTranslation: '', viExpl: '' };
+
+  const parts = explanation.split('|').map((s) => s.trim());
+  let sentenceTranslation = '';
+  let viExpl = '';
+
+  const translationPart = parts.find((p) => p.toLowerCase().startsWith('dịch nghĩa:'));
+  const explanationPart = parts.find((p) => p.toLowerCase().startsWith('giải thích:'));
+
+  if (translationPart) {
+    sentenceTranslation = translationPart.replace(/dịch nghĩa:\s*/i, '');
+  }
+  if (explanationPart) {
+    viExpl = explanationPart.replace(/giải thích:\s*/i, '');
+  }
+
+  if (!sentenceTranslation && !viExpl) {
+    if (parts.length > 1) {
+      viExpl = parts.slice(1).join(' | ');
+    } else {
+      viExpl = parts[0];
+    }
+  }
+
+  return { sentenceTranslation, viExpl };
+};
+
 export default function StudyPage() {
   const { profile } = useAuthStore();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [sessions, setSessions] = useState<StudySession[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedReviewSession, setSelectedReviewSession] = useState<StudySession | null>(null);
 
   // Active quiz session states
   const [quizActive, setQuizActive] = useState(false);
@@ -88,6 +122,65 @@ export default function StudyPage() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const questionStartTimeRef = useRef<number>(0);
 
+  const { setStudySessionActive } = useUIStore();
+
+  // Synchronize active study session state with layout
+  useEffect(() => {
+    setStudySessionActive(quizActive && !results);
+    return () => {
+      setStudySessionActive(false);
+    };
+  }, [quizActive, results, setStudySessionActive]);
+
+  // Intercept back button gestures and browser back navigation using popstate
+  useEffect(() => {
+    const active = quizActive && !results;
+    if (!active) return;
+
+    // Push dummy history entry so back button pops it instead of navigating away
+    window.history.pushState({ preventBack: true }, '');
+
+    const handlePopState = (e: PopStateEvent) => {
+      const confirmExit = window.confirm(
+        'Thoát học? Tiến trình làm bài hiện tại sẽ không được lưu. (Exit session? Current progress will not be saved.)'
+      );
+      if (confirmExit) {
+        setQuizActive(false);
+        setQuestions([]);
+        setSessionId(null);
+        setResults(null);
+      } else {
+        // Push dummy state again to intercept the next back gesture
+        window.history.pushState({ preventBack: true }, '');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      // Clean up the dummy history entry if the user completes or exits the quiz
+      if (window.history.state?.preventBack) {
+        window.history.back();
+      }
+    };
+  }, [quizActive, results]);
+
+  // Prevent page refresh / tab close
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (quizActive && !results) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [quizActive, results]);
+
+
+
   useEffect(() => {
     async function loadSessions() {
       if (!profile?.uid) return;
@@ -104,6 +197,15 @@ export default function StudyPage() {
     loadSessions();
   }, [profile?.uid, quizActive]);
 
+  // Catch retake questions from router state (e.g. from Profile page)
+  useEffect(() => {
+    if (location.state?.practiceQuestions) {
+      const customQ = location.state.practiceQuestions as Question[];
+      navigate(location.pathname, { replace: true });
+      handleStartQuiz(customQ);
+    }
+  }, [location.state, navigate]);
+
   // Timer interval
   useEffect(() => {
     if (quizActive && !results) {
@@ -119,17 +221,35 @@ export default function StudyPage() {
     };
   }, [quizActive, results]);
 
-  const handleStartQuiz = async () => {
+  const handleStartQuiz = async (customQuestions?: Question[]) => {
     if (!profile?.uid) return;
     try {
       setLoadingQuestions(true);
-      // Fetch active TOEIC questions
-      const list = await fetchQuestions({ exam: 'toeic', count: 5 });
-      
-      if (list.length === 0) {
-        toast.error('No practice questions available in database yet. Try importing CSV data first!');
-        setLoadingQuestions(false);
-        return;
+      let list: Question[] = [];
+
+      if (customQuestions && customQuestions.length > 0) {
+        list = customQuestions;
+      } else {
+        // Fetch a larger pool of active TOEIC questions
+        const allQuestions = await fetchQuestions({ exam: 'toeic', count: 50 });
+        
+        if (allQuestions.length === 0) {
+          toast.error('No practice questions available in database yet. Try importing CSV data first!');
+          setLoadingQuestions(false);
+          return;
+        }
+
+        // Smart selection: 60% new, 25% weak, 15% review
+        list = await generateSmartQuizSession(profile.uid, allQuestions, 5);
+
+        if (list.length === 0) {
+          toast('Bạn đã hoàn thành hết câu hỏi hiện có! Hãy quay lại sau hoặc chờ thêm câu hỏi mới.\nYou\'ve completed all available questions!', {
+            icon: '🎉',
+            duration: 5000,
+          });
+          setLoadingQuestions(false);
+          return;
+        }
       }
 
       const activeSessionId = await startStudySession(profile.uid, 'toeic', 'quiz');
@@ -251,9 +371,16 @@ export default function StudyPage() {
             >
               {/* Question Text */}
               <Card className="p-6 bg-white border border-slate-200/80 shadow-sm space-y-4">
-                <div className="flex justify-between items-center">
-                  <Badge variant="purple">TOEIC Part {currentQuestion?.part || 5}</Badge>
-                  <Badge variant="info" className="capitalize">{currentQuestion?.topic || 'Business'}</Badge>
+                <div className="flex justify-between items-center flex-wrap gap-2">
+                  <div className="flex gap-2">
+                    <Badge variant="purple">TOEIC Part {currentQuestion?.part || 5}</Badge>
+                    <Badge variant="info" className="capitalize">{currentQuestion?.topic || 'Business'}</Badge>
+                  </div>
+                  {currentQuestion?.difficulty && (
+                    <Badge variant="warning" dot>
+                      Target: {currentQuestion.difficulty}
+                    </Badge>
+                  )}
                 </div>
                 <h2 className="text-lg font-bold leading-relaxed text-slate-800">
                   {currentQuestion?.question}
@@ -302,37 +429,35 @@ export default function StudyPage() {
 
               {/* Explanation section */}
               {isAnswerSubmitted && (() => {
-                const [enExpl, viExpl] = currentQuestion?.explanation?.includes('|')
-                  ? currentQuestion.explanation.split('|').map((s) => s.trim())
-                  : [currentQuestion?.explanation, null];
+                const { sentenceTranslation, viExpl } = parseExplanation(currentQuestion?.explanation);
 
                 return (
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                   >
-                    <Card className="p-5 bg-[#0071E3]/5 border-[#0071E3]/20 text-slate-700 space-y-3">
+                    <Card className="p-5 bg-blue-50/40 border-blue-100 text-slate-700 space-y-3">
                       <p className="text-xs font-bold text-[#0071E3] uppercase tracking-wide flex items-center gap-1.5 border-b border-slate-200/50 pb-2">
-                        <Icons.Info className="w-4 h-4" /> Explanation / Giải nghĩa
+                        <Icons.Info className="w-4 h-4" /> Giải thích chi tiết
                       </p>
-                      {viExpl ? (
-                        <div className="space-y-3 text-xs leading-relaxed">
+                      <div className="space-y-3 text-xs leading-relaxed">
+                        {sentenceTranslation && (
                           <div>
-                            <span className="inline-flex items-center gap-1 font-bold text-slate-500 mb-1">
-                              🇬🇧 English
+                            <span className="inline-flex items-center gap-1 font-bold text-slate-805 mb-1">
+                              🇻🇳 Dịch câu:
                             </span>
-                            <p className="text-slate-700">{enExpl}</p>
+                            <p className="text-slate-700 font-medium">{sentenceTranslation}</p>
                           </div>
-                          <div className="pt-2 border-t border-slate-200/40">
-                            <span className="inline-flex items-center gap-1 font-bold text-slate-500 mb-1">
-                              🇻🇳 Tiếng Việt
+                        )}
+                        {viExpl && (
+                          <div className={sentenceTranslation ? "pt-2.5 border-t border-slate-200/50" : ""}>
+                            <span className="inline-flex items-center gap-1 font-bold text-slate-805 mb-1">
+                              🇻🇳 Giải thích:
                             </span>
-                            <p className="text-slate-800 font-medium">{viExpl}</p>
+                            <p className="text-slate-705">{viExpl}</p>
                           </div>
-                        </div>
-                      ) : (
-                        <p className="text-xs leading-relaxed">{currentQuestion?.explanation}</p>
-                      )}
+                        )}
+                      </div>
                     </Card>
                   </motion.div>
                 );
@@ -418,7 +543,7 @@ export default function StudyPage() {
                   <Button onClick={() => setQuizActive(false)} variant="secondary" className="px-6 font-semibold">
                     Back to Station
                   </Button>
-                  <Button onClick={handleStartQuiz} className="px-6 font-bold">
+                  <Button onClick={() => handleStartQuiz()} className="px-6 font-bold">
                     Retake Quiz
                   </Button>
                 </div>
@@ -482,7 +607,7 @@ export default function StudyPage() {
                 </div>
               </Link>
             ) : (
-              <div onClick={handleStartQuiz} className="cursor-pointer">
+              <div onClick={() => handleStartQuiz()} className="cursor-pointer">
                 <div
                   className={`group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 transition-all duration-300 hover:scale-[1.02] hover:border-slate-300 hover:shadow-lg ${mode.hoverGlow}`}
                 >
@@ -540,7 +665,8 @@ export default function StudyPage() {
             {sessions.map((session) => (
               <div
                 key={session.id}
-                className="flex items-center gap-4 rounded-xl border border-slate-100 bg-slate-50/50 p-4 transition-colors hover:bg-slate-100/60"
+                onClick={() => setSelectedReviewSession(session)}
+                className="flex items-center gap-4 rounded-xl border border-slate-100 bg-slate-50/50 p-4 transition-colors hover:bg-slate-100/60 cursor-pointer"
               >
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 border border-slate-200 text-lg">
                   {session.type === 'listening' ? '🎧' : session.type === 'vocabulary' ? '📚' : '📝'}
@@ -564,6 +690,13 @@ export default function StudyPage() {
           </div>
         )}
       </motion.div>
+
+      <SessionReviewModal
+        isOpen={selectedReviewSession !== null}
+        onClose={() => setSelectedReviewSession(null)}
+        session={selectedReviewSession}
+        onPracticeQuizAgain={handleStartQuiz}
+      />
     </div>
   );
 }

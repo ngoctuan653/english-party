@@ -246,13 +246,59 @@ body {
   animation: shimmer 2s infinite linear;
 }
 
+/* Custom properties for safe areas */
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 /* Mobile safe areas */
 .safe-top {
-  padding-top: env(safe-area-inset-top);
+  padding-top: var(--safe-top);
 }
 
 .safe-bottom {
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: var(--safe-bottom);
+}
+
+/* Apply safe area paddings to the layout elements on mobile/tablet */
+@media (max-width: 1023px) {
+  /* MobileHeader component override */
+  header.fixed.top-0 {
+    height: calc(3.5rem + var(--safe-top)) !important;
+    padding-top: var(--safe-top) !important;
+  }
+
+  /* BottomNav component override */
+  nav.fixed.bottom-0 {
+    height: calc(4rem + var(--safe-bottom)) !important;
+    padding-bottom: var(--safe-bottom) !important;
+  }
+
+  /* AppLayout main component override */
+  main.lg\:pl-64 {
+    padding-top: calc(3.5rem + var(--safe-top)) !important;
+    padding-bottom: calc(4rem + var(--safe-bottom)) !important;
+  }
+
+  /* AppLayout main component override when study session is active */
+  main.lg\:pl-64.session-active {
+    padding-top: var(--safe-top) !important;
+    padding-bottom: var(--safe-bottom) !important;
+  }
+
+
+  /* Authentication screens (Login/Register) override to respect safe zones */
+  .auth-container {
+    padding-top: calc(2rem + var(--safe-top)) !important;
+    padding-bottom: calc(2rem + var(--safe-bottom)) !important;
+  }
+
+  /* Modals and full-screen overlays */
+  .fixed.inset-0.z-50 {
+    padding-top: calc(1rem + var(--safe-top)) !important;
+    padding-bottom: calc(1rem + var(--safe-bottom)) !important;
+  }
 }
 
 /* Hide scrollbar utility */

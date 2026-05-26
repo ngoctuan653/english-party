@@ -23,6 +23,7 @@ import type { Question, QuestionAnswer } from '@/types/question';
 import type { StudySession, SessionResults } from '@/types/study';
 import { startAntiCheatTracking, stopAntiCheatTracking, validateAnswerTiming } from '@/services/anticheat';
 import { calculateSessionXP, awardXP, updateDailyProgress, updateMissionProgress, checkAndUpdateStreak } from '@/services/gamification';
+import { batchUpdateQuestionProgress, batchUpdateVocabProgress } from '@/services/progress';
 
 // ============================================
 // Fetch Questions
@@ -79,34 +80,7 @@ export async function startStudySession(
   exam: string,
   type: 'quiz' | 'vocabulary' | 'listening' | 'mission'
 ): Promise<string> {
-  const sessionId = `${userId}_${Date.now()}`;
-  const sessionRef = doc(db, 'study_sessions', sessionId);
-
-  const session: Omit<StudySession, 'startedAt' | 'createdAt'> & {
-    startedAt: ReturnType<typeof serverTimestamp>;
-    createdAt: ReturnType<typeof serverTimestamp>;
-  } = {
-    id: sessionId,
-    userId,
-    exam,
-    type,
-    questionsAttempted: 0,
-    questionsCorrect: 0,
-    accuracy: 0,
-    xpEarned: 0,
-    startedAt: serverTimestamp(),
-    endedAt: null,
-    activeSeconds: 0,
-    totalSeconds: 0,
-    tabSwitches: 0,
-    idleIntervals: 0,
-    interactionCount: 0,
-    isValid: true,
-    answers: [],
-    createdAt: serverTimestamp(),
-  };
-
-  await setDoc(sessionRef, session);
+  const sessionId = `${userId}_${exam}_${type}_${Date.now()}`;
 
   // Start anti-cheat tracking
   startAntiCheatTracking();
@@ -126,13 +100,31 @@ export async function endStudySession(
 
   const correctAnswers = customMetrics ? customMetrics.correct : answers.filter((a) => a.isCorrect).length;
   const totalQuestions = customMetrics ? customMetrics.total : answers.length;
-  const accuracy = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
+
+  if (totalQuestions === 0) {
+    return {
+      totalQuestions: 0,
+      correctAnswers: 0,
+      accuracy: 0,
+      xpEarned: 0,
+      streakBonus: 0,
+      timeSpent: antiCheatData.totalSeconds,
+      isValid: false,
+    };
+  }
+
+  const accuracy = (correctAnswers / totalQuestions) * 100;
   const isPerfect = accuracy === 100 && totalQuestions >= 5 && !customMetrics;
 
-  // Retrieve session type
-  const sessionRef = doc(db, 'study_sessions', sessionId);
-  const sessionSnap = await getDoc(sessionRef);
-  const sessionType = sessionSnap.exists() ? (sessionSnap.data().type || 'quiz') : 'quiz';
+  // Extract session parameters from sessionId (e.g. ${userId}_${exam}_${type}_${Date.now()})
+  const parts = sessionId.split('_');
+  const timestampStr = parts[parts.length - 1];
+  const sessionType = (parts[parts.length - 2] || 'quiz') as 'quiz' | 'vocabulary' | 'listening' | 'mission';
+  const exam = parts[parts.length - 3] || 'toeic';
+
+  const startTimestampMs = Number(timestampStr);
+  const startedAtDate = isNaN(startTimestampMs) ? new Date() : new Date(startTimestampMs);
+  const startedAt = Timestamp.fromDate(startedAtDate);
 
   // Validate answer timing
   const isVocabOrListening = sessionType === 'vocabulary' || sessionType === 'listening';
@@ -144,13 +136,19 @@ export async function endStudySession(
     ? calculateSessionXP(correctAnswers, totalQuestions - correctAnswers, currentStreak, isPerfect)
     : { baseXP: 0, streakBonus: 0, perfectBonus: 0, totalXP: 0 };
 
-  // Update session in Firestore
-  await updateDoc(sessionRef, {
+  // Save session in Firestore
+  const sessionRef = doc(db, 'study_sessions', sessionId);
+  const sessionData: StudySession = {
+    id: sessionId,
+    userId,
+    exam,
+    type: sessionType,
     questionsAttempted: totalQuestions,
     questionsCorrect: correctAnswers,
     accuracy: Math.round(accuracy),
     xpEarned: xpCalc.totalXP,
-    endedAt: serverTimestamp(),
+    startedAt,
+    endedAt: Timestamp.now(),
     activeSeconds: antiCheatData.activeSeconds,
     totalSeconds: antiCheatData.totalSeconds,
     tabSwitches: antiCheatData.tabSwitches,
@@ -158,7 +156,10 @@ export async function endStudySession(
     interactionCount: antiCheatData.interactionCount,
     isValid,
     answers,
-  });
+    createdAt: startedAt,
+  };
+
+  await setDoc(sessionRef, sessionData);
 
   // Award XP and update progress
   if (isValid && xpCalc.totalXP > 0) {
@@ -191,6 +192,28 @@ export async function endStudySession(
 
     // Check streak
     await checkAndUpdateStreak(userId);
+
+    // Update per-item progress (mastery tracking)
+    try {
+      if (sessionType === 'vocabulary') {
+        const vocabEntries = answers.map((a) => ({
+          wordId: a.questionId,
+          isCorrect: true,
+          alreadyKnew: a.selectedAnswer === 1,
+        }));
+        await batchUpdateVocabProgress(userId, vocabEntries);
+      } else if (sessionType !== 'listening') {
+        // Quiz: update each question's mastery based on correctness
+        const questionEntries = answers.map((a) => ({
+          questionId: a.questionId,
+          isCorrect: a.isCorrect,
+        }));
+        await batchUpdateQuestionProgress(userId, questionEntries);
+      }
+    } catch (progressErr) {
+      // Non-critical — don't fail the session if progress update fails
+      console.error('Failed to update item progress:', progressErr);
+    }
   }
 
   // Update user stats
@@ -230,15 +253,18 @@ export async function getRecentSessions(userId: string, count: number = 10): Pro
     sessionsRef,
     where('userId', '==', userId),
     orderBy('createdAt', 'desc'),
-    limit(count)
+    limit(count * 3)
   );
 
   const snapshot = await getDocs(q);
   const sessions: StudySession[] = [];
   snapshot.forEach((doc) => {
-    sessions.push({ id: doc.id, ...doc.data() } as StudySession);
+    const data = doc.data();
+    if (data.questionsAttempted && data.questionsAttempted > 0) {
+      sessions.push({ id: doc.id, ...data } as StudySession);
+    }
   });
-  return sessions;
+  return sessions.slice(0, count);
 }
 
 // ============================================

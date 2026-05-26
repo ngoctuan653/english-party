@@ -25,6 +25,16 @@ service cloud.firestore {
       allow create: if isAuthenticated() && request.auth.uid == userId;
       allow update: if isOwner(userId) || isAdmin();
       allow delete: if isAdmin();
+
+      // Question progress (per-user, per-question mastery tracking)
+      match /questionProgress/{progressId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Vocabulary progress (per-user, per-word mastery tracking)
+      match /vocabProgress/{progressId} {
+        allow read, write: if isOwner(userId);
+      }
     }
 
     // Friendships
