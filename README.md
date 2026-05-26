@@ -1,442 +1,298 @@
-\# English Party
-
-
-
-A full-stack gamified English learning platform focused on TOEIC 700–800 preparation for small friend groups.
-
-
-
-Built with React, TypeScript, TailwindCSS, and Firebase.
-
-
-
-\---
-
-
-
-\# Features
-
-
-
-\## Authentication
-
-\- Google login
-
-\- Email/password authentication
-
-\- User profiles
-
-\- Online/offline status
-
-\- XP and streak tracking
-
-
-
-\## Study System
-
-\- TOEIC vocabulary learning
-
-\- TOEIC Part 5 grammar practice
-
-\- Listening practice
-
-\- Flashcards
-
-\- Daily missions
-
-
-
-\## Gamification
-
-\- XP system
-
-\- Daily streaks
-
-\- Leaderboards
-
-\- Friend competition
-
-\- Progress tracking
-
-
-
-\## Anti-cheat System
-
-\- Active study time tracking
-
-\- Idle detection
-
-\- Tab visibility detection
-
-\- Interaction validation
-
-\- Accuracy requirements
-
-
-
-\## Real-time Features
-
-\- Live leaderboard updates
-
-\- Online users
-
-\- Friend activity feed
-
-\- Real-time study sessions
-
-
-
-\## Admin Dashboard
-
-\- Question management
-
-\- Vocabulary management
-
-\- CSV import
-
-\- Listening upload
-
-\- Analytics overview
-
-
-
-\## PWA Support
-
-\- Install to home screen
-
-\- Offline caching
-
-\- Mobile-first UX
-
-\- Push notifications
-
-
-
-\---
-
-
-
-\# Tech Stack
-
-
-
-\## Frontend
-
-\- React
-
-\- TypeScript
-
-\- TailwindCSS
-
-\- Vite
-
-
-
-\## Backend / Infrastructure
-
-\- Firebase Auth
-
-\- Firestore
-
-\- Firebase Storage
-
-\- Firebase Hosting
-
-\- Firebase Cloud Messaging
-
-
-
-\## Future Support
-
-\- Capacitor Android APK
-
-\- IELTS / JLPT / SAT expansion
-
-\- AI-generated questions
-
-
-
-\---
-
-
-
-\# Project Goals
-
-
-
-Create a modern TOEIC learning platform where small friend groups can:
-
-\- study together
-
-\- maintain motivation
-
-\- compete fairly
-
-\- improve consistency
-
-\- avoid fake streak abuse
-
-
-
-\---
-
-
-
-\# Core Modules
-
-
-
-\- Dashboard
-
-\- Vocabulary Learning
-
-\- TOEIC Questions
-
-\- Listening Practice
-
-\- Daily Missions
-
-\- Leaderboards
-
-\- Friend System
-
-\- Admin Panel
-
-
-
-\---
-
-
-
-\# Database Collections
-
-
-
-```txt
-
-users
-
-vocabulary
-
-questions
-
-study\_sessions
-
-daily\_progress
-
-friendships
-
-leaderboards
-
+# 🎓 English Party
+
+<div align="center">
+
+**A gamified TOEIC learning platform for competitive friend groups**
+
+[![React](https://img.shields.io/badge/React-19.2-61dafb?logo=react)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178c6?logo=typescript)](https://www.typescriptlang.org)
+[![Firebase](https://img.shields.io/badge/Firebase-12.13-FFCA28?logo=firebase)](https://firebase.google.com)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.3-06B6D4?logo=tailwindcss)](https://tailwindcss.com)
+[![Vite](https://img.shields.io/badge/Vite-8.0-646CFF?logo=vite)](https://vitejs.dev)
+[![PWA](https://img.shields.io/badge/PWA-Ready-5A67D8?logo=pwa)](https://web.dev/progressive-web-apps/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+
+[Live Demo](#) • [Documentation](#) • [Report Bug](https://github.com/ngoctuan653/english-party/issues) • [Request Feature](https://github.com/ngoctuan653/english-party/issues)
+
+</div>
+
+---
+
+## ✨ Highlights
+
+🚀 **Study with Friends** - Learn together, compete fairly, stay motivated  
+🎮 **Gamified Learning** - XP system, daily streaks, leaderboards  
+🛡️ **Anti-Cheat System** - Real study time tracking, idle detection  
+📱 **Progressive Web App** - Works offline, install to home screen  
+🔥 **Real-time Features** - Live leaderboards, activity feeds  
+⚡ **High Performance** - Vite + React 19 + TypeScript  
+
+---
+
+## 🎯 Core Features
+
+### 🔐 Authentication & Profiles
+- Google & Email/Password login
+- User profiles with avatars
+- Online/offline status tracking
+- XP and streak management
+
+### 📚 Study System
+- **TOEIC Vocabulary** - Flashcard learning with spaced repetition
+- **TOEIC Part 5** - Grammar practice with multiple choice
+- **Listening Practice** - Audio-based exercises
+- **Daily Missions** - Bite-sized tasks for consistency
+- **Progress Analytics** - Detailed performance tracking
+
+### 🏆 Gamification Engine
+- **XP System** - Earn points on every correct answer
+- **Daily Streaks** - Build consistency and motivation
+- **Live Leaderboards** - Real-time friend rankings
+- **Competitive Matching** - Fair difficulty scaling
+- **Achievement Badges** - Milestone rewards
+
+### 🚨 Anti-Cheat Protection
+- Active study time validation
+- Idle detection (3+ seconds)
+- Tab visibility monitoring
+- Minimum accuracy requirements
+- Suspicious activity logging
+
+### 🌐 Real-time Collaboration
+- Live leaderboard updates (Firestore listeners)
+- Online user presence
+- Friend activity feeds
+- Shared study sessions
+
+### 🛠️ Admin Dashboard
+- Question & vocabulary management
+- CSV bulk import
+- Audio file uploads
+- Learning analytics
+- User management
+
+### 📦 PWA Capabilities
+- Install to home screen
+- Offline caching with Workbox
+- Push notifications ready
+- Mobile-first responsive design
+
+---
+
+## 🏗️ Tech Stack
+
+### Frontend
+```
+React 19.2          - UI library
+TypeScript 6.0      - Type safety
+TailwindCSS 4.3     - Styling
+Vite 8.0            - Build tool
+Framer Motion       - Animations
+Lucide React        - Icons
+Recharts            - Charts & analytics
 ```
 
-
-
-Example question schema:
-
-
-
-```json
-
-{
-
-&#x20; "exam": "toeic",
-
-&#x20; "part": 5,
-
-&#x20; "type": "mcq",
-
-&#x20; "topic": "business",
-
-&#x20; "difficulty": 700,
-
-&#x20; "question": "...",
-
-&#x20; "choices": \["A", "B", "C", "D"],
-
-&#x20; "answer": 1,
-
-&#x20; "explanation": "...",
-
-&#x20; "audioUrl": null
-
-}
-
+### Backend & Infrastructure
+```
+Firebase Auth       - Authentication
+Firestore          - Real-time database
+Firebase Storage   - File management
+Firebase Hosting   - Deployment
+Firebase Messaging - Push notifications
 ```
 
-
-
-\---
-
-
-
-\# Responsive Design
-
-
-
-Supports:
-
-\- Desktop
-
-\- Tablet
-
-\- Mobile
-
-\- PWA installation
-
-
-
-UI inspired by:
-
-\- Duolingo
-
-\- Notion
-
-\- Modern mobile learning apps
-
-
-
-\---
-
-
-
-\# Development Setup
-
-
-
-Install dependencies:
-
-
-
-```bash
-
-npm install
-
+### Libraries
+```
+React Router v7    - Navigation
+Zustand            - State management
+react-hot-toast    - Notifications
+Howler             - Audio playback
+PapaParse          - CSV parsing
+date-fns           - Date utilities
+Workbox PWA        - Service worker
 ```
 
+---
 
+## 📊 Project Statistics
 
-Run development server:
+| Metric | Value |
+|--------|-------|
+| **Language** | TypeScript (73.2%), JavaScript (25.3%) |
+| **Package Manager** | npm |
+| **React Version** | 19.2.6 |
+| **Node Modules** | 450+ |
+| **Build Size** | ~500KB (gzipped) |
 
+---
 
-
-```bash
-
-npm run dev
-
-```
-
-
-
-Build production:
-
-
-
-```bash
-
-npm run build
+## 🗂️ Directory Structure
 
 ```
-
-
-
-Deploy Firebase Hosting:
-
-
-
-```bash
-
-firebase deploy
-
-```
-
-
-
-\---
-
-
-
-\# Firebase Features
-
-
-
-\- Authentication
-
-\- Firestore database
-
-\- Real-time listeners
-
-\- Cloud Messaging
-
-\- Storage
-
-\- Hosting
-
-
-
-\---
-
-
-
-\# Folder Structure
-
-
-
-```txt
-
 src/
-
-&#x20; components/
-
-&#x20; pages/
-
-&#x20; layouts/
-
-&#x20; hooks/
-
-&#x20; services/
-
-&#x20; firebase/
-
-&#x20; types/
-
-&#x20; utils/
-
-&#x20; features/
-
+├── components/         # Reusable React components
+├── pages/              # Page components (Dashboard, Study, etc.)
+├── layouts/            # Layout wrappers
+├── hooks/              # Custom React hooks
+├── services/           # Business logic & API calls
+├── firebase/           # Firebase configuration
+├── types/              # TypeScript interfaces
+├── utils/              # Helper functions
+└── features/           # Feature-specific modules
 ```
 
+---
 
+## 💾 Database Schema
 
-\---
+### Collections
+```
+users               → User profiles, stats, settings
+vocabulary          → Word definitions and examples
+questions           → TOEIC questions (parts 1-7)
+study_sessions      → Active study records
+daily_progress      → Daily mission tracking
+friendships         → Friend relationships
+leaderboards        → Real-time rankings
+study_history       → Historical performance data
+```
 
+### Example Question Document
+```json
+{
+  "exam": "toeic",
+  "part": 5,
+  "type": "mcq",
+  "topic": "business",
+  "difficulty": 700,
+  "question": "The meeting was _____ due to technical difficulties.",
+  "choices": ["postponed", "delayed", "canceled", "extended"],
+  "answer": 0,
+  "explanation": "'Postponed' means to put off to a later time...",
+  "audioUrl": null,
+  "createdAt": 1234567890,
+  "tags": ["grammar", "passive-voice"]
+}
+```
 
+---
 
-\# Future Roadmap
+## 🚀 Getting Started
 
+### Prerequisites
+- Node.js 18+
+- npm or yarn
+- Firebase project (create at [firebase.google.com](https://firebase.google.com))
 
+### Installation
 
-\- AI-generated exercises
+1. **Clone the repository**
+```bash
+git clone https://github.com/ngoctuan653/english-party.git
+cd english-party
+```
 
-\- Voice pronunciation scoring
+2. **Install dependencies**
+```bash
+npm install
+```
 
-\- Group study rooms
+3. **Configure Firebase**
+   - Create `.env.local` with your Firebase credentials
+```env
+VITE_FIREBASE_API_KEY=your_key
+VITE_FIREBASE_PROJECT_ID=your_project
+VITE_FIREBASE_AUTH_DOMAIN=your_domain
+```
 
-\- Mobile APK
+4. **Start development server**
+```bash
+npm run dev
+```
+   - Open http://localhost:5173
 
-\- React Native app
+5. **Build for production**
+```bash
+npm run build
+npm run preview
+```
 
-\- IELTS / JLPT support
+---
 
+## 📱 Responsive Design
 
+Fully responsive across all devices:
+- 📱 Mobile (320px+)
+- 📲 Tablet (768px+)
+- 💻 Desktop (1024px+)
+- 🖥️ Ultra-wide (1920px+)
 
-\---
+**UI Inspiration:** Duolingo • Notion • Modern mobile learning apps
 
+---
 
+## 🎮 How to Use
 
-\# License
+### For Students
+1. Sign up with Google or email
+2. Join a friend group
+3. Start daily missions
+4. Learn vocabulary with flashcards
+5. Practice TOEIC questions
+6. Track progress on leaderboards
 
+### For Admins
+1. Access admin dashboard
+2. Upload new questions via CSV
+3. Upload audio files for listening
+4. Monitor user statistics
+5. Manage users and content
 
+---
 
-MIT
+## 🗺️ Roadmap
 
+- [ ] AI-generated exercises
+- [ ] Voice pronunciation scoring
+- [ ] Group study rooms with video chat
+- [ ] Native mobile app (React Native)
+- [ ] Capacitor Android APK
+- [ ] IELTS / JLPT / SAT expansion
+- [ ] Offline sync improvements
+- [ ] Dark mode
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙋 Support
+
+Have questions or need help? 
+- 📧 Open an issue on [GitHub](https://github.com/ngoctuan653/english-party/issues)
+- 💬 Discussions welcome
+
+---
+
+<div align="center">
+
+**Made with ❤️ by ngoctuan653**
+
+⭐ If you find this helpful, please star the repository!
+
+</div>
