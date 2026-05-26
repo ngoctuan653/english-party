@@ -1,0 +1,35 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user is an admin
+    function isAdmin() {
+      return isAuthenticated() && 
+        firestore.exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        firestore.get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // User avatars folder
+    match /avatars/{userId}/{allPaths=**} {
+      allow read: if true; // Avatars are public
+      allow write: if isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Questions assets folder (e.g. listening audio)
+    match /questions/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Vocabulary assets folder (e.g. word pronunciation audio, illustration images)
+    match /vocabulary/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
