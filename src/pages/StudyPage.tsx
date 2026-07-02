@@ -17,44 +17,20 @@ import * as Icons from 'lucide-react';
 import { generateSmartQuizSession } from '@/services/progress';
 import SessionReviewModal from '@/components/study/SessionReviewModal';
 
-interface StudyMode {
-  id: string;
-  icon: string;
-  title: string;
-  description: string;
-  gradient: string;
-  hoverGlow: string;
-  route: string;
-}
+const grammarTopics = [
+  { title: 'Basic Grammar Knowledge', subtitle: 'Core TOEIC grammar foundation', questions: 50, status: 'Not started' },
+  { title: 'Nouns', subtitle: 'Danh tu', questions: 62, status: 'Not started' },
+  { title: 'Verbs', subtitle: 'Dong tu', questions: 45, status: 'Not started' },
+  { title: 'Active and Passive Voice', subtitle: 'Cau chu dong va cau bi dong', questions: 54, status: 'Not started' },
+  { title: 'Adjectives', subtitle: 'Tinh tu', questions: 38, status: 'Not started' },
+  { title: 'Adverbs', subtitle: 'Trang tu', questions: 41, status: 'Not started' },
+];
 
-const studyModes: StudyMode[] = [
-  {
-    id: 'quiz',
-    icon: '📝',
-    title: 'Grammar Quiz',
-    description: 'Practice TOEIC Part 5 multiple choice grammar questions',
-    gradient: 'from-violet-600 to-purple-500',
-    hoverGlow: 'group-hover:shadow-violet-500/30',
-    route: 'quiz',
-  },
-  {
-    id: 'vocabulary',
-    icon: '📚',
-    title: 'Vocabulary',
-    description: 'Learn high-level TOEIC vocabulary words with flashcards',
-    gradient: 'from-blue-600 to-blue-400',
-    hoverGlow: 'group-hover:shadow-blue-500/30',
-    route: '/study/vocabulary',
-  },
-  {
-    id: 'listening',
-    icon: '🎧',
-    title: 'Listening',
-    description: 'Improve TOEIC listening comprehension with full audio sets',
-    gradient: 'from-teal-600 to-teal-400',
-    hoverGlow: 'group-hover:shadow-teal-500/30',
-    route: '/study/listening',
-  },
+const studyRailItems = [
+  { id: 'grammar', label: 'Grammar', description: 'TOEIC Part 5', icon: Icons.BookOpen, active: true },
+  { id: 'part5', label: 'Part 5: Complete Sentences', description: 'Short grammar drills', icon: Icons.FileText },
+  { id: 'vocabulary', label: 'Vocabulary', description: 'Flashcards and review', icon: Icons.BookMarked, route: '/study/vocabulary' },
+  { id: 'listening', label: 'Listening', description: 'Audio practice set', icon: Icons.Headphones, route: '/study/listening' },
 ];
 
 const containerVariants = {
@@ -105,6 +81,7 @@ export default function StudyPage() {
   const [sessions, setSessions] = useState<StudySession[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedReviewSession, setSelectedReviewSession] = useState<StudySession | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Active quiz session states
   const [quizActive, setQuizActive] = useState(false);
@@ -555,87 +532,177 @@ export default function StudyPage() {
     );
   }
 
+  const filteredGrammarTopics = grammarTopics.filter((topic) => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return true;
+    return `${topic.title} ${topic.subtitle}`.toLowerCase().includes(term);
+  });
+
   return (
-    <div className="space-y-8 pb-8 text-slate-800 max-w-4xl mx-auto">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold sm:text-3xl">
-          <span className="bg-gradient-to-r from-blue-600 to-[#0071E3] bg-clip-text text-transparent">
-            Choose Your Study Mode
-          </span>
-        </h1>
-        <p className="mt-1 text-sm text-slate-500 sm:text-base">
-          Pick a mode and start leveling up your English skills
-        </p>
+    <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-6 pb-8 text-slate-800 xl:grid-cols-[300px_minmax(0,1fr)]">
+      <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-4 shadow-sm xl:sticky xl:top-24">
+        <div className="mb-4 flex items-center gap-3 border-b border-slate-100 pb-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#10A37F] text-white shadow-lg shadow-emerald-200">
+            <Icons.BookOpen className="h-6 w-6" />
+          </div>
+          <div className="min-w-0">
+            <h2 className="text-sm font-black text-slate-900">Reading Skills</h2>
+            <p className="truncate text-[11px] font-medium text-slate-500">Grammar, vocab and TOEIC drills</p>
+          </div>
+        </div>
+
+        <nav className="space-y-2">
+          {studyRailItems.map((item) => {
+            const Icon = item.icon;
+            const content = (
+              <div
+                className={`flex items-center gap-3 rounded-2xl border px-3 py-3 transition-all ${
+                  item.active
+                    ? 'border-emerald-500 bg-[#10A37F] text-white shadow-lg shadow-emerald-200'
+                    : 'border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${item.active ? 'bg-white/20 text-white' : 'bg-sky-50 text-sky-500'}`}>
+                  <Icon className="h-4 w-4" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-sm font-bold">{item.label}</span>
+                  <span className={`block truncate text-[10px] ${item.active ? 'text-white/75' : 'text-slate-400'}`}>
+                    {item.description}
+                  </span>
+                </span>
+              </div>
+            );
+
+            return item.route ? (
+              <Link key={item.id} to={item.route} className="block">
+                {content}
+              </Link>
+            ) : (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => item.id === 'part5' && handleStartQuiz()}
+                className="block w-full text-left"
+              >
+                {content}
+              </button>
+            );
+          })}
+        </nav>
+      </aside>
+
+      <section className="min-w-0 space-y-5">
+      <motion.div
+        initial={{ opacity: 0, y: 18 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative overflow-hidden rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-teal-50 px-6 py-8 shadow-sm sm:px-10"
+      >
+        <div className="relative z-10 flex items-center justify-between gap-6">
+          <div>
+            <p className="mb-2 text-xs font-bold uppercase tracking-wide text-emerald-600">TOEIC Reading</p>
+            <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">TOEIC Grammar</h1>
+            <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-slate-500">
+              Study by topic, practice with smart random drills, and review your recent performance in one compact workspace.
+            </p>
+          </div>
+          <div className="hidden h-36 w-36 shrink-0 items-center justify-center rounded-3xl bg-[#10A37F] text-white shadow-2xl shadow-emerald-200 md:flex">
+            <Icons.BookOpen className="h-16 w-16" />
+          </div>
+        </div>
+      </motion.div>
+
+      <div className="inline-flex max-w-full items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 p-1 text-xs font-bold text-slate-500">
+        <button className="flex items-center gap-2 rounded-lg bg-[#0EA5E9] px-4 py-2 text-white shadow-sm">
+          <Icons.BookOpen className="h-4 w-4" />
+          Topics
+        </button>
+        <button className="flex items-center gap-2 px-4 py-2 transition-colors hover:text-slate-800">
+          <Icons.BarChart3 className="h-4 w-4" />
+          Mixed Practice
+        </button>
+        <button className="flex items-center gap-2 px-4 py-2 transition-colors hover:text-slate-800">
+          <Icons.LineChart className="h-4 w-4" />
+          Progress
+        </button>
       </div>
 
-      {/* Study Mode Cards */}
+      <button
+        type="button"
+        onClick={() => handleStartQuiz()}
+        disabled={loadingQuestions}
+        className="flex w-full items-center justify-between rounded-2xl border border-dashed border-sky-300 bg-white px-5 py-5 text-left shadow-sm transition-all hover:border-sky-400 hover:bg-sky-50/30 disabled:cursor-not-allowed disabled:opacity-70"
+      >
+        <span className="flex min-w-0 items-center gap-4">
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-sky-100 text-sky-500">
+            <Icons.Shuffle className="h-7 w-7" />
+          </span>
+          <span className="min-w-0">
+            <span className="block text-lg font-black text-slate-900">Random Practice</span>
+            <span className="block truncate text-sm font-medium text-slate-500">5 smart questions selected from your current TOEIC bank</span>
+          </span>
+        </span>
+        <span className="ml-4 hidden rounded-xl bg-[#0EA5E9] px-5 py-3 text-sm font-bold text-white shadow-sm sm:inline-flex">
+          {loadingQuestions ? 'Loading...' : 'Start'}
+        </span>
+      </button>
+
+      <div className="relative">
+        <Icons.Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <input
+          value={searchTerm}
+          onChange={(event) => setSearchTerm(event.target.value)}
+          className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-11 pr-4 text-sm font-medium text-slate-700 outline-none transition-colors placeholder:text-slate-400 focus:border-sky-400 focus:ring-4 focus:ring-sky-100"
+          placeholder="Search lessons or grammar topics..."
+        />
+      </div>
+
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="flex items-center gap-2 text-lg font-black text-slate-900">
+          <Icons.BookOpen className="h-5 w-5 text-sky-500" />
+          Grammar Topics
+        </h2>
+        <span className="text-xs font-bold text-slate-400">{filteredGrammarTopics.length} topics</span>
+      </div>
+
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-1 gap-4 sm:grid-cols-3"
+        className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
       >
-        {studyModes.map((mode) => (
-          <motion.div key={mode.id} variants={cardVariants}>
-            {mode.route.startsWith('/') ? (
-              <Link to={mode.route} className="block">
-                <div
-                  className={`group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 transition-all duration-300 hover:scale-[1.02] hover:border-slate-300 hover:shadow-lg ${mode.hoverGlow}`}
-                >
-                  <div
-                    className={`absolute -right-8 -top-8 h-32 w-32 rounded-full bg-gradient-to-br ${mode.gradient} opacity-10 blur-3xl transition-opacity duration-300 group-hover:opacity-20`}
-                  />
-
-                  <div className="relative">
-                    <div
-                      className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${mode.gradient} text-xl shadow-sm text-white`}
-                    >
-                      {mode.icon}
-                    </div>
-
-                    <h3 className="mb-1 text-sm font-bold text-slate-800">{mode.title}</h3>
-                    <p className="text-xs text-slate-500 leading-relaxed min-h-[40px]">
-                      {mode.description}
-                    </p>
-
-                    <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-slate-500 transition-colors group-hover:text-slate-800">
-                      Start studying
-                      <Icons.ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            ) : (
-              <div onClick={() => handleStartQuiz()} className="cursor-pointer">
-                <div
-                  className={`group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 transition-all duration-300 hover:scale-[1.02] hover:border-slate-300 hover:shadow-lg ${mode.hoverGlow}`}
-                >
-                  <div
-                    className={`absolute -right-8 -top-8 h-32 w-32 rounded-full bg-gradient-to-br ${mode.gradient} opacity-10 blur-3xl transition-opacity duration-300 group-hover:opacity-20`}
-                  />
-
-                  <div className="relative">
-                    <div
-                      className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${mode.gradient} text-xl shadow-sm text-white`}
-                    >
-                      {mode.icon}
-                    </div>
-
-                    <h3 className="mb-1 text-sm font-bold text-slate-800">{mode.title}</h3>
-                    <p className="text-xs text-slate-500 leading-relaxed min-h-[40px]">
-                      {mode.description}
-                    </p>
-
-                    <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-slate-500 transition-colors group-hover:text-slate-800">
-                      {loadingQuestions ? 'Loading...' : 'Start Quiz'}
-                      <Icons.ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-                    </div>
-                  </div>
-                </div>
+        {filteredGrammarTopics.map((topic) => (
+          <motion.button
+            key={topic.title}
+            variants={cardVariants}
+            type="button"
+            onClick={() => handleStartQuiz()}
+            className="group rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-md"
+          >
+            <div className="mb-4 flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h3 className="truncate text-base font-black text-slate-900">{topic.title}</h3>
+                <p className="mt-1 truncate text-xs font-medium text-slate-500">{topic.subtitle}</p>
               </div>
-            )}
-          </motion.div>
+              <div className="flex shrink-0 gap-2 text-slate-300">
+                <Icons.Star className="h-4 w-4" />
+                <Icons.RotateCcw className="h-4 w-4" />
+              </div>
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="flex items-center gap-1.5 text-xs font-black text-blue-600">
+                  <Icons.Target className="h-4 w-4" />
+                  {topic.questions} questions
+                </p>
+                <p className="mt-5 text-xs font-bold text-slate-500">{topic.status}</p>
+              </div>
+              <span className="inline-flex items-center gap-1 text-xs font-black text-sky-500">
+                Practice
+                <Icons.ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </span>
+            </div>
+          </motion.button>
         ))}
       </motion.div>
 
@@ -690,6 +757,8 @@ export default function StudyPage() {
           </div>
         )}
       </motion.div>
+
+      </section>
 
       <SessionReviewModal
         isOpen={selectedReviewSession !== null}

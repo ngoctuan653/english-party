@@ -18,6 +18,7 @@ export interface AntiCheatData {
 interface ActivityTracker {
   startTime: number;
   lastActivityTime: number;
+  activeStartedAt: number | null;
   tabSwitches: number;
   idleIntervals: number;
   interactionCount: number;
@@ -34,6 +35,7 @@ export function startAntiCheatTracking(): void {
   tracker = {
     startTime: Date.now(),
     lastActivityTime: Date.now(),
+    activeStartedAt: Date.now(),
     tabSwitches: 0,
     idleIntervals: 0,
     interactionCount: 0,
@@ -44,40 +46,57 @@ export function startAntiCheatTracking(): void {
     interactionHandler: null,
   };
 
+  const addActiveSegment = (now: number) => {
+    if (!tracker || tracker.isIdle || tracker.activeStartedAt === null) return;
+    tracker.activeTime += Math.max(0, now - tracker.activeStartedAt) / 1000;
+    tracker.activeStartedAt = null;
+  };
+
+  const scheduleIdleTimer = () => {
+    if (!tracker) return;
+    if (tracker.idleTimer) clearTimeout(tracker.idleTimer);
+    tracker.idleTimer = setTimeout(() => {
+      if (tracker) {
+        addActiveSegment(Date.now());
+        tracker.isIdle = true;
+        tracker.idleIntervals++;
+      }
+    }, ANTI_CHEAT.idleTimeoutSeconds * 1000);
+  };
+
   // Track tab visibility
   tracker.visibilityHandler = () => {
     if (!tracker) return;
+    const now = Date.now();
     if (document.visibilityState === 'hidden') {
+      addActiveSegment(now);
       tracker.tabSwitches++;
       tracker.isIdle = true;
+      if (tracker.idleTimer) clearTimeout(tracker.idleTimer);
     } else {
-      tracker.lastActivityTime = Date.now();
+      tracker.lastActivityTime = now;
+      tracker.activeStartedAt = now;
       tracker.isIdle = false;
+      scheduleIdleTimer();
     }
   };
   document.addEventListener('visibilitychange', tracker.visibilityHandler);
 
   // Track interactions (clicks, keys, touches)
   tracker.interactionHandler = () => {
-    if (!tracker) return;
+    if (!tracker || document.visibilityState === 'hidden') return;
     tracker.interactionCount++;
     const now = Date.now();
-    
-    if (!tracker.isIdle) {
-      tracker.activeTime += (now - tracker.lastActivityTime) / 1000;
+
+    if (tracker.isIdle || tracker.activeStartedAt === null) {
+      tracker.activeStartedAt = now;
     }
-    
+
     tracker.lastActivityTime = now;
     tracker.isIdle = false;
 
     // Reset idle timer
-    if (tracker.idleTimer) clearTimeout(tracker.idleTimer);
-    tracker.idleTimer = setTimeout(() => {
-      if (tracker) {
-        tracker.isIdle = true;
-        tracker.idleIntervals++;
-      }
-    }, ANTI_CHEAT.idleTimeoutSeconds * 1000);
+    scheduleIdleTimer();
   };
 
   document.addEventListener('click', tracker.interactionHandler);
@@ -85,12 +104,7 @@ export function startAntiCheatTracking(): void {
   document.addEventListener('touchstart', tracker.interactionHandler);
 
   // Start idle timer
-  tracker.idleTimer = setTimeout(() => {
-    if (tracker) {
-      tracker.isIdle = true;
-      tracker.idleIntervals++;
-    }
-  }, ANTI_CHEAT.idleTimeoutSeconds * 1000);
+  scheduleIdleTimer();
 }
 
 export function stopAntiCheatTracking(): AntiCheatData {
@@ -109,8 +123,9 @@ export function stopAntiCheatTracking(): AntiCheatData {
   const totalSeconds = (now - tracker.startTime) / 1000;
   
   // Add remaining active time
-  if (!tracker.isIdle) {
-    tracker.activeTime += (now - tracker.lastActivityTime) / 1000;
+  if (!tracker.isIdle && tracker.activeStartedAt !== null) {
+    tracker.activeTime += Math.max(0, now - tracker.activeStartedAt) / 1000;
+    tracker.activeStartedAt = null;
   }
 
   const data: AntiCheatData = {
@@ -151,7 +166,7 @@ function validateSession(t: ActivityTracker, totalSeconds: number): boolean {
   if (t.idleIntervals > ANTI_CHEAT.maxIdleIntervals) return false;
 
   // Must have some interactions
-  if (t.interactionCount < 5) return false;
+  if (t.interactionCount < ANTI_CHEAT.minInteractions) return false;
 
   return true;
 }
@@ -170,12 +185,17 @@ export function getAntiCheatStatus(): AntiCheatData | null {
   
   const now = Date.now();
   const totalSeconds = (now - tracker.startTime) / 1000;
+  const activeSeconds =
+    tracker.activeTime +
+    (!tracker.isIdle && tracker.activeStartedAt !== null
+      ? Math.max(0, now - tracker.activeStartedAt) / 1000
+      : 0);
   
   return {
     tabSwitches: tracker.tabSwitches,
     idleIntervals: tracker.idleIntervals,
     interactionCount: tracker.interactionCount,
-    activeSeconds: Math.round(tracker.activeTime),
+    activeSeconds: Math.round(activeSeconds),
     totalSeconds: Math.round(totalSeconds),
     isValid: validateSession(tracker, totalSeconds),
   };

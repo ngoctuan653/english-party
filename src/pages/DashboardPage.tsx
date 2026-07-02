@@ -138,118 +138,114 @@ export default function DashboardPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45 }}
-        className="relative overflow-hidden rounded-2xl border border-slate-200/60 bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f3460] shadow-xl"
+        className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-200/70"
       >
-        {/* Background glow effects */}
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-1/2 top-0 -translate-x-1/2 w-80 h-80 bg-amber-400/8 rounded-full blur-3xl" />
-          <div className="absolute right-0 bottom-0 w-48 h-48 bg-blue-500/8 rounded-full blur-3xl" />
-        </div>
-
         {/* Header */}
-        <div className="flex justify-between items-center px-6 pt-5 pb-3 relative z-10">
-          <h2 className="text-base font-bold text-white flex items-center gap-2">
-            <Icons.Award className="w-5 h-5 text-amber-400" />
+        <div className="relative z-10 flex items-center justify-between border-b border-slate-100 px-5 py-4 sm:px-6">
+          <h2 className="flex items-center gap-2 text-base font-bold text-slate-900">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-amber-500 ring-1 ring-amber-100">
+              <Icons.Award className="h-5 w-5" />
+            </span>
             Leaderboard
           </h2>
-          <Link to="/leaderboard" className="text-xs text-amber-400 hover:text-amber-300 font-semibold transition-colors">
+          <Link to="/leaderboard" className="text-xs font-bold text-[#0071E3] transition-colors hover:text-blue-700">
             Full Standings →
           </Link>
         </div>
 
         {loading ? (
           <div className="p-6 space-y-4">
-            <Skeleton className="h-40 w-full rounded-xl bg-white/10" />
+            <Skeleton className="h-40 w-full rounded-xl bg-slate-100" />
           </div>
         ) : leaderboard.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-white/40 text-sm relative z-10">
-            <span className="text-4xl mb-3">🏆</span>
-            <p className="font-medium">No players yet. Be the first!</p>
+          <div className="relative z-10 flex flex-col items-center justify-center py-12 text-sm text-slate-400">
+            <Icons.Trophy className="mb-3 h-10 w-10 text-amber-300" />
+            <p className="font-medium text-slate-500">No players yet. Be the first!</p>
           </div>
         ) : (
           <div className="relative z-10">
             {/* ── PODIUM SECTION ── */}
-            <div className="px-4 sm:px-8 pt-2 pb-0">
-              <div className="flex items-end justify-center gap-3 sm:gap-8 md:gap-12">
+            <div className="bg-gradient-to-b from-white to-slate-50 px-4 pb-0 pt-5 sm:px-8 sm:pt-6">
+              <div className="flex items-end justify-center gap-3 sm:gap-8 md:gap-14">
                 {/* 2nd place (left, medium height) */}
                 {top3.length >= 2 && (
-                  <div className="flex flex-col items-center flex-1 max-w-[120px]">
+                  <div className="flex max-w-[120px] flex-1 flex-col items-center">
                     <div className="relative">
                       <Avatar
                         fallback={top3[1].avatarUrl && !top3[1].avatarUrl.includes('/') ? top3[1].avatarUrl : undefined}
                         src={top3[1].avatarUrl && top3[1].avatarUrl.includes('/') ? top3[1].avatarUrl : undefined}
                         alt={top3[1].displayName}
                         size="lg"
-                        className="ring-3 ring-slate-300/60"
+                        className="rounded-full ring-4 ring-white shadow-md shadow-slate-200"
                       />
                       {top3[1].uid === profile?.uid && (
-                        <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-[8px] font-extrabold bg-[#0071E3] text-white px-1.5 py-0.5 rounded-full">YOU</span>
+                        <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-[#0071E3] px-1.5 py-0.5 text-[8px] font-extrabold text-white shadow-sm">YOU</span>
                       )}
                     </div>
-                    <p className="mt-1.5 text-[11px] font-bold text-white/80 max-w-[80px] truncate text-center">{top3[1].displayName}</p>
-                    <p className="text-[10px] tabular-nums font-semibold text-slate-400">{top3[1].xp.toLocaleString()} XP</p>
+                    <p className="mt-2 max-w-[88px] truncate text-center text-[11px] font-bold text-slate-700">{top3[1].displayName}</p>
+                    <p className="text-[10px] font-semibold tabular-nums text-slate-400">{top3[1].xp.toLocaleString()} XP</p>
                     {/* Silver podium block */}
-                    <div className="mt-2 w-full h-20 sm:h-24 bg-gradient-to-b from-[#C0C8D8] to-[#8A95A5] rounded-t-lg flex items-center justify-center shadow-lg shadow-slate-500/20 relative">
-                      <span className="text-3xl sm:text-4xl font-black text-white/80">2</span>
-                      <span className="absolute top-2 text-xl">🥈</span>
+                    <div className="relative mt-3 flex h-20 w-full items-center justify-center rounded-t-xl bg-gradient-to-b from-slate-200 to-slate-400 shadow-lg shadow-slate-300/40 sm:h-24">
+                      <span className="absolute top-2 flex h-5 w-5 items-center justify-center rounded-full bg-white/80 text-[10px] font-black text-slate-500 ring-1 ring-white">2</span>
+                      <span className="text-3xl font-black text-white/90 sm:text-4xl">2</span>
                     </div>
                   </div>
                 )}
 
                 {/* 1st place (center, tallest) */}
                 {top3.length >= 1 && (
-                  <div className="flex flex-col items-center flex-1 max-w-[140px]">
-                    <motion.span
+                  <div className="flex max-w-[140px] flex-1 flex-col items-center">
+                    <motion.div
                       initial={{ y: -10, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
-                      className="text-3xl sm:text-4xl mb-1 drop-shadow-lg"
+                      className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-amber-50 text-amber-500 shadow-sm ring-1 ring-amber-100 sm:h-10 sm:w-10"
                     >
-                      🏆
-                    </motion.span>
+                      <Icons.Trophy className="h-5 w-5 sm:h-6 sm:w-6" />
+                    </motion.div>
                     <div className="relative">
                       <Avatar
                         fallback={top3[0].avatarUrl && !top3[0].avatarUrl.includes('/') ? top3[0].avatarUrl : undefined}
                         src={top3[0].avatarUrl && top3[0].avatarUrl.includes('/') ? top3[0].avatarUrl : undefined}
                         alt={top3[0].displayName}
                         size="xl"
-                        className="ring-4 ring-amber-400/60"
+                        className="rounded-full ring-4 ring-amber-300 shadow-lg shadow-amber-200/70"
                       />
                       {top3[0].uid === profile?.uid && (
-                        <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-[8px] font-extrabold bg-[#0071E3] text-white px-1.5 py-0.5 rounded-full">YOU</span>
+                        <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-[#0071E3] px-1.5 py-0.5 text-[8px] font-extrabold text-white shadow-sm">YOU</span>
                       )}
                     </div>
-                    <p className="mt-1.5 text-sm font-extrabold text-amber-300 max-w-[100px] truncate text-center">{top3[0].displayName}</p>
-                    <p className="text-xs tabular-nums font-bold text-amber-400/80">{top3[0].xp.toLocaleString()} XP</p>
+                    <p className="mt-2 max-w-[108px] truncate text-center text-sm font-extrabold text-slate-900">{top3[0].displayName}</p>
+                    <p className="text-xs font-bold tabular-nums text-amber-600">{top3[0].xp.toLocaleString()} XP</p>
                     {/* Gold podium block */}
-                    <div className="mt-2 w-full h-28 sm:h-32 bg-gradient-to-b from-[#F5C842] to-[#C97D10] rounded-t-lg flex items-center justify-center shadow-xl shadow-amber-500/30 relative">
-                      <span className="text-4xl sm:text-5xl font-black text-white/90">1</span>
-                      <span className="absolute top-2 text-xl">🥇</span>
+                    <div className="relative mt-3 flex h-28 w-full items-center justify-center rounded-t-xl bg-gradient-to-b from-[#FFD95A] to-[#E19A16] shadow-xl shadow-amber-300/50 sm:h-32">
+                      <span className="absolute top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/85 text-xs font-black text-amber-600 ring-1 ring-white">1</span>
+                      <span className="text-4xl font-black text-white sm:text-5xl">1</span>
                     </div>
                   </div>
                 )}
 
                 {/* 3rd place (right, shortest) */}
                 {top3.length >= 3 && (
-                  <div className="flex flex-col items-center flex-1 max-w-[120px]">
+                  <div className="flex max-w-[120px] flex-1 flex-col items-center">
                     <div className="relative">
                       <Avatar
                         fallback={top3[2].avatarUrl && !top3[2].avatarUrl.includes('/') ? top3[2].avatarUrl : undefined}
                         src={top3[2].avatarUrl && top3[2].avatarUrl.includes('/') ? top3[2].avatarUrl : undefined}
                         alt={top3[2].displayName}
                         size="lg"
-                        className="ring-3 ring-amber-700/40"
+                        className="rounded-full ring-4 ring-white shadow-md shadow-slate-200"
                       />
                       {top3[2].uid === profile?.uid && (
-                        <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 text-[8px] font-extrabold bg-[#0071E3] text-white px-1.5 py-0.5 rounded-full">YOU</span>
+                        <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 rounded-full bg-[#0071E3] px-1.5 py-0.5 text-[8px] font-extrabold text-white shadow-sm">YOU</span>
                       )}
                     </div>
-                    <p className="mt-1.5 text-[11px] font-bold text-white/70 max-w-[80px] truncate text-center">{top3[2].displayName}</p>
-                    <p className="text-[10px] tabular-nums font-semibold text-slate-400">{top3[2].xp.toLocaleString()} XP</p>
+                    <p className="mt-2 max-w-[88px] truncate text-center text-[11px] font-bold text-slate-700">{top3[2].displayName}</p>
+                    <p className="text-[10px] font-semibold tabular-nums text-slate-400">{top3[2].xp.toLocaleString()} XP</p>
                     {/* Bronze podium block */}
-                    <div className="mt-2 w-full h-14 sm:h-18 bg-gradient-to-b from-[#D4845A] to-[#A05A30] rounded-t-lg flex items-center justify-center shadow-lg shadow-amber-800/20 relative">
-                      <span className="text-2xl sm:text-3xl font-black text-white/80">3</span>
-                      <span className="absolute top-1.5 text-lg">🥉</span>
+                    <div className="relative mt-3 flex h-16 w-full items-center justify-center rounded-t-xl bg-gradient-to-b from-[#D99567] to-[#B56A3E] shadow-lg shadow-orange-200/50">
+                      <span className="absolute top-2 flex h-5 w-5 items-center justify-center rounded-full bg-white/80 text-[10px] font-black text-orange-700 ring-1 ring-white">3</span>
+                      <span className="text-2xl font-black text-white/90 sm:text-3xl">3</span>
                     </div>
                   </div>
                 )}
@@ -258,28 +254,29 @@ export default function DashboardPage() {
 
             {/* ── REMAINING USERS LIST ── */}
             {rest.length > 0 && (
-              <div className="px-4 sm:px-6 py-3 space-y-1.5 border-t border-white/5 mt-3 bg-black/10">
+              <div className="space-y-2 border-t border-slate-100 bg-white px-4 py-4 sm:px-6">
                 {rest.map((user, idx) => (
                   <div
                     key={user.uid}
-                    className={`flex items-center gap-3 rounded-lg px-3 py-2 text-xs transition-colors ${
+                    className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 text-xs transition-all ${
                       user.uid === profile?.uid
-                        ? 'bg-[#0071E3]/15 border border-[#0071E3]/30'
-                        : 'bg-white/5 border border-white/5 hover:bg-white/8'
+                        ? 'border-[#0071E3]/30 bg-blue-50 shadow-sm'
+                        : 'border-slate-100 bg-slate-50/80 hover:border-slate-200 hover:bg-white'
                     }`}
                   >
-                    <span className="w-6 text-center font-bold text-slate-400 text-[11px]">#{idx + 4}</span>
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-[11px] font-bold text-slate-500 ring-1 ring-slate-200">#{idx + 4}</span>
                     <Avatar
                       fallback={user.avatarUrl && !user.avatarUrl.includes('/') ? user.avatarUrl : undefined}
                       src={user.avatarUrl && user.avatarUrl.includes('/') ? user.avatarUrl : undefined}
                       alt={user.displayName}
                       size="xs"
+                      className="rounded-full ring-2 ring-white"
                     />
-                    <span className={`flex-1 font-semibold truncate ${user.uid === profile?.uid ? 'text-blue-300' : 'text-white/70'}`}>
+                    <span className={`min-w-0 flex-1 truncate font-semibold ${user.uid === profile?.uid ? 'text-[#0071E3]' : 'text-slate-700'}`}>
                       {user.displayName}
-                      {user.uid === profile?.uid && <span className="ml-1.5 text-[8px] bg-[#0071E3] text-white px-1 py-0.5 rounded-full">YOU</span>}
+                      {user.uid === profile?.uid && <span className="ml-1.5 rounded-full bg-[#0071E3] px-1 py-0.5 text-[8px] text-white">YOU</span>}
                     </span>
-                    <span className="font-bold tabular-nums text-white/50 text-[10px]">
+                    <span className="text-[10px] font-bold tabular-nums text-slate-500">
                       {user.xp.toLocaleString()} XP
                     </span>
                   </div>

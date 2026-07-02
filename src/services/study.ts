@@ -10,19 +10,25 @@ import {
   getDocs,
   getDoc,
   doc,
-  setDoc,
-  updateDoc,
-  serverTimestamp,
   orderBy,
   limit,
   Timestamp,
-  increment,
+  runTransaction,
 } from 'firebase/firestore';
 import { db } from '@/services/firebase/config';
 import type { Question, QuestionAnswer } from '@/types/question';
-import type { StudySession, SessionResults } from '@/types/study';
+import type { StudySession, SessionResults, SessionType } from '@/types/study';
+import type { DailyProgress, MissionProgress, MissionType } from '@/types/gamification';
+import type { UserProfile } from '@/types/user';
 import { startAntiCheatTracking, stopAntiCheatTracking, validateAnswerTiming } from '@/services/anticheat';
-import { calculateSessionXP, awardXP, updateDailyProgress, updateMissionProgress, checkAndUpdateStreak } from '@/services/gamification';
+import { ANTI_CHEAT } from '@/utils/constants';
+import {
+  calculateSessionXP,
+  generateDailyMissions,
+  hasMetStreakRequirements,
+} from '@/services/gamification';
+import { calculateLevel } from '@/types/gamification';
+import { getTodayDateString } from '@/utils/helpers';
 import { batchUpdateQuestionProgress, batchUpdateVocabProgress } from '@/services/progress';
 
 // ============================================
@@ -88,6 +94,137 @@ export async function startStudySession(
   return sessionId;
 }
 
+const MAX_SESSION_ITEMS = 200;
+
+function emptyXP() {
+  return { baseXP: 0, streakBonus: 0, perfectBonus: 0, totalXP: 0 };
+}
+
+function clampInteger(value: number, min: number, max: number): number {
+  if (!Number.isFinite(value)) return min;
+  return Math.min(max, Math.max(min, Math.floor(value)));
+}
+
+function getYesterdayDateString(): string {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return yesterday.toISOString().split('T')[0];
+}
+
+function createInitialMissions(): MissionProgress[] {
+  return generateDailyMissions().map((mission) => ({
+    missionId: mission.id,
+    type: mission.type,
+    title: mission.title,
+    target: mission.target,
+    current: 0,
+    completed: false,
+    xpReward: mission.xpReward,
+  }));
+}
+
+function createDailyProgress(userId: string, today: string, now: Timestamp): DailyProgress {
+  return {
+    id: `${userId}_${today}`,
+    userId,
+    date: today,
+    questionsCompleted: 0,
+    wordsLearned: 0,
+    activeMinutes: 0,
+    listeningSetsCompleted: 0,
+    xpEarned: 0,
+    accuracy: 0,
+    missions: createInitialMissions(),
+    streakMaintained: false,
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+
+function applyMissionProgress(
+  missions: MissionProgress[],
+  missionType: MissionType,
+  progressAmount: number,
+  now: Timestamp
+): { missions: MissionProgress[]; completedRewards: number } {
+  if (progressAmount <= 0) return { missions, completedRewards: 0 };
+
+  let completedRewards = 0;
+  const updatedMissions = missions.map((mission) => {
+    if (mission.type !== missionType || mission.completed) return mission;
+
+    const current = Math.min(mission.target, mission.current + progressAmount);
+    const completed = current >= mission.target;
+    if (completed) completedRewards += mission.xpReward;
+
+    return {
+      ...mission,
+      current,
+      completed,
+      ...(completed ? { completedAt: now } : {}),
+    };
+  });
+
+  return { missions: updatedMissions, completedRewards };
+}
+
+function validateSessionInput(
+  answers: QuestionAnswer[],
+  totalQuestions: number,
+  correctAnswers: number,
+  sessionType: SessionType,
+  totalSeconds: number,
+  customMetrics?: { total: number; correct: number }
+): boolean {
+  if (totalQuestions <= 0 || totalQuestions > MAX_SESSION_ITEMS) return false;
+  if (correctAnswers < 0 || correctAnswers > totalQuestions) return false;
+
+  const answersAreWellFormed = answers.every((answer) =>
+    answer.questionId &&
+    Number.isInteger(answer.selectedAnswer) &&
+    Number.isFinite(answer.timeSpent) &&
+    answer.timeSpent >= 0
+  );
+  if (!answersAreWellFormed) return false;
+
+  if (!customMetrics) {
+    if (answers.length !== totalQuestions) return false;
+    const uniqueQuestionIds = new Set(answers.map((answer) => answer.questionId));
+    if (uniqueQuestionIds.size !== answers.length) return false;
+  } else if (sessionType !== 'vocabulary' && customMetrics.total !== answers.length) {
+    return false;
+  }
+
+  if (sessionType === 'quiz') {
+    if (!validateAnswerTiming(totalQuestions, totalSeconds)) return false;
+    const fastAnswers = answers.filter((answer) => answer.timeSpent < ANTI_CHEAT.minSingleAnswerSeconds).length;
+    const fastAnswerRatio = answers.length > 0 ? fastAnswers / answers.length : 0;
+    if (fastAnswerRatio > ANTI_CHEAT.maxFastAnswerRatio) return false;
+  }
+
+  if (sessionType === 'listening') {
+    return totalSeconds >= ANTI_CHEAT.minSecondsPerQuestion;
+  }
+
+  if (sessionType === 'vocabulary') {
+    return totalSeconds >= Math.min(totalQuestions, 30);
+  }
+
+  return true;
+}
+
+function buildSessionResults(session: StudySession): SessionResults {
+  return {
+    totalQuestions: session.questionsAttempted,
+    correctAnswers: session.questionsCorrect,
+    accuracy: session.accuracy,
+    xpEarned: session.xpEarned,
+    streakBonus: session.streakBonus ?? 0,
+    timeSpent: session.totalSeconds,
+    isValid: session.isValid,
+  };
+}
+
 export async function endStudySession(
   sessionId: string,
   userId: string,
@@ -95,11 +232,14 @@ export async function endStudySession(
   currentStreak: number,
   customMetrics?: { total: number; correct: number }
 ): Promise<SessionResults> {
-  // Stop anti-cheat tracking
   const antiCheatData = stopAntiCheatTracking();
 
-  const correctAnswers = customMetrics ? customMetrics.correct : answers.filter((a) => a.isCorrect).length;
-  const totalQuestions = customMetrics ? customMetrics.total : answers.length;
+  const totalQuestions = customMetrics
+    ? clampInteger(customMetrics.total, 0, MAX_SESSION_ITEMS)
+    : clampInteger(answers.length, 0, MAX_SESSION_ITEMS);
+  const correctAnswers = customMetrics
+    ? clampInteger(customMetrics.correct, 0, totalQuestions)
+    : clampInteger(answers.filter((a) => a.isCorrect).length, 0, totalQuestions);
 
   if (totalQuestions === 0) {
     return {
@@ -116,84 +256,198 @@ export async function endStudySession(
   const accuracy = (correctAnswers / totalQuestions) * 100;
   const isPerfect = accuracy === 100 && totalQuestions >= 5 && !customMetrics;
 
-  // Extract session parameters from sessionId (e.g. ${userId}_${exam}_${type}_${Date.now()})
   const parts = sessionId.split('_');
   const timestampStr = parts[parts.length - 1];
-  const sessionType = (parts[parts.length - 2] || 'quiz') as 'quiz' | 'vocabulary' | 'listening' | 'mission';
+  const sessionType = (parts[parts.length - 2] || 'quiz') as SessionType;
   const exam = parts[parts.length - 3] || 'toeic';
 
   const startTimestampMs = Number(timestampStr);
   const startedAtDate = isNaN(startTimestampMs) ? new Date() : new Date(startTimestampMs);
   const startedAt = Timestamp.fromDate(startedAtDate);
 
-  // Validate answer timing
-  const isVocabOrListening = sessionType === 'vocabulary' || sessionType === 'listening';
-  const timingValid = isVocabOrListening ? true : validateAnswerTiming(totalQuestions, antiCheatData.totalSeconds);
-  const isValid = antiCheatData.isValid && timingValid;
-
-  // Calculate XP (only award if valid session)
-  const xpCalc = isValid
-    ? calculateSessionXP(correctAnswers, totalQuestions - correctAnswers, currentStreak, isPerfect)
-    : { baseXP: 0, streakBonus: 0, perfectBonus: 0, totalXP: 0 };
-
-  // Save session in Firestore
-  const sessionRef = doc(db, 'study_sessions', sessionId);
-  const sessionData: StudySession = {
-    id: sessionId,
-    userId,
-    exam,
-    type: sessionType,
-    questionsAttempted: totalQuestions,
-    questionsCorrect: correctAnswers,
-    accuracy: Math.round(accuracy),
-    xpEarned: xpCalc.totalXP,
-    startedAt,
-    endedAt: Timestamp.now(),
-    activeSeconds: antiCheatData.activeSeconds,
-    totalSeconds: antiCheatData.totalSeconds,
-    tabSwitches: antiCheatData.tabSwitches,
-    idleIntervals: antiCheatData.idleIntervals,
-    interactionCount: antiCheatData.interactionCount,
-    isValid,
+  const inputValid = validateSessionInput(
     answers,
-    createdAt: startedAt,
-  };
+    totalQuestions,
+    correctAnswers,
+    sessionType,
+    antiCheatData.totalSeconds,
+    customMetrics
+  );
+  const isValid = antiCheatData.isValid && inputValid;
 
-  await setDoc(sessionRef, sessionData);
+  const sessionRef = doc(db, 'study_sessions', sessionId);
+  const userRef = doc(db, 'users', userId);
+  const today = getTodayDateString();
+  const progressRef = doc(db, 'daily_progress', `${userId}_${today}`);
 
-  // Award XP and update progress
-  if (isValid && xpCalc.totalXP > 0) {
-    await awardXP(userId, xpCalc.totalXP);
+  const transactionResult = await runTransaction(db, async (transaction) => {
+    const existingSessionSnap = await transaction.get(sessionRef);
+    if (existingSessionSnap.exists()) {
+      return {
+        ...buildSessionResults(existingSessionSnap.data() as StudySession),
+        alreadyProcessed: true,
+      };
+    }
 
-    // Update daily progress
-    const progressUpdates: any = {
-      xpEarned: xpCalc.totalXP,
-      activeMinutes: Math.round(antiCheatData.activeSeconds / 60),
-      accuracy: Math.round(accuracy),
+    const now = Timestamp.now();
+    const userSnap = await transaction.get(userRef);
+    if (!userSnap.exists()) {
+      throw new Error('User profile not found.');
+    }
+
+    const profile = userSnap.data() as UserProfile;
+    const progressSnap = await transaction.get(progressRef);
+    const existingProgress = progressSnap.exists()
+      ? (progressSnap.data() as DailyProgress)
+      : createDailyProgress(userId, today, now);
+
+    let progressAfter: DailyProgress = {
+      ...existingProgress,
+      missions: [...(existingProgress.missions ?? createInitialMissions())],
+      updatedAt: now,
     };
-    if (sessionType === 'vocabulary') {
-      progressUpdates.wordsLearned = totalQuestions;
-    } else if (sessionType === 'listening') {
-      progressUpdates.listeningSetsCompleted = 1;
-    } else {
-      progressUpdates.questionsCompleted = totalQuestions;
+
+    const activeMinutes = Math.floor(antiCheatData.activeSeconds / 60);
+    const wrongAnswers = totalQuestions - correctAnswers;
+    let xpCalc = emptyXP();
+    let missionBonus = 0;
+    let totalAwardedXP = 0;
+    let shouldMaintainStreak = false;
+
+    if (isValid) {
+      const previousAccuracyWeight =
+        (existingProgress.questionsCompleted || 0) +
+        (existingProgress.listeningSetsCompleted || 0);
+      const sessionAccuracyWeight = sessionType === 'vocabulary' ? 0 : totalQuestions;
+
+      progressAfter = {
+        ...progressAfter,
+        questionsCompleted:
+          progressAfter.questionsCompleted +
+          (sessionType === 'quiz' || sessionType === 'mission' ? totalQuestions : 0),
+        wordsLearned:
+          progressAfter.wordsLearned +
+          (sessionType === 'vocabulary' ? totalQuestions : 0),
+        activeMinutes: progressAfter.activeMinutes + activeMinutes,
+        listeningSetsCompleted:
+          progressAfter.listeningSetsCompleted +
+          (sessionType === 'listening' ? 1 : 0),
+      };
+
+      if (sessionAccuracyWeight > 0) {
+        const weightedAccuracy =
+          ((existingProgress.accuracy || 0) * previousAccuracyWeight +
+            Math.round(accuracy) * sessionAccuracyWeight) /
+          Math.max(1, previousAccuracyWeight + sessionAccuracyWeight);
+        progressAfter.accuracy = Math.round(weightedAccuracy);
+      }
+
+      shouldMaintainStreak =
+        !progressAfter.streakMaintained && hasMetStreakRequirements(progressAfter);
+
+      xpCalc = calculateSessionXP(
+        correctAnswers,
+        wrongAnswers,
+        profile.currentStreak ?? currentStreak,
+        isPerfect,
+        {
+          includeStreakBonus: shouldMaintainStreak,
+          includeWrongAnswerXP: sessionType !== 'vocabulary' && correctAnswers / totalQuestions >= 0.5,
+        }
+      );
+
+      const missionUpdates: Array<[MissionType, number]> = [];
+      if (sessionType === 'vocabulary') {
+        missionUpdates.push(['words', totalQuestions]);
+      } else if (sessionType === 'listening') {
+        missionUpdates.push(['listening', 1]);
+      } else {
+        missionUpdates.push(['questions', totalQuestions]);
+      }
+      missionUpdates.push(['minutes', activeMinutes]);
+
+      for (const [missionType, amount] of missionUpdates) {
+        const missionResult = applyMissionProgress(progressAfter.missions, missionType, amount, now);
+        progressAfter.missions = missionResult.missions;
+        missionBonus += missionResult.completedRewards;
+      }
+
+      totalAwardedXP = xpCalc.totalXP + missionBonus;
+      progressAfter.xpEarned += totalAwardedXP;
+
+      if (shouldMaintainStreak) {
+        progressAfter.streakMaintained = true;
+      }
     }
-    await updateDailyProgress(userId, progressUpdates);
 
-    // Update mission progress
-    if (sessionType === 'vocabulary') {
-      await updateMissionProgress(userId, 'words', totalQuestions);
-    } else if (sessionType === 'listening') {
-      await updateMissionProgress(userId, 'listening', 1);
-    } else {
-      await updateMissionProgress(userId, 'questions', totalQuestions);
+    const sessionData: StudySession = {
+      id: sessionId,
+      userId,
+      exam,
+      type: sessionType,
+      questionsAttempted: totalQuestions,
+      questionsCorrect: correctAnswers,
+      accuracy: Math.round(accuracy),
+      xpEarned: totalAwardedXP,
+      baseXP: xpCalc.baseXP,
+      streakBonus: xpCalc.streakBonus,
+      perfectBonus: xpCalc.perfectBonus,
+      missionBonus,
+      startedAt,
+      endedAt: now,
+      activeSeconds: antiCheatData.activeSeconds,
+      totalSeconds: antiCheatData.totalSeconds,
+      tabSwitches: antiCheatData.tabSwitches,
+      idleIntervals: antiCheatData.idleIntervals,
+      interactionCount: antiCheatData.interactionCount,
+      isValid,
+      answers,
+      createdAt: startedAt,
+    };
+
+    transaction.set(sessionRef, sessionData);
+
+    if (isValid) {
+      transaction.set(progressRef, progressAfter);
+
+      const nextXP = Math.max(0, (profile.xp || 0) + totalAwardedXP);
+      const userUpdates: Partial<UserProfile> & Record<string, unknown> = {
+        xp: nextXP,
+        level: calculateLevel(nextXP),
+        totalStudyMinutes: (profile.totalStudyMinutes || 0) + activeMinutes,
+        updatedAt: now,
+      };
+
+      if (sessionType === 'vocabulary') {
+        userUpdates.vocabularyLearned = (profile.vocabularyLearned || 0) + totalQuestions;
+      } else {
+        userUpdates.totalQuestionsAnswered = (profile.totalQuestionsAnswered || 0) + totalQuestions;
+        userUpdates.totalCorrectAnswers = (profile.totalCorrectAnswers || 0) + correctAnswers;
+      }
+
+      if (shouldMaintainStreak) {
+        const lastStudy = profile.lastStudyDate || '';
+        let newStreak = 1;
+        if (lastStudy === today) {
+          newStreak = profile.currentStreak || 1;
+        } else if (lastStudy === getYesterdayDateString()) {
+          newStreak = (profile.currentStreak || 0) + 1;
+        }
+        userUpdates.currentStreak = newStreak;
+        userUpdates.longestStreak = Math.max(newStreak, profile.longestStreak || 0);
+        userUpdates.lastStudyDate = today;
+      }
+
+      transaction.update(userRef, userUpdates);
     }
-    await updateMissionProgress(userId, 'minutes', Math.round(antiCheatData.activeSeconds / 60));
 
-    // Check streak
-    await checkAndUpdateStreak(userId);
+    return {
+      ...buildSessionResults(sessionData),
+      alreadyProcessed: false,
+    };
+  });
 
-    // Update per-item progress (mastery tracking)
+  if (transactionResult.isValid && !transactionResult.alreadyProcessed) {
     try {
       if (sessionType === 'vocabulary') {
         const vocabEntries = answers.map((a) => ({
@@ -203,7 +457,6 @@ export async function endStudySession(
         }));
         await batchUpdateVocabProgress(userId, vocabEntries);
       } else if (sessionType !== 'listening') {
-        // Quiz: update each question's mastery based on correctness
         const questionEntries = answers.map((a) => ({
           questionId: a.questionId,
           isCorrect: a.isCorrect,
@@ -211,36 +464,12 @@ export async function endStudySession(
         await batchUpdateQuestionProgress(userId, questionEntries);
       }
     } catch (progressErr) {
-      // Non-critical — don't fail the session if progress update fails
       console.error('Failed to update item progress:', progressErr);
     }
   }
 
-  // Update user stats
-  if (isValid) {
-    const userRef = doc(db, 'users', userId);
-    const userUpdates: any = {
-      totalStudyMinutes: increment(Math.round(antiCheatData.activeSeconds / 60)),
-      updatedAt: serverTimestamp(),
-    };
-    if (sessionType === 'vocabulary') {
-      userUpdates.vocabularyLearned = increment(totalQuestions);
-    } else {
-      userUpdates.totalQuestionsAnswered = increment(totalQuestions);
-      userUpdates.totalCorrectAnswers = increment(correctAnswers);
-    }
-    await updateDoc(userRef, userUpdates);
-  }
-
-  return {
-    totalQuestions,
-    correctAnswers,
-    accuracy: Math.round(accuracy),
-    xpEarned: xpCalc.totalXP,
-    streakBonus: xpCalc.streakBonus,
-    timeSpent: antiCheatData.totalSeconds,
-    isValid,
-  };
+  const { alreadyProcessed: _alreadyProcessed, ...publicResult } = transactionResult;
+  return publicResult;
 }
 
 // ============================================

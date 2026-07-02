@@ -26,11 +26,25 @@ export function calculateSessionXP(
   correctAnswers: number,
   wrongAnswers: number,
   currentStreak: number,
-  isPerfect: boolean
+  isPerfect: boolean,
+  options: {
+    includeStreakBonus?: boolean;
+    includeWrongAnswerXP?: boolean;
+  } = {}
 ): { baseXP: number; streakBonus: number; perfectBonus: number; totalXP: number } {
-  const baseXP = correctAnswers * XP_PER_CORRECT_ANSWER + wrongAnswers * XP_PER_WRONG_ANSWER;
-  const streakBonus = Math.min(currentStreak * STREAK_BONUS_PER_DAY, STREAK_BONUS_CAP);
-  const perfectBonus = isPerfect && correctAnswers >= 5 ? PERFECT_QUIZ_BONUS : 0;
+  const safeCorrect = Math.max(0, Math.floor(Number.isFinite(correctAnswers) ? correctAnswers : 0));
+  const safeWrong = Math.max(0, Math.floor(Number.isFinite(wrongAnswers) ? wrongAnswers : 0));
+  const safeStreak = Math.max(0, Math.floor(Number.isFinite(currentStreak) ? currentStreak : 0));
+  const totalAnswers = safeCorrect + safeWrong;
+  const accuracy = totalAnswers > 0 ? safeCorrect / totalAnswers : 0;
+
+  const includeWrongAnswerXP = options.includeWrongAnswerXP ?? accuracy >= 0.5;
+  const wrongXP = includeWrongAnswerXP ? safeWrong * XP_PER_WRONG_ANSWER : 0;
+  const baseXP = safeCorrect * XP_PER_CORRECT_ANSWER + wrongXP;
+  const streakBonus = options.includeStreakBonus === false
+    ? 0
+    : Math.min(safeStreak * STREAK_BONUS_PER_DAY, STREAK_BONUS_CAP);
+  const perfectBonus = isPerfect && safeCorrect >= 5 ? PERFECT_QUIZ_BONUS : 0;
   const totalXP = baseXP + streakBonus + perfectBonus;
 
   return { baseXP, streakBonus, perfectBonus, totalXP };
@@ -183,7 +197,7 @@ export async function updateMissionProgress(
 
   const updatedMissions = data.missions.map((mission) => {
     if (mission.type === missionType && !mission.completed) {
-      const newCurrent = mission.current + progressAmount;
+      const newCurrent = Math.min(mission.target, Math.max(0, mission.current + progressAmount));
       const completed = newCurrent >= mission.target;
       
       if (completed && !mission.completed) {
@@ -268,6 +282,11 @@ export function generateDailyMissions(): Mission[] {
 // ============================================
 
 export async function awardXP(userId: string, xpAmount: number): Promise<{ newXP: number; newLevel: number; leveledUp: boolean }> {
+  const safeXPAmount = Math.max(0, Math.floor(Number.isFinite(xpAmount) ? xpAmount : 0));
+  if (safeXPAmount === 0) {
+    return { newXP: 0, newLevel: 0, leveledUp: false };
+  }
+
   const userRef = doc(db, 'users', userId);
   const userSnap = await getDoc(userRef);
   
@@ -277,12 +296,12 @@ export async function awardXP(userId: string, xpAmount: number): Promise<{ newXP
 
   const profile = userSnap.data() as UserProfile;
   const oldLevel = calculateLevel(profile.xp);
-  const newXP = profile.xp + xpAmount;
+  const newXP = profile.xp + safeXPAmount;
   const newLevel = calculateLevel(newXP);
   const leveledUp = newLevel > oldLevel;
 
   await updateDoc(userRef, {
-    xp: increment(xpAmount),
+    xp: increment(safeXPAmount),
     level: newLevel,
     updatedAt: serverTimestamp(),
   });

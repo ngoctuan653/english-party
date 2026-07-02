@@ -39,6 +39,9 @@ export const ANTI_CHEAT = {
   minActiveRatio: 0.6,
   maxTabSwitches: 5,
   minSecondsPerQuestion: 5,
+  minSingleAnswerSeconds: 1.5,
+  maxFastAnswerRatio: 0.35,
+  minInteractions: 2,
   maxIdleIntervals: 3,
   idleTimeoutSeconds: 30,
 };

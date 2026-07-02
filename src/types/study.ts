@@ -12,6 +12,10 @@ export interface StudySession {
   questionsCorrect: number;
   accuracy: number;
   xpEarned: number;
+  baseXP?: number;
+  streakBonus?: number;
+  perfectBonus?: number;
+  missionBonus?: number;
   startedAt: Timestamp;
   endedAt: Timestamp | null;
   activeSeconds: number;
