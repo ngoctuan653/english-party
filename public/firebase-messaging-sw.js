@@ -4,14 +4,26 @@
 importScripts("https://www.gstatic.com/firebasejs/11.0.0/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/11.0.0/firebase-messaging-compat.js");
 
-firebase.initializeApp({
-  apiKey: "AIzaSyAWYgfD8vEJ-UQaYppsCjPVLrBhHgcOk8s",
-  authDomain: "english-party.firebaseapp.com",
-  projectId: "english-party",
-  storageBucket: "english-party.firebasestorage.app",
-  messagingSenderId: "376449805687",
-  appId: "1:376449805687:web:54492b19a5b966fc4cc572",
-});
+const urlParams = new URLSearchParams(self.location.search);
+const apiKey = urlParams.get('apiKey');
+const authDomain = urlParams.get('authDomain');
+const projectId = urlParams.get('projectId');
+const storageBucket = urlParams.get('storageBucket');
+const messagingSenderId = urlParams.get('messagingSenderId');
+const appId = urlParams.get('appId');
+
+if (apiKey) {
+  firebase.initializeApp({
+    apiKey,
+    authDomain,
+    projectId,
+    storageBucket,
+    messagingSenderId,
+    appId,
+  });
+} else {
+  console.warn("[firebase-messaging-sw.js] Firebase config parameters are missing in service worker URL.");
+}
 
 const messaging = firebase.messaging();
 
