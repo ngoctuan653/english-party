@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
+import { signOut } from '@/services/firebase/auth';
 import { getRecentSessions } from '@/services/study';
 import { Card } from '@/components/ui/Card';
 import { Avatar } from '@/components/ui/Avatar';
@@ -14,7 +16,18 @@ import { motion } from 'framer-motion';
 import SessionReviewModal from '@/components/study/SessionReviewModal';
 
 export default function ProfilePage() {
-  const { profile } = useAuthStore();
+  const { profile, reset } = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      reset();
+      navigate('/login');
+    } catch (err) {
+      console.error('Logout failed', err);
+    }
+  };
   const [sessions, setSessions] = useState<StudySession[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedReviewSession, setSelectedReviewSession] = useState<StudySession | null>(null);
@@ -91,6 +104,17 @@ export default function ProfilePage() {
     <div className="space-y-8 pb-8 text-slate-800">
       {/* Profile Header Card */}
       <Card className="p-6 md:p-8 relative overflow-hidden bg-white border border-slate-200/60 shadow-sm">
+        {/* Settings Button - top right */}
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => navigate('/settings')}
+          className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-600 hover:text-slate-800 text-xs font-semibold transition-all duration-150"
+        >
+          <Icons.Settings className="w-3.5 h-3.5" />
+          Settings
+        </motion.button>
+
         <div className="flex flex-col md:flex-row items-center gap-6 text-center md:text-left">
           <Avatar
             fallback={profile.avatarUrl && !profile.avatarUrl.includes('/') ? profile.avatarUrl : undefined}
@@ -291,6 +315,27 @@ export default function ProfilePage() {
             </div>
           </Card>
         </div>
+      </div>
+
+      {/* Mobile Actions: Settings & Logout */}
+      <div className="grid grid-cols-2 gap-3">
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={() => navigate('/settings')}
+          className="flex items-center justify-center gap-2 p-4 rounded-2xl bg-white border border-slate-200 shadow-sm text-slate-700 font-semibold text-sm hover:bg-slate-50 transition-colors"
+        >
+          <Icons.Settings className="w-5 h-5 text-[#0071E3]" />
+          Settings
+        </motion.button>
+
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={handleLogout}
+          className="flex items-center justify-center gap-2 p-4 rounded-2xl bg-white border border-red-100 shadow-sm text-rose-600 font-semibold text-sm hover:bg-rose-50 transition-colors"
+        >
+          <Icons.LogOut className="w-5 h-5" />
+          Sign Out
+        </motion.button>
       </div>
 
       <SessionReviewModal

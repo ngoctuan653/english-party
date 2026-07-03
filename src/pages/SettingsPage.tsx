@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/stores/authStore';
-import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/services/firebase/config';
+import { doc, updateDoc, serverTimestamp, arrayUnion } from 'firebase/firestore';
+import { db, getMessagingInstance, getToken, onMessage } from '@/services/firebase/config';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
@@ -10,6 +10,8 @@ import { toast } from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import * as Icons from 'lucide-react';
 import type { ExamType } from '@/types/user';
+
+const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY || '';
 
 export default function SettingsPage() {
   const { profile, setProfile } = useAuthStore();
@@ -23,6 +25,156 @@ export default function SettingsPage() {
     profile?.notificationsEnabled !== false
   );
   const [saving, setSaving] = useState(false);
+
+  // Detect iOS and standalone mode
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || (navigator as any).standalone === true;
+
+  // Get iOS version
+  const iOSVersion = (() => {
+    if (!isIOS) return null;
+    const match = navigator.userAgent.match(/OS (\d+)_(\d+)/);
+    return match ? parseInt(match[1]) : null;
+  })();
+
+  // iOS needs: standalone mode + iOS 16.4+
+  const iOSNeedsHomescreen = isIOS && !isStandalone;
+  const iOSUnsupported = isIOS && isStandalone && iOSVersion !== null && iOSVersion < 16;
+
+  // Push notification states
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const [pushLoading, setPushLoading] = useState(false);
+  const [pushSupported, setPushSupported] = useState(true);
+  const [fcmToken, setFcmToken] = useState<string | null>(null);
+  const [tokenCopied, setTokenCopied] = useState(false);
+  const [tokenError, setTokenError] = useState<string | null>(null);
+
+  // Check current push notification status on mount + load token if already granted
+  useEffect(() => {
+    if (iOSNeedsHomescreen || iOSUnsupported) {
+      setPushSupported(false);
+      return;
+    }
+    if (typeof Notification === 'undefined') {
+      setPushSupported(false);
+      return;
+    }
+    const alreadyGranted = Notification.permission === 'granted';
+    setPushEnabled(alreadyGranted);
+
+    // If already granted, fetch token silently to show in UI
+    if (alreadyGranted) {
+      (async () => {
+        try {
+          const messaging = await getMessagingInstance();
+          if (messaging) {
+            // Explicitly register service worker to avoid conflicts with Vite PWA sw.js
+            const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+            const token = await getToken(messaging, {
+              vapidKey: VAPID_KEY,
+              serviceWorkerRegistration: registration
+            });
+            setFcmToken(token);
+          }
+        } catch (err) {
+          console.warn('Could not load FCM token:', err);
+          setTokenError(err instanceof Error ? err.message : String(err));
+        }
+      })();
+    }
+  }, []);
+
+
+  // Listen for foreground messages
+  useEffect(() => {
+    let unsubscribe: (() => void) | undefined;
+
+    (async () => {
+      const messaging = await getMessagingInstance();
+      if (messaging) {
+        unsubscribe = onMessage(messaging, (payload) => {
+          console.log('Foreground message:', payload);
+          toast(payload.notification?.body || 'New notification!', {
+            icon: '🔔',
+          });
+        });
+      }
+    })();
+
+    return () => unsubscribe?.();
+  }, []);
+
+  const handleTogglePush = async () => {
+    if (!profile) return;
+
+    // iOS in browser → guide to add homescreen first
+    if (iOSNeedsHomescreen) {
+      toast('Trên iOS, hãy Add to Home Screen trước rồi mở app từ màn hình chính để bật thông báo.', {
+        icon: '📱',
+        duration: 5000,
+      });
+      return;
+    }
+
+    // iOS too old
+    if (iOSUnsupported) {
+      toast.error('Push notifications yêu cầu iOS 16.4 trở lên.');
+      return;
+    }
+
+    // If already granted, we can't revoke via JS — guide user
+    if (pushEnabled) {
+      toast('Để tắt, vào cài đặt trình duyệt và chặn thông báo cho trang này.', { icon: 'ℹ️' });
+      return;
+    }
+
+    setPushLoading(true);
+    setTokenError(null);
+    try {
+      const permission = await Notification.requestPermission();
+
+      if (permission === 'granted') {
+        const messaging = await getMessagingInstance();
+        if (!messaging) {
+          toast.error('Push notifications không được hỗ trợ trên trình duyệt này.');
+          setPushLoading(false);
+          return;
+        }
+
+        // Explicitly register service worker to avoid conflicts with Vite PWA sw.js
+        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+        const token = await getToken(messaging, {
+          vapidKey: VAPID_KEY,
+          serviceWorkerRegistration: registration
+        });
+        console.log('FCM Token:', token);
+
+        // Save token to user's Firestore doc
+        const userRef = doc(db, 'users', profile.uid);
+        await updateDoc(userRef, {
+          fcmTokens: arrayUnion(token),
+          updatedAt: serverTimestamp(),
+        });
+
+        setPushEnabled(true);
+        setFcmToken(token);
+        toast.success('Đã bật Push Notifications! 🔔');
+      } else if (permission === 'denied') {
+        toast.error('Quyền thông báo bị từ chối. Kiểm tra cài đặt trình duyệt.');
+      } else {
+        toast('Bạn đã bỏ qua yêu cầu thông báo.', { icon: '⚠️' });
+      }
+    } catch (err) {
+      console.error('Push notification error:', err);
+      const errMsg = err instanceof Error ? err.message : String(err);
+      setTokenError(errMsg);
+      toast.error('Không thể bật thông báo: ' + errMsg);
+    } finally {
+      setPushLoading(false);
+    }
+  };
+
 
   if (!profile) {
     return (
@@ -69,6 +221,8 @@ export default function SettingsPage() {
       setSaving(false);
     }
   };
+
+
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 pb-8 text-slate-800">
@@ -179,6 +333,7 @@ export default function SettingsPage() {
             Preferences
           </h2>
 
+          {/* In-app notifications toggle */}
           <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-200/60">
             <div className="space-y-1">
               <p className="text-sm font-semibold text-slate-800">In-App Notifications</p>
@@ -198,7 +353,152 @@ export default function SettingsPage() {
               />
             </button>
           </div>
+
+          {/* Push notifications toggle */}
+          <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-200/60">
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
+                Push Notifications
+                {pushEnabled && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium bg-emerald-100 text-emerald-700 rounded-full">
+                    Active
+                  </span>
+                )}
+              </p>
+              <p className="text-xs text-slate-500">
+                {iOSNeedsHomescreen
+                  ? 'Cần Add to Home Screen trên iOS trước'
+                  : iOSUnsupported
+                    ? 'Yêu cầu iOS 16.4 trở lên'
+                    : pushSupported
+                      ? 'Nhận thông báo kể cả khi app đóng'
+                      : 'Không hỗ trợ trên trình duyệt này'}
+              </p>
+            </div>
+            <button
+              type="button"
+              disabled={!pushSupported || pushLoading || iOSNeedsHomescreen || iOSUnsupported}
+              onClick={handleTogglePush}
+              className={`w-12 h-6 flex items-center rounded-full p-1 transition-all duration-300 ${
+                !pushSupported || pushLoading || iOSNeedsHomescreen || iOSUnsupported
+                  ? 'bg-slate-200 cursor-not-allowed opacity-50'
+                  : pushEnabled
+                    ? 'bg-[#34C759] cursor-pointer'
+                    : 'bg-slate-300 cursor-pointer'
+              }`}
+            >
+              <div
+                className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-all duration-300 ${
+                  pushEnabled ? 'translate-x-6' : 'translate-x-0'
+                }`}
+              />
+            </button>
+          </div>
+
+          {/* iOS: needs Add to Homescreen */}
+          {iOSNeedsHomescreen && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-start gap-3 p-4 bg-amber-50 rounded-2xl border border-amber-200/80"
+            >
+              <Icons.Smartphone className="w-5 h-5 text-amber-500 mt-0.5 shrink-0" />
+              <div className="space-y-2">
+                <p className="text-sm font-bold text-amber-800">Cần Add to Home Screen trước</p>
+                <p className="text-xs text-amber-700">
+                  iOS chỉ hỗ trợ Push Notifications khi app được cài từ màn hình chính (iOS 16.4+).
+                </p>
+                <ol className="text-xs text-amber-700 space-y-1 list-none">
+                  <li className="flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center text-[10px] font-bold shrink-0">1</span>
+                    Bấm nút <Icons.Share className="inline w-3.5 h-3.5 mx-0.5" /> <strong>Share</strong> trên Safari
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center text-[10px] font-bold shrink-0">2</span>
+                    Chọn <strong>"Add to Home Screen"</strong>
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center text-[10px] font-bold shrink-0">3</span>
+                    Mở app từ màn hình chính → vào Settings → bật thông báo
+                  </li>
+                </ol>
+              </div>
+            </motion.div>
+          )}
+
+          {/* iOS standalone but old version */}
+          {iOSUnsupported && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-start gap-3 p-4 bg-red-50 rounded-2xl border border-red-200/60"
+            >
+              <Icons.AlertCircle className="w-5 h-5 text-red-400 mt-0.5 shrink-0" />
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-red-700">iOS quá cũ</p>
+                <p className="text-xs text-red-600">
+                  Push Notifications trên iOS yêu cầu <strong>iOS 16.4 trở lên</strong>. Hãy cập nhật iOS để sử dụng tính năng này.
+                </p>
+              </div>
+            </motion.div>
+          )}
+
+          {/* FCM Token display for testing */}
+          {fcmToken && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-2 p-4 bg-slate-50 rounded-2xl border border-slate-200"
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
+                  <Icons.Key className="w-3.5 h-3.5" />
+                  FCM Token (để test)
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(fcmToken);
+                    setTokenCopied(true);
+                    setTimeout(() => setTokenCopied(false), 2000);
+                  }}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+                >
+                  {tokenCopied ? (
+                    <><Icons.Check className="w-3 h-3 text-emerald-500" /> Đã copy</>
+                  ) : (
+                    <><Icons.Copy className="w-3 h-3" /> Copy</>
+                  )}
+                </button>
+              </div>
+              <p className="text-[10px] text-slate-400 font-mono break-all leading-relaxed select-all">
+                {fcmToken}
+              </p>
+              <p className="text-[10px] text-slate-400">
+                Dán token này vào <strong>Firebase Console → Messaging → Send test message</strong>
+              </p>
+            </motion.div>
+          )}
+
+          {/* FCM Token Error display */}
+          {tokenError && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-1 p-4 bg-rose-50 rounded-2xl border border-rose-100 text-rose-800"
+            >
+              <p className="text-xs font-bold flex items-center gap-1.5">
+                <Icons.AlertTriangle className="w-4 h-4 text-rose-500" />
+                Lỗi lấy FCM Token
+              </p>
+              <p className="text-[11px] font-mono leading-relaxed break-all">
+                {tokenError}
+              </p>
+            </motion.div>
+          )}
         </Card>
+
+
 
         {/* Action Button */}
         <div className="flex justify-end gap-3">
@@ -214,3 +514,5 @@ export default function SettingsPage() {
     </div>
   );
 }
+
+

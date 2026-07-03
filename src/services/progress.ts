@@ -213,6 +213,11 @@ export async function batchUpdateVocabProgress(
 
     if (entry.alreadyKnew) {
       newMastery = 100;
+    } else if (entry.isCorrect) {
+      newMastery = Math.max(
+        existing?.mastery ?? 0,
+        MASTERY_THRESHOLDS.MASTERED
+      );
     } else {
       const currentMastery = existing?.mastery ?? 0;
       newMastery = calculateNewMastery(currentMastery, entry.isCorrect);
@@ -234,6 +239,73 @@ export async function batchUpdateVocabProgress(
   });
 
   await Promise.all(writes);
+}
+
+export function buildSmartVocabDeck(
+  allWords: VocabWord[],
+  progressMap: Map<string, VocabProgressRecord>,
+  options: { maxCount?: number; reviewSampleCount?: number } = {}
+): VocabWord[] {
+  const maxCount = Math.max(1, options.maxCount ?? 12);
+  const reviewSampleCount = Math.max(1, options.reviewSampleCount ?? 3);
+
+  const newWords: VocabWord[] = [];
+  const learningWords: { w: VocabWord; mastery: number; lastSeen: number }[] = [];
+  const masteredWords: { w: VocabWord; mastery: number; lastSeen: number }[] = [];
+
+  for (const w of allWords) {
+    const prog = progressMap.get(w.id);
+    if (!prog) {
+      newWords.push(w);
+      continue;
+    }
+
+    const lastSeen = prog.lastSeenAt?.toMillis?.() ?? 0;
+    if (prog.mastery < MASTERY_THRESHOLDS.MASTERED) {
+      learningWords.push({ w, mastery: prog.mastery, lastSeen });
+    } else {
+      masteredWords.push({ w, mastery: prog.mastery, lastSeen });
+    }
+  }
+
+  learningWords.sort((a, b) => a.mastery - b.mastery || a.lastSeen - b.lastSeen);
+  masteredWords.sort((a, b) => a.lastSeen - b.lastSeen || a.mastery - b.mastery);
+
+  const activeWords = [
+    ...shuffle(newWords),
+    ...learningWords.map((entry) => entry.w),
+  ];
+
+  const picked: VocabWord[] = activeWords.slice(0, maxCount);
+  const pickedIds = new Set(picked.map((w) => w.id));
+
+  const reviewSlots =
+    picked.length === 0
+      ? Math.min(reviewSampleCount, maxCount)
+      : Math.min(reviewSampleCount, maxCount - picked.length);
+
+  if (reviewSlots > 0) {
+    const notRecentlySeen = masteredWords.filter(
+      (entry) => !recentlySeenVocabIds.includes(entry.w.id)
+    );
+    const reviewCandidates = notRecentlySeen.length > 0 ? notRecentlySeen : masteredWords;
+    const reviewPicked = reviewCandidates
+      .filter((entry) => !pickedIds.has(entry.w.id))
+      .slice(0, reviewSlots)
+      .map((entry) => entry.w);
+    picked.push(...reviewPicked);
+  }
+
+  const deck = picked.length > 0
+    ? picked
+    : shuffle(allWords).slice(0, Math.min(reviewSampleCount, allWords.length));
+
+  recentlySeenVocabIds = pushToRecentCache(
+    recentlySeenVocabIds,
+    deck.map((w) => w.id)
+  );
+
+  return deck;
 }
 
 // ============================================
@@ -406,12 +478,6 @@ export async function generateSmartVocabSession(
     ...reviewWords.map((r) => r.w),
     ...masteredWords.map((m) => m.w),
   ];
-
-  // Update recently seen cache
-  recentlySeenVocabIds = pushToRecentCache(
-    recentlySeenVocabIds,
-    orderedWords.slice(0, RECENTLY_SEEN_CACHE_SIZE).map((w) => w.id)
-  );
 
   return {
     words: orderedWords,

@@ -2,6 +2,8 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import { getMessaging, getToken, onMessage, isSupported } from 'firebase/messaging';
+import type { Messaging } from 'firebase/messaging';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'demo-api-key',
@@ -16,3 +18,18 @@ export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+
+// Firebase Cloud Messaging - lazy init (not supported in all browsers/environments)
+let messagingInstance: Messaging | null = null;
+
+export async function getMessagingInstance(): Promise<Messaging | null> {
+  if (messagingInstance) return messagingInstance;
+  const supported = await isSupported();
+  if (supported) {
+    messagingInstance = getMessaging(app);
+    return messagingInstance;
+  }
+  return null;
+}
+
+export { getToken, onMessage };

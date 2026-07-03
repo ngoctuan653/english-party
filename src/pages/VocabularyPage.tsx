@@ -18,7 +18,7 @@ import { toast } from 'react-hot-toast';
 import type { SessionResults } from '@/types/study';
 import type { QuestionAnswer } from '@/types/question';
 import type { VocabProgressRecord } from '@/types/progress';
-import { generateSmartVocabSession } from '@/services/progress';
+import { buildSmartVocabDeck, generateSmartVocabSession } from '@/services/progress';
 
 const getTopicMeta = (topic: string) => {
   const meta: Record<string, { emoji: string; gradient: string; hoverGlow: string }> = {
@@ -71,8 +71,10 @@ export default function VocabularyPage() {
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+  const [sessionWords, setSessionWords] = useState<VocabWord[]>([]);
   const [isFlipped, setIsFlipped] = useState(false);
   const [autoPlayAudio, setAutoPlayAudio] = useState(true);
+  const [topicSearchTerm, setTopicSearchTerm] = useState('');
 
   // Initialize SpeechSynthesis voices early
   useEffect(() => {
@@ -123,9 +125,12 @@ export default function VocabularyPage() {
           setSessionId(null);
           setResults(null);
           setSelectedTopic(null);
+          setSessionWords([]);
           setCurrentIndex(0);
           setIsFlipped(false);
+          setSecondsElapsed(0);
           setViewedWordIds(new Set());
+          setWordSelections(new Map());
           answersRef.current = [];
         }
       } else {
@@ -208,6 +213,7 @@ export default function VocabularyPage() {
         if (practiceIds && practiceIds.length > 0) {
           const filtered = allWords.filter((w) => practiceIds.includes(w.id));
           setWords(filtered);
+          setSessionWords(filtered);
           setSelectedTopic('custom_practice');
           if (profile?.uid) {
             const { progressMap, stats } = await generateSmartVocabSession(
@@ -245,12 +251,15 @@ export default function VocabularyPage() {
     }
   }, [location.state, navigate]);
 
-  const filteredWords = words.filter(
-    (w) =>
-      selectedTopic &&
-      (selectedTopic === 'custom_practice' ||
-        w.topic.toLowerCase() === selectedTopic.toLowerCase())
-  );
+  const filteredWords = selectedTopic
+    ? sessionWords.length > 0
+      ? sessionWords
+      : words.filter(
+          (w) =>
+            selectedTopic === 'custom_practice' ||
+            w.topic.toLowerCase() === selectedTopic.toLowerCase()
+        )
+    : [];
 
   const currentWord = filteredWords[currentIndex];
 
@@ -279,10 +288,10 @@ export default function VocabularyPage() {
         console.error('Failed to start vocabulary session:', err);
       }
     }
-    if (!loading && selectedTopic && filteredWords.length > 0) {
+    if (!loading && selectedTopic && filteredWords.length > 0 && !results) {
       startSession();
     }
-  }, [profile?.uid, loading, selectedTopic, filteredWords.length]);
+  }, [profile?.uid, loading, selectedTopic, filteredWords.length, sessionId, results]);
 
   // Autoplay word sound on card changes
   useEffect(() => {
@@ -371,6 +380,9 @@ export default function VocabularyPage() {
         profile.currentStreak,
         { total: viewedWordIds.size, correct: viewedWordIds.size }
       );
+      const { progressMap, stats } = await generateSmartVocabSession(profile.uid, words);
+      setVocabProgressMap(progressMap);
+      setProgressStats(stats);
       setResults(sessionResults);
       toast.success('Vocabulary session saved! 🎉');
     } catch (err) {
@@ -389,9 +401,12 @@ export default function VocabularyPage() {
         setSessionId(null);
         setResults(null);
         setSelectedTopic(null);
+        setSessionWords([]);
         setCurrentIndex(0);
         setIsFlipped(false);
+        setSecondsElapsed(0);
         setViewedWordIds(new Set());
+        setWordSelections(new Map());
         answersRef.current = [];
       }
     }
@@ -404,6 +419,38 @@ export default function VocabularyPage() {
   const masteredCount = progressStats.masteredCount;
   const learningCount = progressStats.learningCount + progressStats.reviewCount;
   const remainingCount = progressStats.newCount;
+
+  const createDeckForTopic = (
+    topic: string,
+    sourceWords: VocabWord[] = words,
+    sourceProgressMap: Map<string, VocabProgressRecord> = vocabProgressMap
+  ) => {
+    const topicWords = topic === 'custom_practice'
+      ? sourceWords
+      : sourceWords.filter((w) => w.topic.toLowerCase() === topic.toLowerCase());
+
+    return buildSmartVocabDeck(topicWords, sourceProgressMap, {
+      maxCount: Math.min(12, Math.max(1, topicWords.length)),
+      reviewSampleCount: 3,
+    });
+  };
+
+  const resetVocabRun = () => {
+    setSessionId(null);
+    setResults(null);
+    setCurrentIndex(0);
+    setIsFlipped(false);
+    setSecondsElapsed(0);
+    setViewedWordIds(new Set());
+    setWordSelections(new Map());
+    answersRef.current = [];
+  };
+
+  const handleSelectTopic = (topic: string) => {
+    setSessionWords(createDeckForTopic(topic));
+    setSelectedTopic(topic);
+    resetVocabRun();
+  };
 
   /** Get display state for a word */
   const getWordState = (wordId: string): { label: string; emoji: string; color: string } => {
@@ -474,13 +521,9 @@ export default function VocabularyPage() {
               <Button
                 variant="secondary"
                 onClick={() => {
-                  setResults(null);
-                  setSessionId(null);
+                  resetVocabRun();
                   setSelectedTopic(null);
-                  setViewedWordIds(new Set());
-                  answersRef.current = [];
-                  setCurrentIndex(0);
-                  setIsFlipped(false);
+                  setSessionWords([]);
                 }}
                 className="flex-1 font-semibold text-xs py-2"
               >
@@ -489,13 +532,10 @@ export default function VocabularyPage() {
             )}
             <Button
               onClick={() => {
-                setResults(null);
-                setSessionId(null);
-                setSecondsElapsed(0);
-                setViewedWordIds(new Set());
-                answersRef.current = [];
-                setCurrentIndex(0);
-                setIsFlipped(false);
+                if (selectedTopic) {
+                  setSessionWords(createDeckForTopic(selectedTopic));
+                }
+                resetVocabRun();
               }}
               className="flex-1 bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs py-2"
             >
@@ -509,29 +549,115 @@ export default function VocabularyPage() {
 
   if (!selectedTopic) {
     const uniqueTopics = Array.from(new Set(words.map((w) => w.topic.toLowerCase())));
+    const searchTerm = topicSearchTerm.trim().toLowerCase();
+    const filteredTopics = uniqueTopics.filter((topic) => !searchTerm || topic.includes(searchTerm));
+    const totalWords = words.length;
+    const masteredPercent = totalWords > 0 ? Math.round((masteredCount / totalWords) * 100) : 0;
 
     return (
-      <div className="space-y-8 pb-8 text-slate-850 max-w-4xl mx-auto animate-fade-in">
-        <div>
-          <h1 className="text-2xl font-bold sm:text-3xl">
-            <span className="bg-gradient-to-r from-blue-600 to-[#0071E3] bg-clip-text text-transparent">
-              Chủ đề Từ vựng
-            </span>
-          </h1>
-          <p className="mt-1 text-sm text-slate-500 sm:text-base">
-            Chọn một chủ đề để bắt đầu ôn luyện flashcards từ vựng
-          </p>
-        </div>
+      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-6 pb-8 text-slate-800 xl:grid-cols-[300px_minmax(0,1fr)]">
+        <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-4 shadow-sm xl:sticky xl:top-24">
+          <div className="mb-4 flex items-center gap-3 border-b border-slate-100 pb-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#0EA5E9] text-white shadow-lg shadow-sky-200">
+              <Icons.BookMarked className="h-6 w-6" />
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-sm font-black text-slate-900">Vocabulary</h2>
+              <p className="truncate text-[11px] font-medium text-slate-500">TOEIC word bank and flashcards</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+              <p className="text-[10px] font-bold uppercase text-slate-400">Words</p>
+              <p className="mt-1 text-lg font-black text-slate-900">{totalWords}</p>
+            </div>
+            <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+              <p className="text-[10px] font-bold uppercase text-slate-400">Topics</p>
+              <p className="mt-1 text-lg font-black text-slate-900">{uniqueTopics.length}</p>
+            </div>
+            <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+              <p className="text-[10px] font-bold uppercase text-slate-400">Learning</p>
+              <p className="mt-1 text-lg font-black text-amber-600">{learningCount}</p>
+            </div>
+            <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
+              <p className="text-[10px] font-bold uppercase text-slate-400">Mastered</p>
+              <p className="mt-1 text-lg font-black text-emerald-600">{masteredCount}</p>
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-xl border border-sky-100 bg-sky-50 p-3">
+            <div className="mb-2 flex items-center justify-between text-[10px] font-bold uppercase text-slate-500">
+              <span>Mastery</span>
+              <span className="text-sky-600">{masteredPercent}%</span>
+            </div>
+            <Progress value={masteredPercent} height="sm" />
+          </div>
+        </aside>
+
+        <section className="min-w-0 space-y-5">
+
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative overflow-hidden rounded-3xl border border-sky-100 bg-gradient-to-br from-sky-50 via-white to-cyan-50 px-6 py-8 shadow-sm sm:px-10"
+          >
+            <div className="relative z-10 flex items-center justify-between gap-6">
+              <div>
+                <p className="mb-2 text-xs font-bold uppercase tracking-wide text-sky-600">TOEIC Vocabulary</p>
+                <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Vocabulary Topics</h1>
+                <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-slate-500">
+                  Build your TOEIC word bank by topic, review weak words, and keep progress visible while you study.
+                </p>
+              </div>
+              <div className="hidden h-36 w-36 shrink-0 items-center justify-center rounded-3xl bg-[#0EA5E9] text-white shadow-2xl shadow-sky-200 md:flex">
+                <Icons.Layers3 className="h-16 w-16" />
+              </div>
+            </div>
+          </motion.div>
+
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <p className="text-[10px] font-bold uppercase text-slate-400">New Words</p>
+              <p className="mt-1 text-2xl font-black text-slate-900">{remainingCount}</p>
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <p className="text-[10px] font-bold uppercase text-slate-400">In Review</p>
+              <p className="mt-1 text-2xl font-black text-amber-600">{learningCount}</p>
+            </div>
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <p className="text-[10px] font-bold uppercase text-slate-400">Mastered</p>
+              <p className="mt-1 text-2xl font-black text-emerald-600">{masteredCount}</p>
+            </div>
+          </div>
+
+          <div className="relative">
+            <Icons.Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              value={topicSearchTerm}
+              onChange={(event) => setTopicSearchTerm(event.target.value)}
+              className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-11 pr-4 text-sm font-medium text-slate-700 outline-none transition-colors placeholder:text-slate-400 focus:border-sky-400 focus:ring-4 focus:ring-sky-100"
+              placeholder="Search vocabulary topics..."
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2 text-lg font-black text-slate-900">
+              <Icons.BookMarked className="h-5 w-5 text-sky-500" />
+              Topic Library
+            </h2>
+            <span className="text-xs font-bold text-slate-400">{filteredTopics.length} topics</span>
+          </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map((n) => (
               <Skeleton key={n} className="h-40 w-full rounded-2xl" />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-            {uniqueTopics.map((topic) => {
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {filteredTopics.map((topic) => {
               const topicWords = words.filter((w) => w.topic.toLowerCase() === topic);
               const totalCount = topicWords.length;
               const masteredCount = topicWords.filter(
@@ -546,58 +672,57 @@ export default function VocabularyPage() {
               const meta = getTopicMeta(topic);
 
               return (
-                <div
+                <button
                   key={topic}
-                  onClick={() => setSelectedTopic(topic)}
-                  className={`group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:scale-[1.02] hover:border-slate-300 hover:shadow-lg cursor-pointer ${meta.hoverGlow}`}
+                  type="button"
+                  onClick={() => handleSelectTopic(topic)}
+                  className={`group rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-md ${meta.hoverGlow}`}
                 >
-                  <div
-                    className={`absolute -right-6 -top-6 h-24 w-24 rounded-full bg-gradient-to-br ${meta.gradient} opacity-10 blur-2xl transition-opacity duration-300 group-hover:opacity-20`}
-                  />
-
-                  <div className="relative space-y-4">
-                    <div className="flex items-center gap-3">
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
                       <div
-                        className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${meta.gradient} text-lg shadow-sm text-white`}
+                        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${meta.gradient} text-lg text-white shadow-sm`}
                       >
                         {meta.emoji}
                       </div>
-                      <div>
-                        <h3 className="text-sm font-bold text-slate-800 capitalize">{topic}</h3>
-                        <p className="text-[10px] text-slate-400 font-bold">{totalCount} từ vựng</p>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="truncate text-base font-black capitalize text-slate-900">{topic}</h3>
+                        <p className="mt-1 text-xs font-bold text-sky-600">{totalCount} words</p>
                       </div>
+                      <Icons.ChevronRight className="mt-1 h-4 w-4 shrink-0 text-slate-300 transition-transform group-hover:translate-x-1 group-hover:text-sky-500" />
                     </div>
 
                     <div className="space-y-1.5">
-                      <div className="flex justify-between items-center text-[9px] font-bold text-slate-500">
-                        <span>Tiến độ học</span>
-                        <span>{masteredCount} / {totalCount} từ</span>
+                      <div className="flex items-center justify-between text-[10px] font-bold text-slate-500">
+                        <span>Mastered</span>
+                        <span>{masteredCount} / {totalCount}</span>
                       </div>
                       <Progress value={percentMastered} height="sm" />
                     </div>
 
-                    <div className="flex gap-2 text-[9px] font-bold text-slate-400">
+                    <div className="flex flex-wrap gap-2 text-[9px] font-bold text-slate-400">
                       <Badge variant="purple" size="sm" dot={learningCount > 0}>
-                        {learningCount} đang học
+                        {learningCount} learning
                       </Badge>
                       <Badge variant="default" size="sm">
-                        {totalCount - masteredCount - learningCount} từ mới
+                        {totalCount - masteredCount - learningCount} new
                       </Badge>
                     </div>
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
         )}
+        </section>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 pb-8 text-slate-800 max-w-xl mx-auto">
+    <div className="mx-auto max-w-3xl space-y-5 pb-8 text-slate-800">
       {/* Header toolbar */}
-      <div className="flex justify-between items-center bg-white p-4 border border-slate-200/60 rounded-2xl shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         <button
           onClick={handleExitVocab}
           className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
@@ -605,7 +730,7 @@ export default function VocabularyPage() {
           <Icons.X className="w-4 h-4" /> Exit Vocabulary
         </button>
         
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3 text-xs font-bold text-slate-500">
           <label className="flex items-center gap-1 text-[10px] font-bold text-slate-400 cursor-pointer select-none">
             <input
               type="checkbox"
@@ -639,14 +764,13 @@ export default function VocabularyPage() {
       </div>
 
       {/* Title */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="rounded-3xl border border-sky-100 bg-gradient-to-br from-sky-50 via-white to-cyan-50 p-5 shadow-sm">
         <div>
-          <h1 className="text-2xl font-bold sm:text-3xl">
-            <span className="bg-gradient-to-r from-blue-600 to-[#0071E3] bg-clip-text text-transparent capitalize">
-              Chủ đề: {selectedTopic}
-            </span>
+          <p className="mb-2 text-xs font-bold uppercase tracking-wide text-sky-600">Flashcard Session</p>
+          <h1 className="text-2xl font-black capitalize tracking-tight text-slate-900 sm:text-3xl">
+            Topic: {selectedTopic}
           </h1>
-          <p className="mt-1 text-xs text-slate-505">
+          <p className="mt-2 text-xs font-bold text-slate-500">
             {filteredWords.length} words available
           </p>
         </div>
@@ -674,7 +798,7 @@ export default function VocabularyPage() {
         <div className="space-y-6">
           {/* Card wrapper */}
           <div
-            className="w-full cursor-pointer h-80"
+            className="h-[22rem] w-full cursor-pointer"
             style={{ perspective: '1000px' }}
             onClick={() => setIsFlipped(!isFlipped)}
           >
@@ -686,7 +810,7 @@ export default function VocabularyPage() {
             >
               {/* Front Side */}
               <div
-                className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-slate-200/60 bg-white shadow-md p-8 text-center"
+                className="absolute inset-0 flex flex-col items-center justify-center rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm"
                 style={{ backfaceVisibility: 'hidden' }}
               >
                 <Badge variant="purple" className="absolute right-4 top-4 text-[9px] uppercase font-bold tracking-wider">
@@ -705,17 +829,17 @@ export default function VocabularyPage() {
                     </span>
                   );
                 })()}
-                <h2 className="text-4xl font-black text-slate-900 tracking-tight flex items-center justify-center gap-2">
+                <h2 className="flex items-center justify-center gap-2 text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">
                   {currentWord.word}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       speakText(currentWord.word, 0.85);
                     }}
-                    className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-650 transition-colors cursor-pointer"
+                    className="rounded-full p-2 text-slate-400 transition-colors hover:bg-sky-50 hover:text-sky-600"
                     title="Pronounce word"
                   >
-                    <Icons.Volume2 className="w-5 h-5 text-violet-500" />
+                    <Icons.Volume2 className="h-5 w-5 text-sky-500" />
                   </button>
                 </h2>
                 <p className="text-sm text-slate-500 mt-2">/{currentWord.pronunciation}/</p>
@@ -729,7 +853,7 @@ export default function VocabularyPage() {
 
               {/* Back Side */}
               <div
-                className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-slate-200/60 bg-white shadow-md p-8 text-center"
+                className="absolute inset-0 flex flex-col items-center justify-center rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm"
                 style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
               >
                 <Badge variant="success" className="absolute right-4 top-4 text-[9px] uppercase font-bold">
@@ -754,10 +878,10 @@ export default function VocabularyPage() {
                         e.stopPropagation();
                         speakText(currentWord.example, 0.95);
                       }}
-                      className="p-1 rounded-lg bg-white border border-slate-150 hover:border-slate-200 text-slate-400 hover:text-slate-700 transition-colors shadow-sm cursor-pointer"
+                      className="rounded-lg border border-slate-200 bg-white p-1 text-slate-400 shadow-sm transition-colors hover:border-sky-200 hover:text-sky-600"
                       title="Pronounce example sentence"
                     >
-                      <Icons.Volume2 className="w-3.5 h-3.5 text-violet-500" />
+                      <Icons.Volume2 className="h-3.5 w-3.5 text-sky-500" />
                     </button>
                   </div>
                   <p className="text-xs italic text-slate-700 mt-1 leading-relaxed">"{currentWord.example}"</p>
@@ -787,7 +911,7 @@ export default function VocabularyPage() {
               }`}
             >
               <Icons.CheckCircle className="w-4 h-4" />
-              <span>Đã hiểu (Bây giờ đã học)</span>
+              <span>Got it now</span>
             </button>
             <button
               onClick={(e) => {
@@ -801,7 +925,7 @@ export default function VocabularyPage() {
               }`}
             >
               <Icons.BookmarkCheck className="w-4 h-4" />
-              <span>Đã học (Đã biết từ trước)</span>
+              <span>Already knew it</span>
             </button>
           </div>
 
@@ -836,21 +960,21 @@ export default function VocabularyPage() {
             <div className="grid grid-cols-3 gap-4 text-xs">
               <div className="space-y-1">
                 <div className="flex justify-between text-[10px] text-slate-500 font-bold">
-                  <span>✅ Mastered</span>
+                  <span>Mastered</span>
                   <span className="text-emerald-600">{masteredCount}</span>
                 </div>
                 <Progress value={words.length > 0 ? (masteredCount / words.length) * 100 : 0} height="sm" />
               </div>
               <div className="space-y-1">
                 <div className="flex justify-between text-[10px] text-slate-500 font-bold">
-                  <span>📖 Learning</span>
+                  <span>Learning</span>
                   <span className="text-amber-600">{learningCount}</span>
                 </div>
                 <Progress value={words.length > 0 ? (learningCount / words.length) * 100 : 0} height="sm" />
               </div>
               <div className="space-y-1">
                 <div className="flex justify-between text-[10px] text-slate-500 font-bold">
-                  <span>🆕 New</span>
+                  <span>New</span>
                   <span className="text-slate-600">{remainingCount}</span>
                 </div>
                 <Progress value={words.length > 0 ? (remainingCount / words.length) * 100 : 0} height="sm" />
