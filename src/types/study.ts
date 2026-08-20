@@ -3,6 +3,12 @@ import type { QuestionAnswer } from './question';
 
 export type SessionType = 'quiz' | 'vocabulary' | 'listening' | 'mission';
 
+export type SessionValidationIssue =
+  | 'invalid-session-data'
+  | 'implausibly-fast'
+  | 'excessive-tab-switching'
+  | 'extended-inactivity';
+
 export interface StudySession {
   id: string;
   userId: string;
@@ -23,6 +29,8 @@ export interface StudySession {
   tabSwitches: number;
   idleIntervals: number;
   interactionCount: number;
+  trackingAvailable?: boolean;
+  validationIssues?: SessionValidationIssue[];
   isValid: boolean;
   answers: QuestionAnswer[];
   createdAt: Timestamp;
@@ -46,4 +54,5 @@ export interface SessionResults {
   streakBonus: number;
   timeSpent: number;
   isValid: boolean;
+  validationIssues?: SessionValidationIssue[];
 }

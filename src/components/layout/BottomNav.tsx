@@ -11,8 +11,10 @@ export function BottomNav() {
     <nav 
       className="fixed bottom-0 inset-x-0 lg:hidden bg-white/80 backdrop-blur-xl border-t border-slate-200/80 flex items-center justify-around px-2 z-30"
     >
-      {NAV_ITEMS.filter((item) => item.path !== '/leaderboard').map((item) => {
-        const isActive = location.pathname === item.path;
+      {NAV_ITEMS.filter((item) => item.path !== '/friends').map((item) => {
+        const isActive = item.path === '/'
+          ? location.pathname === '/'
+          : location.pathname.startsWith(item.path);
         const Icon = (Icons as any)[item.icon] || Icons.HelpCircle;
 
         return (

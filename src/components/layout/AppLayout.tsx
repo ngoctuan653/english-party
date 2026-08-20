@@ -20,8 +20,8 @@ export function AppLayout() {
       {!isStudySessionActive && <MobileHeader />}
 
       {/* Main Content Area */}
-      <main className={`lg:pl-64 pt-14 lg:pt-16 pb-16 lg:pb-0 min-h-screen flex flex-col ${isStudySessionActive ? 'session-active' : ''}`}>
-        <div className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 relative">
+      <main className={`app-main lg:pl-56 pt-14 lg:pt-16 pb-16 lg:pb-0 min-h-screen flex flex-col ${isStudySessionActive ? 'session-active' : ''}`}>
+        <div className="relative mx-auto flex w-full max-w-[1600px] flex-1 p-4 sm:p-5 lg:p-6 xl:p-7">
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}
@@ -29,7 +29,7 @@ export function AppLayout() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.22, ease: 'easeOut' }}
-              className="w-full h-full flex flex-col flex-1"
+              className="flex h-full w-full flex-1 flex-col"
             >
               <Outlet />
             </motion.div>

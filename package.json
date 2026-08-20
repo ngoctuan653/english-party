@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate:learning-bank": "node scripts/generate-learning-bank.cjs",
+    "validate:learning-bank": "node scripts/validate-learning-bank.cjs"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.0",

@@ -12,28 +12,35 @@ import { motion, AnimatePresence } from 'framer-motion';
 import * as Icons from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useUIStore } from '@/stores/uiStore';
-import { startStudySession, endStudySession } from '@/services/study';
+import { cancelStudySession, startStudySession, endStudySession } from '@/services/study';
 import { formatDuration } from '@/utils/helpers';
 import { toast } from 'react-hot-toast';
 import type { SessionResults } from '@/types/study';
 import type { QuestionAnswer } from '@/types/question';
 import type { VocabProgressRecord } from '@/types/progress';
 import { buildSmartVocabDeck, generateSmartVocabSession } from '@/services/progress';
+import {
+  LearningIntro,
+  LearningModuleNav,
+  LearningSectionHeading,
+  LearningStats,
+  WorkspaceSearch,
+} from '@/components/study/LearningWorkspace';
 
 const getTopicMeta = (topic: string) => {
-  const meta: Record<string, { emoji: string; gradient: string; hoverGlow: string }> = {
-    office: { emoji: '🏢', gradient: 'from-blue-600 to-indigo-500', hoverGlow: 'hover:shadow-indigo-500/25' },
-    travel: { emoji: '✈️', gradient: 'from-cyan-500 to-blue-500', hoverGlow: 'hover:shadow-cyan-500/25' },
-    marketing: { emoji: '📊', gradient: 'from-rose-500 to-orange-500', hoverGlow: 'hover:shadow-rose-500/25' },
-    finance: { emoji: '💰', gradient: 'from-emerald-500 to-teal-500', hoverGlow: 'hover:shadow-emerald-500/25' },
-    technology: { emoji: '💻', gradient: 'from-violet-600 to-purple-500', hoverGlow: 'hover:shadow-violet-500/25' },
-    hotel: { emoji: '🏨', gradient: 'from-amber-500 to-orange-500', hoverGlow: 'hover:shadow-amber-500/25' },
-    email: { emoji: '✉️', gradient: 'from-sky-500 to-indigo-500', hoverGlow: 'hover:shadow-sky-500/25' },
-    shipping: { emoji: '📦', gradient: 'from-amber-600 to-yellow-600', hoverGlow: 'hover:shadow-amber-600/25' },
-    meetings: { emoji: '🤝', gradient: 'from-teal-600 to-emerald-500', hoverGlow: 'hover:shadow-teal-500/25' },
-    business: { emoji: '💼', gradient: 'from-slate-700 to-slate-800', hoverGlow: 'hover:shadow-slate-700/25' },
+  const meta: Record<string, { emoji: string; tone: string; hoverGlow: string }> = {
+    office: { emoji: '🏢', tone: 'bg-blue-600', hoverGlow: 'hover:shadow-blue-500/10' },
+    travel: { emoji: '✈️', tone: 'bg-cyan-600', hoverGlow: 'hover:shadow-cyan-500/10' },
+    marketing: { emoji: '📊', tone: 'bg-rose-600', hoverGlow: 'hover:shadow-rose-500/10' },
+    finance: { emoji: '💰', tone: 'bg-emerald-600', hoverGlow: 'hover:shadow-emerald-500/10' },
+    technology: { emoji: '💻', tone: 'bg-violet-600', hoverGlow: 'hover:shadow-violet-500/10' },
+    hotel: { emoji: '🏨', tone: 'bg-amber-600', hoverGlow: 'hover:shadow-amber-500/10' },
+    email: { emoji: '✉️', tone: 'bg-sky-600', hoverGlow: 'hover:shadow-sky-500/10' },
+    shipping: { emoji: '📦', tone: 'bg-orange-600', hoverGlow: 'hover:shadow-orange-500/10' },
+    meetings: { emoji: '🤝', tone: 'bg-teal-600', hoverGlow: 'hover:shadow-teal-500/10' },
+    business: { emoji: '💼', tone: 'bg-slate-800', hoverGlow: 'hover:shadow-slate-500/10' },
   };
-  return meta[topic.toLowerCase()] || { emoji: '📚', gradient: 'from-violet-500 to-purple-500', hoverGlow: 'hover:shadow-purple-500/25' };
+  return meta[topic.toLowerCase()] || { emoji: '📚', tone: 'bg-indigo-600', hoverGlow: 'hover:shadow-indigo-500/10' };
 };
 
 const speakText = (text: string, rate: number = 0.9) => {
@@ -119,6 +126,7 @@ export default function VocabularyPage() {
         'Thoát học? Tiến trình học từ vựng hiện tại sẽ không được lưu. (Exit session? Current progress will not be saved.)'
       );
       if (confirmExit) {
+        cancelStudySession(sessionId);
         if (location.state?.practiceIds || selectedTopic === 'custom_practice') {
           navigate('/study');
         } else {
@@ -147,7 +155,7 @@ export default function VocabularyPage() {
         window.history.back();
       }
     };
-  }, [selectedTopic, results, navigate, location.state]);
+  }, [selectedTopic, results, navigate, location.state, sessionId]);
 
   // Prevent page refresh / tab close
   useEffect(() => {
@@ -196,6 +204,13 @@ export default function VocabularyPage() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const wordStartTimeRef = useRef<number>(0);
   const answersRef = useRef<QuestionAnswer[]>([]);
+  const activeSessionIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    activeSessionIdRef.current = sessionId;
+  }, [sessionId]);
+
+  useEffect(() => () => cancelStudySession(activeSessionIdRef.current), []);
 
   useEffect(() => {
     async function loadVocab() {
@@ -395,6 +410,7 @@ export default function VocabularyPage() {
 
   const handleExitVocab = () => {
     if (results || viewedWordIds.size === 0 || window.confirm('Exit session? Current progress will not be saved.')) {
+      cancelStudySession(sessionId);
       if (location.state?.practiceIds || selectedTopic === 'custom_practice') {
         navigate('/study');
       } else {
@@ -555,104 +571,57 @@ export default function VocabularyPage() {
     const masteredPercent = totalWords > 0 ? Math.round((masteredCount / totalWords) * 100) : 0;
 
     return (
-      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-6 pb-8 text-slate-800 xl:grid-cols-[300px_minmax(0,1fr)]">
-        <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-4 shadow-sm xl:sticky xl:top-24">
-          <div className="mb-4 flex items-center gap-3 border-b border-slate-100 pb-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#0EA5E9] text-white shadow-lg shadow-sky-200">
-              <Icons.BookMarked className="h-6 w-6" />
-            </div>
-            <div className="min-w-0">
-              <h2 className="text-sm font-black text-slate-900">Vocabulary</h2>
-              <p className="truncate text-[11px] font-medium text-slate-500">TOEIC word bank and flashcards</p>
-            </div>
-          </div>
+      <div className="mx-auto w-full max-w-[1440px] space-y-4 pb-8 text-slate-800">
+        <section className="min-w-0 space-y-4">
+          <LearningModuleNav active="vocabulary" />
 
-          <div className="grid grid-cols-2 gap-2">
-            <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-              <p className="text-[10px] font-bold uppercase text-slate-400">Words</p>
-              <p className="mt-1 text-lg font-black text-slate-900">{totalWords}</p>
-            </div>
-            <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-              <p className="text-[10px] font-bold uppercase text-slate-400">Topics</p>
-              <p className="mt-1 text-lg font-black text-slate-900">{uniqueTopics.length}</p>
-            </div>
-            <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-              <p className="text-[10px] font-bold uppercase text-slate-400">Learning</p>
-              <p className="mt-1 text-lg font-black text-amber-600">{learningCount}</p>
-            </div>
-            <div className="rounded-xl border border-slate-100 bg-slate-50 p-3">
-              <p className="text-[10px] font-bold uppercase text-slate-400">Mastered</p>
-              <p className="mt-1 text-lg font-black text-emerald-600">{masteredCount}</p>
-            </div>
-          </div>
-
-          <div className="mt-4 rounded-xl border border-sky-100 bg-sky-50 p-3">
-            <div className="mb-2 flex items-center justify-between text-[10px] font-bold uppercase text-slate-500">
-              <span>Mastery</span>
-              <span className="text-sky-600">{masteredPercent}%</span>
-            </div>
-            <Progress value={masteredPercent} height="sm" />
-          </div>
-        </aside>
-
-        <section className="min-w-0 space-y-5">
-
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden rounded-3xl border border-sky-100 bg-gradient-to-br from-sky-50 via-white to-cyan-50 px-6 py-8 shadow-sm sm:px-10"
-          >
-            <div className="relative z-10 flex items-center justify-between gap-6">
-              <div>
-                <p className="mb-2 text-xs font-bold uppercase tracking-wide text-sky-600">TOEIC Vocabulary</p>
-                <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Vocabulary Topics</h1>
-                <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-slate-500">
-                  Build your TOEIC word bank by topic, review weak words, and keep progress visible while you study.
-                </p>
+          <LearningIntro
+            eyebrow="TOEIC Vocabulary"
+            title="Vocabulary Library"
+            description="Build a practical word bank by topic. Smart sessions prioritize new and weak words, then add a small review sample only when needed."
+            icon={Icons.Layers3}
+            accent="blue"
+            aside={(
+              <div className="w-full">
+                <div className="flex items-end justify-between gap-3">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase text-slate-400">Overall mastery</p>
+                    <p className="mt-1 text-3xl font-black text-slate-950">{masteredPercent}%</p>
+                  </div>
+                  <p className="pb-1 text-xs font-bold text-emerald-700">{masteredCount}/{totalWords}</p>
+                </div>
+                <div className="mt-4">
+                  <Progress value={masteredPercent} height="sm" />
+                </div>
               </div>
-              <div className="hidden h-36 w-36 shrink-0 items-center justify-center rounded-3xl bg-[#0EA5E9] text-white shadow-2xl shadow-sky-200 md:flex">
-                <Icons.Layers3 className="h-16 w-16" />
-              </div>
-            </div>
-          </motion.div>
+            )}
+          />
 
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-              <p className="text-[10px] font-bold uppercase text-slate-400">New Words</p>
-              <p className="mt-1 text-2xl font-black text-slate-900">{remainingCount}</p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-              <p className="text-[10px] font-bold uppercase text-slate-400">In Review</p>
-              <p className="mt-1 text-2xl font-black text-amber-600">{learningCount}</p>
-            </div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-              <p className="text-[10px] font-bold uppercase text-slate-400">Mastered</p>
-              <p className="mt-1 text-2xl font-black text-emerald-600">{masteredCount}</p>
-            </div>
-          </div>
+          <LearningStats
+            items={[
+              { label: 'Word bank', value: totalWords, detail: `${uniqueTopics.length} topics`, icon: Icons.LibraryBig, tone: 'blue' },
+              { label: 'New words', value: remainingCount, detail: 'Ready to learn', icon: Icons.Sparkles, tone: 'violet' },
+              { label: 'In review', value: learningCount, detail: 'Needs reinforcement', icon: Icons.RotateCcw, tone: 'amber' },
+              { label: 'Mastered', value: masteredCount, detail: 'Completed words', icon: Icons.BadgeCheck, tone: 'emerald' },
+            ]}
+          />
 
-          <div className="relative">
-            <Icons.Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <input
-              value={topicSearchTerm}
-              onChange={(event) => setTopicSearchTerm(event.target.value)}
-              className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-11 pr-4 text-sm font-medium text-slate-700 outline-none transition-colors placeholder:text-slate-400 focus:border-sky-400 focus:ring-4 focus:ring-sky-100"
-              placeholder="Search vocabulary topics..."
-            />
-          </div>
+          <WorkspaceSearch
+            value={topicSearchTerm}
+            onChange={setTopicSearchTerm}
+            placeholder="Search vocabulary topics..."
+          />
 
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="flex items-center gap-2 text-lg font-black text-slate-900">
-              <Icons.BookMarked className="h-5 w-5 text-sky-500" />
-              Topic Library
-            </h2>
-            <span className="text-xs font-bold text-slate-400">{filteredTopics.length} topics</span>
-          </div>
+          <LearningSectionHeading
+            title="Vocabulary topics"
+            count={`${filteredTopics.length} topics`}
+            icon={Icons.BookMarked}
+          />
 
         {loading ? (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map((n) => (
-              <Skeleton key={n} className="h-40 w-full rounded-2xl" />
+              <Skeleton key={n} className="h-40 w-full rounded-lg" />
             ))}
           </div>
         ) : (
@@ -676,12 +645,12 @@ export default function VocabularyPage() {
                   key={topic}
                   type="button"
                   onClick={() => handleSelectTopic(topic)}
-                  className={`group rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-md ${meta.hoverGlow}`}
+                  className={`group min-h-40 rounded-lg border border-slate-200 bg-white p-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md ${meta.hoverGlow}`}
                 >
                   <div className="space-y-4">
                     <div className="flex items-start gap-3">
                       <div
-                        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${meta.gradient} text-lg text-white shadow-sm`}
+                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-md ${meta.tone} text-lg text-white shadow-sm`}
                       >
                         {meta.emoji}
                       </div>
@@ -720,9 +689,9 @@ export default function VocabularyPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-5 pb-8 text-slate-800">
+    <div className="mx-auto w-full max-w-4xl space-y-4 pb-8 text-slate-800">
       {/* Header toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
         <button
           onClick={handleExitVocab}
           className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
@@ -764,11 +733,11 @@ export default function VocabularyPage() {
       </div>
 
       {/* Title */}
-      <div className="rounded-3xl border border-sky-100 bg-gradient-to-br from-sky-50 via-white to-cyan-50 p-5 shadow-sm">
+      <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
         <div>
           <p className="mb-2 text-xs font-bold uppercase tracking-wide text-sky-600">Flashcard Session</p>
-          <h1 className="text-2xl font-black capitalize tracking-tight text-slate-900 sm:text-3xl">
-            Topic: {selectedTopic}
+          <h1 className="text-2xl font-black capitalize text-slate-950 sm:text-3xl">
+            {selectedTopic}
           </h1>
           <p className="mt-2 text-xs font-bold text-slate-500">
             {filteredWords.length} words available
@@ -810,7 +779,7 @@ export default function VocabularyPage() {
             >
               {/* Front Side */}
               <div
-                className="absolute inset-0 flex flex-col items-center justify-center rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm"
+                className="absolute inset-0 flex flex-col items-center justify-center rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm"
                 style={{ backfaceVisibility: 'hidden' }}
               >
                 <Badge variant="purple" className="absolute right-4 top-4 text-[9px] uppercase font-bold tracking-wider">
@@ -853,7 +822,7 @@ export default function VocabularyPage() {
 
               {/* Back Side */}
               <div
-                className="absolute inset-0 flex flex-col items-center justify-center rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm"
+                className="absolute inset-0 flex flex-col items-center justify-center rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm"
                 style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
               >
                 <Badge variant="success" className="absolute right-4 top-4 text-[9px] uppercase font-bold">

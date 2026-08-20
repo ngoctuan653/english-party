@@ -323,6 +323,51 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 /**
+ * Build a focused deck from questions the learner has not recovered yet.
+ * A mistake is considered recovered once correct attempts catch up and
+ * mastery reaches the review threshold.
+ */
+export function buildMistakeReviewDeck(
+  allQuestions: Question[],
+  progressMap: Map<string, QuestionProgress>,
+  count = 10,
+): Question[] {
+  const candidates = allQuestions
+    .map((question) => ({ question, progress: progressMap.get(question.id) }))
+    .filter(({ progress }) =>
+      progress &&
+      progress.wrongCount > 0 &&
+      (progress.wrongCount > progress.correctCount || progress.mastery < MASTERY_THRESHOLDS.REVIEW)
+    )
+    .sort((a, b) => {
+      const aProgress = a.progress!;
+      const bProgress = b.progress!;
+      const aUnresolved = aProgress.wrongCount > aProgress.correctCount ? 0 : 1;
+      const bUnresolved = bProgress.wrongCount > bProgress.correctCount ? 0 : 1;
+      const aLastSeen = aProgress.lastSeenAt?.toMillis?.() ?? 0;
+      const bLastSeen = bProgress.lastSeenAt?.toMillis?.() ?? 0;
+
+      return (
+        aUnresolved - bUnresolved ||
+        aProgress.mastery - bProgress.mastery ||
+        bProgress.wrongCount - aProgress.wrongCount ||
+        aLastSeen - bLastSeen
+      );
+    });
+
+  const fresh = candidates.filter(({ question }) => !recentlySeenQuestionIds.includes(question.id));
+  const repeated = candidates.filter(({ question }) => recentlySeenQuestionIds.includes(question.id));
+  const deck = [...fresh, ...repeated].slice(0, Math.max(1, count)).map(({ question }) => question);
+
+  recentlySeenQuestionIds = pushToRecentCache(
+    recentlySeenQuestionIds,
+    deck.map((question) => question.id),
+  );
+
+  return deck;
+}
+
+/**
  * Generate a smart quiz session.
  * Prioritises: new (60%) → weak (25%) → review (15%)
  * Applies cooldown + recently-seen filtering.

@@ -28,12 +28,12 @@ export function MobileHeader() {
 
   const getPageTitle = () => {
     const path = location.pathname;
-    if (path === '/') return 'Dashboard';
+    if (path === '/') return 'Learn';
     if (path.startsWith('/study/vocabulary')) return 'Vocab';
     if (path.startsWith('/study/listening')) return 'Listening';
-    if (path === '/study') return 'Study';
-    if (path === '/missions') return 'Missions';
-    if (path === '/leaderboard') return 'Leaderboard';
+    if (path === '/study') return 'Practice';
+    if (path === '/missions') return 'Quests';
+    if (path === '/leaderboard') return 'League';
     if (path === '/friends') return 'Friends';
     if (path === '/profile') return 'Profile';
     if (path === '/settings') return 'Settings';
@@ -70,8 +70,8 @@ export function MobileHeader() {
       {/* Right side: Streak & Notifications */}
       <div className="flex items-center gap-3">
         {profile && profile.currentStreak > 0 && (
-          <div className="flex items-center gap-1 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-full text-xs font-semibold text-amber-500">
-            <span>🔥</span>
+          <div className="flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-600">
+            <Icons.Flame className="h-3.5 w-3.5 fill-amber-400" />
             <span>{profile.currentStreak}</span>
           </div>
         )}

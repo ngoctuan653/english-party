@@ -77,7 +77,7 @@ export function Card({
       initial={noAnimation ? undefined : 'hidden'}
       animate={noAnimation ? undefined : 'visible'}
       className={[
-        'relative rounded-2xl',
+        'relative rounded-lg',
         'bg-white',
         'border border-slate-200/50 shadow-sm',
         // Hover glow

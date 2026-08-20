@@ -2,36 +2,85 @@ import { useEffect, useState, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { useUIStore } from '@/stores/uiStore';
-import { getRecentSessions, fetchQuestions, startStudySession, endStudySession } from '@/services/study';
+import {
+  cancelStudySession,
+  endStudySession,
+  fetchQuestions,
+  getRecentSessions,
+  startStudySession,
+} from '@/services/study';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Progress } from '@/components/ui/Progress';
 import { Skeleton } from '@/components/ui/Skeleton';
-import type { StudySession, SessionResults } from '@/types/study';
+import type { StudySession, SessionResults, SessionValidationIssue } from '@/types/study';
 import type { Question, QuestionAnswer } from '@/types/question';
 import { formatTimestamp, formatDuration, getAccuracyColor } from '@/utils/helpers';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
 import * as Icons from 'lucide-react';
-import { generateSmartQuizSession } from '@/services/progress';
+import {
+  buildMistakeReviewDeck,
+  generateSmartQuizSession,
+  getUserQuestionProgress,
+} from '@/services/progress';
 import SessionReviewModal from '@/components/study/SessionReviewModal';
+import {
+  LearningIntro,
+  LearningModuleNav,
+  LearningSectionHeading,
+  WorkspaceSearch,
+} from '@/components/study/LearningWorkspace';
+import { getBundledQuestionCount, getBundledTopics } from '@/data/questionBank';
 
-const grammarTopics = [
-  { title: 'Basic Grammar Knowledge', subtitle: 'Core TOEIC grammar foundation', questions: 50, status: 'Not started' },
-  { title: 'Nouns', subtitle: 'Danh tu', questions: 62, status: 'Not started' },
-  { title: 'Verbs', subtitle: 'Dong tu', questions: 45, status: 'Not started' },
-  { title: 'Active and Passive Voice', subtitle: 'Cau chu dong va cau bi dong', questions: 54, status: 'Not started' },
-  { title: 'Adjectives', subtitle: 'Tinh tu', questions: 38, status: 'Not started' },
-  { title: 'Adverbs', subtitle: 'Trang tu', questions: 41, status: 'Not started' },
-];
+type ToeicReadingPart = 5 | 6 | 7;
 
-const studyRailItems = [
-  { id: 'grammar', label: 'Grammar', description: 'TOEIC Part 5', icon: Icons.BookOpen, active: true },
-  { id: 'part5', label: 'Part 5: Complete Sentences', description: 'Short grammar drills', icon: Icons.FileText },
-  { id: 'vocabulary', label: 'Vocabulary', description: 'Flashcards and review', icon: Icons.BookMarked, route: '/study/vocabulary' },
-  { id: 'listening', label: 'Listening', description: 'Audio practice set', icon: Icons.Headphones, route: '/study/listening' },
-];
+const partMeta: Record<ToeicReadingPart, { title: string; shortTitle: string; description: string }> = {
+  5: {
+    title: 'Incomplete Sentences',
+    shortTitle: 'Grammar',
+    description: 'Build accuracy with grammar, word forms, and business vocabulary in individual sentences.',
+  },
+  6: {
+    title: 'Text Completion',
+    shortTitle: 'Text completion',
+    description: 'Choose language that completes emails, notices, memos, and other workplace texts.',
+  },
+  7: {
+    title: 'Reading Comprehension',
+    shortTitle: 'Reading',
+    description: 'Read practical workplace documents and answer detail, purpose, and inference questions.',
+  },
+};
+
+const topicLabels: Record<string, string> = {
+  'subject-verb-agreement': 'Subject-verb agreement',
+  'infinitives-gerunds': 'Infinitives & gerunds',
+  'passive-voice': 'Active & passive voice',
+  'verb-tenses': 'Verb tenses',
+  'modal-verbs': 'Modal verbs',
+  'word-forms': 'Word forms',
+  'customer-service': 'Customer service',
+  advertisements: 'Advertisements',
+  comparisons: 'Comparisons',
+  conjunctions: 'Conjunctions',
+  participles: 'Participles',
+  prepositions: 'Prepositions',
+  reservations: 'Reservations',
+  schedules: 'Schedules',
+  subjunctive: 'Subjunctive',
+};
+
+const formatTopic = (topic: string) =>
+  topicLabels[topic] ?? topic.replaceAll('-', ' ').replace(/\b\w/g, (character) => character.toUpperCase());
+
+const validationIssueMessages: Record<SessionValidationIssue, string> = {
+  'invalid-session-data': 'Some answer data was incomplete or inconsistent.',
+  'implausibly-fast': 'Most answers were submitted in an implausibly short time.',
+  'excessive-tab-switching': 'The study tab was left too many times during this session.',
+  'extended-inactivity': 'The session contained multiple long periods without learning activity.',
+};
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -82,6 +131,8 @@ export default function StudyPage() {
   const [loading, setLoading] = useState(true);
   const [selectedReviewSession, setSelectedReviewSession] = useState<StudySession | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [activePart, setActivePart] = useState<ToeicReadingPart>(5);
+  const [practiceTitle, setPracticeTitle] = useState('Part 5 mixed practice');
 
   // Active quiz session states
   const [quizActive, setQuizActive] = useState(false);
@@ -98,8 +149,16 @@ export default function StudyPage() {
   const [secondsElapsed, setSecondsElapsed] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const questionStartTimeRef = useRef<number>(0);
+  const finishInProgressRef = useRef(false);
+  const activeSessionIdRef = useRef<string | null>(null);
 
   const { setStudySessionActive } = useUIStore();
+
+  useEffect(() => {
+    activeSessionIdRef.current = sessionId;
+  }, [sessionId]);
+
+  useEffect(() => () => cancelStudySession(activeSessionIdRef.current), []);
 
   // Synchronize active study session state with layout
   useEffect(() => {
@@ -122,6 +181,7 @@ export default function StudyPage() {
         'Thoát học? Tiến trình làm bài hiện tại sẽ không được lưu. (Exit session? Current progress will not be saved.)'
       );
       if (confirmExit) {
+        cancelStudySession(sessionId);
         setQuizActive(false);
         setQuestions([]);
         setSessionId(null);
@@ -140,7 +200,7 @@ export default function StudyPage() {
         window.history.back();
       }
     };
-  }, [quizActive, results]);
+  }, [quizActive, results, sessionId]);
 
   // Prevent page refresh / tab close
   useEffect(() => {
@@ -174,14 +234,23 @@ export default function StudyPage() {
     loadSessions();
   }, [profile?.uid, quizActive]);
 
+  useEffect(() => {
+    const part = Number(new URLSearchParams(location.search).get('part'));
+    if (part === 5 || part === 6 || part === 7) setActivePart(part);
+  }, [location.search]);
+
   // Catch retake questions from router state (e.g. from Profile page)
   useEffect(() => {
+    if (!profile?.uid) return;
     if (location.state?.practiceQuestions) {
       const customQ = location.state.practiceQuestions as Question[];
       navigate(location.pathname, { replace: true });
       handleStartQuiz(customQ);
+    } else if (location.state?.practiceMode === 'mistakes') {
+      navigate(location.pathname, { replace: true });
+      handleStartMistakeReview();
     }
-  }, [location.state, navigate]);
+  }, [location.state, navigate, profile?.uid]);
 
   // Timer interval
   useEffect(() => {
@@ -198,7 +267,10 @@ export default function StudyPage() {
     };
   }, [quizActive, results]);
 
-  const handleStartQuiz = async (customQuestions?: Question[]) => {
+  const handleStartQuiz = async (
+    customQuestions?: Question[],
+    filters: { part?: ToeicReadingPart; topic?: string; count?: number; title?: string } = {},
+  ) => {
     if (!profile?.uid) return;
     try {
       setLoadingQuestions(true);
@@ -206,9 +278,15 @@ export default function StudyPage() {
 
       if (customQuestions && customQuestions.length > 0) {
         list = customQuestions;
+        setPracticeTitle(filters.title ?? 'Review practice');
       } else {
-        // Fetch a larger pool of active TOEIC questions
-        const allQuestions = await fetchQuestions({ exam: 'toeic', count: 50 });
+        const targetPart = filters.part ?? activePart;
+        const allQuestions = await fetchQuestions({
+          exam: 'toeic',
+          part: targetPart,
+          topic: filters.topic,
+          count: 250,
+        });
         
         if (allQuestions.length === 0) {
           toast.error('No practice questions available in database yet. Try importing CSV data first!');
@@ -216,8 +294,12 @@ export default function StudyPage() {
           return;
         }
 
-        // Smart selection: 60% new, 25% weak, 15% review
-        list = await generateSmartQuizSession(profile.uid, allQuestions, 5);
+        list = await generateSmartQuizSession(profile.uid, allQuestions, filters.count ?? 10);
+        setPracticeTitle(
+          filters.topic
+            ? `Part ${targetPart} · ${formatTopic(filters.topic)}`
+            : `Part ${targetPart} mixed practice`,
+        );
 
         if (list.length === 0) {
           toast('Bạn đã hoàn thành hết câu hỏi hiện có! Hãy quay lại sau hoặc chờ thêm câu hỏi mới.\nYou\'ve completed all available questions!', {
@@ -278,7 +360,8 @@ export default function StudyPage() {
   };
 
   const handleFinishQuiz = async () => {
-    if (!sessionId || !profile?.uid) return;
+    if (!sessionId || !profile?.uid || finishInProgressRef.current) return;
+    finishInProgressRef.current = true;
     try {
       setLoadingQuestions(true);
       const sessionResults = await endStudySession(
@@ -293,12 +376,38 @@ export default function StudyPage() {
       console.error(err);
       toast.error('Failed to save quiz results.');
     } finally {
+      finishInProgressRef.current = false;
+      setLoadingQuestions(false);
+    }
+  };
+
+  const handleStartMistakeReview = async () => {
+    if (!profile?.uid || loadingQuestions) return;
+    try {
+      setLoadingQuestions(true);
+      const [allQuestions, progressMap] = await Promise.all([
+        fetchQuestions({ exam: 'toeic', count: 1000 }),
+        getUserQuestionProgress(profile.uid),
+      ]);
+      const reviewDeck = buildMistakeReviewDeck(allQuestions, progressMap, 10);
+
+      if (reviewDeck.length === 0) {
+        toast.success('No unresolved mistakes. Your review queue is clear!');
+        return;
+      }
+
+      await handleStartQuiz(reviewDeck, { title: 'Mistakes review' });
+    } catch (error) {
+      console.error(error);
+      toast.error('Could not prepare your mistakes review.');
+    } finally {
       setLoadingQuestions(false);
     }
   };
 
   const handleExitQuiz = () => {
     if (results || window.confirm('Exit quiz? Current progress will not be saved.')) {
+      cancelStudySession(sessionId);
       setQuizActive(false);
       setQuestions([]);
       setSessionId(null);
@@ -312,24 +421,25 @@ export default function StudyPage() {
     const progressPercent = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
 
     return (
-      <div className="max-w-2xl mx-auto pb-8 text-slate-800 animate-fade-in space-y-6">
+      <div className="mx-auto w-full max-w-[1280px] space-y-4 pb-8 text-slate-800 animate-fade-in">
         {/* Header toolbar */}
-        <div className="flex justify-between items-center bg-white p-4 border border-slate-200/60 rounded-2xl shadow-sm">
+        <div className="grid gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm sm:grid-cols-[auto_1fr_auto] sm:items-center">
           <button
             onClick={handleExitQuiz}
-            className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-xs font-bold text-slate-500 transition-colors hover:text-slate-900"
           >
             <Icons.X className="w-4 h-4" /> Exit Session
           </button>
-          
-          <div className="flex items-center gap-4 text-xs font-semibold text-slate-500">
-            <span className="flex items-center gap-1">
+
+          <p className="truncate text-center text-xs font-black text-slate-800 sm:px-4">{practiceTitle}</p>
+
+          <div className="flex items-center justify-between gap-4 text-xs font-semibold text-slate-500 sm:justify-end">
+            <span className="flex items-center gap-1.5 tabular-nums">
               <Icons.Timer className="w-3.5 h-3.5 text-[#0071E3]" />
               {Math.floor(secondsElapsed / 60)}:{(secondsElapsed % 60).toString().padStart(2, '0')}
             </span>
-            <span className="text-slate-300">|</span>
-            <span className="text-[#0071E3] font-bold">
-              Question {currentIndex + 1} / {questions.length}
+            <span className="font-black text-[#0071E3]">
+              {currentIndex + 1} / {questions.length}
             </span>
           </div>
         </div>
@@ -344,12 +454,15 @@ export default function StudyPage() {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.25 }}
-              className="space-y-6"
+              className={`grid items-start gap-4 lg:min-h-[calc(100vh-210px)] lg:items-stretch ${
+                currentQuestion?.context
+                  ? 'lg:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]'
+                  : 'lg:grid-cols-[minmax(320px,0.75fr)_minmax(0,1.25fr)]'
+              }`}
             >
-              {/* Question Text */}
-              <Card className="p-6 bg-white border border-slate-200/80 shadow-sm space-y-4">
-                <div className="flex justify-between items-center flex-wrap gap-2">
-                  <div className="flex gap-2">
+              <Card className="h-full space-y-5 rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <Badge variant="purple">TOEIC Part {currentQuestion?.part || 5}</Badge>
                     <Badge variant="info" className="capitalize">{currentQuestion?.topic || 'Business'}</Badge>
                   </div>
@@ -359,172 +472,222 @@ export default function StudyPage() {
                     </Badge>
                   )}
                 </div>
-                <h2 className="text-lg font-bold leading-relaxed text-slate-800">
-                  {currentQuestion?.question}
-                </h2>
+                {currentQuestion?.context && (
+                  <div className="max-h-[calc(100vh-280px)] overflow-y-auto whitespace-pre-line rounded-md border border-slate-200 bg-slate-50 p-5 text-sm leading-7 text-slate-700">
+                    {currentQuestion.context}
+                  </div>
+                )}
+                <div className="border-t border-slate-100 pt-4">
+                  <p className="mb-2 text-[10px] font-black uppercase text-slate-400">Question {currentIndex + 1}</p>
+                  <h2 className="text-lg font-bold leading-relaxed text-slate-950 sm:text-xl">
+                    {currentQuestion?.question}
+                  </h2>
+                </div>
               </Card>
 
-              {/* Choices list */}
-              <div className="grid grid-cols-1 gap-3">
-                {currentQuestion?.choices.map((choice, idx) => {
-                  const letter = String.fromCharCode(65 + idx);
-                  const isSelected = selectedChoice === idx;
-                  const isCorrect = idx === currentQuestion.correctAnswer;
+              <div className="flex h-full flex-col gap-4">
+                <div className={`grid gap-3 ${currentQuestion?.context ? 'grid-cols-1' : 'sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2'}`}>
+                  {currentQuestion?.choices.map((choice, idx) => {
+                    const letter = String.fromCharCode(65 + idx);
+                    const isSelected = selectedChoice === idx;
+                    const isCorrect = idx === currentQuestion.correctAnswer;
 
-                  let borderClass = 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700 shadow-sm';
-                  if (isSelected && !isAnswerSubmitted) {
-                    borderClass = 'border-[#0071E3] bg-[#0071E3]/5 text-[#0071E3] shadow-sm';
-                  } else if (isAnswerSubmitted) {
-                    if (isCorrect) {
-                      borderClass = 'border-emerald-500 bg-emerald-50 text-emerald-700';
-                    } else if (isSelected) {
-                      borderClass = 'border-rose-500 bg-rose-50 text-rose-700';
-                    } else {
-                      borderClass = 'border-slate-100 bg-slate-50/50 opacity-40 text-slate-400';
+                    let borderClass = 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 text-slate-700 shadow-sm';
+                    if (isSelected && !isAnswerSubmitted) {
+                      borderClass = 'border-[#0071E3] bg-sky-50 text-[#0071E3] shadow-sm';
+                    } else if (isAnswerSubmitted) {
+                      if (isCorrect) {
+                        borderClass = 'border-emerald-500 bg-emerald-50 text-emerald-700';
+                      } else if (isSelected) {
+                        borderClass = 'border-rose-500 bg-rose-50 text-rose-700';
+                      } else {
+                        borderClass = 'border-slate-100 bg-slate-50 opacity-50 text-slate-400';
+                      }
                     }
-                  }
+
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => !isAnswerSubmitted && setSelectedChoice(idx)}
+                        disabled={isAnswerSubmitted}
+                        className={`flex min-h-16 w-full items-center gap-4 rounded-lg border p-4 text-left text-sm font-semibold transition-all ${borderClass}`}
+                      >
+                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-black ${
+                          isSelected && !isAnswerSubmitted
+                            ? 'border-[#0071E3] bg-[#0071E3] text-white'
+                            : 'border-slate-200 bg-slate-100 text-slate-500'
+                        }`}>
+                          {letter}
+                        </span>
+                        <span className="min-w-0 flex-1 leading-5">{choice}</span>
+                        {isAnswerSubmitted && isCorrect && <Icons.Check className="h-5 w-5 shrink-0 text-emerald-600" />}
+                        {isAnswerSubmitted && isSelected && !isCorrect && <Icons.X className="h-5 w-5 shrink-0 text-rose-600" />}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {isAnswerSubmitted && (() => {
+                  const { sentenceTranslation, viExpl } = parseExplanation(currentQuestion?.explanation);
 
                   return (
-                    <button
-                      key={idx}
-                      onClick={() => !isAnswerSubmitted && setSelectedChoice(idx)}
-                      disabled={isAnswerSubmitted}
-                      className={`w-full rounded-2xl border p-4.5 text-left text-sm font-semibold transition-all flex items-center gap-4 cursor-pointer ${borderClass}`}
-                    >
-                      <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                        isSelected && !isAnswerSubmitted ? 'bg-[#0071E3] text-white' : 'bg-slate-100 text-slate-500 border border-slate-200'
-                      }`}>
-                        {letter}
-                      </span>
-                      <span>{choice}</span>
-                      {isAnswerSubmitted && isCorrect && <Icons.Check className="w-5 h-5 ml-auto text-emerald-600" />}
-                      {isAnswerSubmitted && isSelected && !isCorrect && <Icons.X className="w-5 h-5 ml-auto text-rose-600" />}
-                    </button>
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                      <Card className="space-y-3 rounded-lg border-sky-200 bg-sky-50 p-5 text-slate-700 shadow-none">
+                        <p className="flex items-center gap-2 border-b border-sky-200 pb-2 text-xs font-black uppercase text-sky-700">
+                          <Icons.Info className="h-4 w-4" /> Detailed explanation
+                        </p>
+                        <div className="space-y-3 text-sm leading-6">
+                          {sentenceTranslation && (
+                            <div>
+                              <span className="mb-1 inline-flex items-center gap-1.5 text-xs font-black text-slate-800">
+                                <Icons.Languages className="h-4 w-4 text-sky-600" /> Translation
+                              </span>
+                              <p className="font-medium text-slate-700">{sentenceTranslation}</p>
+                            </div>
+                          )}
+                          {viExpl && (
+                            <div className={sentenceTranslation ? 'border-t border-sky-200 pt-3' : ''}>
+                              <span className="mb-1 inline-flex items-center gap-1.5 text-xs font-black text-slate-800">
+                                <Icons.BookOpenCheck className="h-4 w-4 text-sky-600" /> Explanation
+                              </span>
+                              <p className="text-slate-700">{viExpl}</p>
+                            </div>
+                          )}
+                        </div>
+                      </Card>
+                    </motion.div>
                   );
-                })}
-              </div>
+                })()}
 
-              {/* Explanation section */}
-              {isAnswerSubmitted && (() => {
-                const { sentenceTranslation, viExpl } = parseExplanation(currentQuestion?.explanation);
-
-                return (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    <Card className="p-5 bg-blue-50/40 border-blue-100 text-slate-700 space-y-3">
-                      <p className="text-xs font-bold text-[#0071E3] uppercase tracking-wide flex items-center gap-1.5 border-b border-slate-200/50 pb-2">
-                        <Icons.Info className="w-4 h-4" /> Giải thích chi tiết
-                      </p>
-                      <div className="space-y-3 text-xs leading-relaxed">
-                        {sentenceTranslation && (
-                          <div>
-                            <span className="inline-flex items-center gap-1 font-bold text-slate-805 mb-1">
-                              🇻🇳 Dịch câu:
-                            </span>
-                            <p className="text-slate-700 font-medium">{sentenceTranslation}</p>
-                          </div>
-                        )}
-                        {viExpl && (
-                          <div className={sentenceTranslation ? "pt-2.5 border-t border-slate-200/50" : ""}>
-                            <span className="inline-flex items-center gap-1 font-bold text-slate-805 mb-1">
-                              🇻🇳 Giải thích:
-                            </span>
-                            <p className="text-slate-705">{viExpl}</p>
-                          </div>
-                        )}
-                      </div>
-                    </Card>
-                  </motion.div>
-                );
-              })()}
-
-              {/* Action trigger */}
-              <div className="flex justify-end gap-3 pt-2">
-                {!isAnswerSubmitted ? (
-                  <Button
-                    onClick={handleSubmitAnswer}
-                    disabled={selectedChoice === null}
-                    className="px-8 font-bold"
-                  >
-                    Submit Answer
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleNextQuestion}
-                    className="px-8 font-bold"
-                  >
-                    {currentIndex < questions.length - 1 ? 'Next Question' : 'Finish Quiz'}
-                  </Button>
-                )}
+                <div className="mt-auto flex justify-end border-t border-slate-200 pt-4">
+                  {!isAnswerSubmitted ? (
+                    <Button
+                      onClick={handleSubmitAnswer}
+                      disabled={selectedChoice === null}
+                      className="w-full px-8 font-bold sm:w-auto"
+                    >
+                      <Icons.Check className="h-4 w-4" /> Submit Answer
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleNextQuestion}
+                      disabled={loadingQuestions}
+                      className="w-full px-8 font-bold sm:w-auto"
+                    >
+                      {loadingQuestions ? (
+                        <Icons.LoaderCircle className="h-4 w-4 animate-spin" />
+                      ) : currentIndex < questions.length - 1 ? (
+                        <Icons.ArrowRight className="h-4 w-4" />
+                      ) : (
+                        <Icons.Flag className="h-4 w-4" />
+                      )}
+                      {loadingQuestions
+                        ? 'Saving...'
+                        : currentIndex < questions.length - 1
+                          ? 'Next Question'
+                          : 'Finish Quiz'}
+                    </Button>
+                  )}
+                </div>
               </div>
             </motion.div>
           ) : (
-            // Results screen
             <motion.div
               initial={{ opacity: 0, scale: 0.96 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="space-y-6 text-center"
+              className="grid overflow-hidden rounded-lg border border-slate-200 bg-white shadow-md lg:min-h-[calc(100vh-210px)] lg:grid-cols-[minmax(300px,0.75fr)_minmax(0,1.25fr)]"
             >
-              <Card className="p-8 bg-white border border-slate-200/80 shadow-md space-y-6">
-                <h2 className="text-2xl font-black text-slate-800">Quiz Results</h2>
-                
-                {/* Accuracy percentage circle/badge */}
-                <div className="w-32 h-32 mx-auto rounded-full bg-slate-50 border-4 border-[#0071E3] flex flex-col justify-center items-center relative overflow-hidden shadow-md shadow-[#0071E3]/5">
-                  <div className="absolute inset-0 bg-[#0071E3]/3 blur-xl" />
-                  <p className="text-3xl font-black text-slate-800 relative z-10">{results.accuracy}%</p>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase relative z-10">Accuracy</p>
+              <section className="flex flex-col justify-between bg-slate-950 p-6 text-white sm:p-8">
+                <div>
+                  <p className="text-xs font-black uppercase text-sky-300">{practiceTitle}</p>
+                  <h2 className="mt-2 text-2xl font-black">Quiz complete</h2>
+                  <p className="mt-2 text-sm leading-6 text-slate-400">Your result has been saved to recent study activity.</p>
                 </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs pt-4 border-t border-slate-100">
-                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60">
-                    <p className="text-[9px] text-slate-400 font-bold uppercase">Correct</p>
-                    <p className="text-base font-black text-slate-800 mt-1">
-                      {results.correctAnswers} / {results.totalQuestions}
-                    </p>
+                <div className="mt-8 flex items-center gap-5 lg:flex-col lg:items-start">
+                  <div className="flex h-32 w-32 shrink-0 flex-col items-center justify-center rounded-full border-4 border-sky-400 bg-slate-900">
+                    <p className="text-3xl font-black">{results.accuracy}%</p>
+                    <p className="text-[10px] font-black uppercase text-slate-400">Accuracy</p>
                   </div>
-                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60">
-                    <p className="text-[9px] text-slate-400 font-bold uppercase">Time Spent</p>
-                    <p className="text-base font-black text-slate-800 mt-1">
-                      {Math.round(results.timeSpent)}s
-                    </p>
-                  </div>
-                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60">
-                    <p className="text-[9px] text-slate-400 font-bold uppercase">XP Earned</p>
-                    <p className="text-base font-black text-emerald-600 mt-1">
-                      +{results.xpEarned} XP
-                    </p>
-                  </div>
-                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60">
-                    <p className="text-[9px] text-slate-400 font-bold uppercase">Streak Bonus</p>
-                    <p className="text-base font-black text-amber-500 mt-1">
-                      +{results.streakBonus} XP
+                  <div>
+                    <p className="text-sm font-bold text-slate-300">Correct answers</p>
+                    <p className="mt-1 text-3xl font-black tabular-nums">
+                      {results.correctAnswers}<span className="text-lg text-slate-500"> / {results.totalQuestions}</span>
                     </p>
                   </div>
                 </div>
+              </section>
 
-                {!results.isValid && (
-                  <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs leading-relaxed text-left flex items-start gap-2">
-                    <Icons.AlertTriangle className="w-5 h-5 shrink-0 text-rose-500" />
+              <section className="flex flex-col gap-5 p-5 sm:p-8">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-black uppercase text-slate-400">Session summary</p>
+                    <h3 className="mt-1 text-xl font-black text-slate-950">Learning performance</h3>
+                  </div>
+                  <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-black ${
+                    results.isValid ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
+                  }`}>
+                    {results.isValid ? <Icons.ShieldCheck className="h-4 w-4" /> : <Icons.ShieldAlert className="h-4 w-4" />}
+                    {results.isValid ? 'Verified' : 'Review needed'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-slate-200 bg-slate-200 sm:grid-cols-4">
+                  <div className="bg-slate-50 p-4">
+                    <p className="text-[10px] font-black uppercase text-slate-400">Correct</p>
+                    <p className="mt-1 text-lg font-black text-slate-900">{results.correctAnswers} / {results.totalQuestions}</p>
+                  </div>
+                  <div className="bg-slate-50 p-4">
+                    <p className="text-[10px] font-black uppercase text-slate-400">Time spent</p>
+                    <p className="mt-1 text-lg font-black text-slate-900">{formatDuration(Math.round(results.timeSpent))}</p>
+                  </div>
+                  <div className="bg-slate-50 p-4">
+                    <p className="text-[10px] font-black uppercase text-slate-400">XP earned</p>
+                    <p className="mt-1 text-lg font-black text-emerald-600">+{results.xpEarned} XP</p>
+                  </div>
+                  <div className="bg-slate-50 p-4">
+                    <p className="text-[10px] font-black uppercase text-slate-400">Streak bonus</p>
+                    <p className="mt-1 text-lg font-black text-amber-600">+{results.streakBonus} XP</p>
+                  </div>
+                </div>
+
+                {results.isValid ? (
+                  <div className="flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-emerald-800">
+                    <Icons.ShieldCheck className="mt-0.5 h-5 w-5 shrink-0" />
                     <div>
-                      <p className="font-bold">Session Flagged (Anti-Cheat)</p>
-                      <p className="text-[10px] text-rose-600/80 mt-0.5">
-                        This session did not meet validation guidelines (answering too fast, switching tabs, or inactive). XP rewards have been discarded.
+                      <p className="text-sm font-black">Session verified</p>
+                      <p className="mt-1 text-xs leading-5 text-emerald-700">Your timing and learning activity passed validation. XP and progress were recorded.</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-start gap-3 rounded-lg border border-rose-200 bg-rose-50 p-4 text-rose-800">
+                    <Icons.AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
+                    <div>
+                      <p className="text-sm font-black">Session not eligible for XP</p>
+                      <p className="mt-1 text-xs leading-5 text-rose-700">
+                        {(results.validationIssues ?? []).length > 0
+                          ? (results.validationIssues ?? []).map((issue) => validationIssueMessages[issue]).join(' ')
+                          : 'The session data could not be validated.'}
                       </p>
                     </div>
                   </div>
                 )}
 
-                <div className="flex gap-3 justify-center pt-2">
-                  <Button onClick={() => setQuizActive(false)} variant="secondary" className="px-6 font-semibold">
-                    Back to Station
+                <div className="mt-auto flex flex-col-reverse gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:justify-end">
+                  <Button
+                    onClick={() => {
+                      handleExitQuiz();
+                      navigate('/');
+                    }}
+                    variant="secondary"
+                    className="px-6 font-semibold"
+                  >
+                    <Icons.Map className="h-4 w-4" /> Back to Path
                   </Button>
                   <Button onClick={() => handleStartQuiz()} className="px-6 font-bold">
-                    Retake Quiz
+                    <Icons.RotateCcw className="h-4 w-4" /> Practice Again
                   </Button>
                 </div>
-              </Card>
+              </section>
             </motion.div>
           )}
         </AnimatePresence>
@@ -532,157 +695,183 @@ export default function StudyPage() {
     );
   }
 
-  const filteredGrammarTopics = grammarTopics.filter((topic) => {
+  const filteredGrammarTopics = getBundledTopics(activePart).filter((topic) => {
     const term = searchTerm.trim().toLowerCase();
     if (!term) return true;
-    return `${topic.title} ${topic.subtitle}`.toLowerCase().includes(term);
+    return formatTopic(topic.topic).toLowerCase().includes(term);
   });
 
   return (
-    <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-6 pb-8 text-slate-800 xl:grid-cols-[300px_minmax(0,1fr)]">
-      <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-4 shadow-sm xl:sticky xl:top-24">
-        <div className="mb-4 flex items-center gap-3 border-b border-slate-100 pb-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#10A37F] text-white shadow-lg shadow-emerald-200">
-            <Icons.BookOpen className="h-6 w-6" />
+    <div className="mx-auto w-full max-w-[1440px] space-y-4 pb-8 text-slate-800">
+      <section className="min-w-0 space-y-4">
+      <LearningModuleNav active="grammar" />
+
+      <LearningIntro
+        eyebrow="TOEIC Reading"
+        title={`Part ${activePart}: ${partMeta[activePart].title}`}
+        description={partMeta[activePart].description}
+        icon={activePart === 7 ? Icons.Newspaper : activePart === 6 ? Icons.Files : Icons.BookOpen}
+        accent="emerald"
+        aside={(
+          <div className="w-full">
+            <p className="text-[10px] font-bold uppercase text-slate-400">Question bank</p>
+            <p className="mt-1 text-3xl font-black text-slate-950">{getBundledQuestionCount(activePart)}</p>
+            <p className="mt-1 text-xs text-slate-500">verified practice questions</p>
+            <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-slate-200">
+              <div className="h-full w-full bg-emerald-500" />
+            </div>
           </div>
-          <div className="min-w-0">
-            <h2 className="text-sm font-black text-slate-900">Reading Skills</h2>
-            <p className="truncate text-[11px] font-medium text-slate-500">Grammar, vocab and TOEIC drills</p>
-          </div>
-        </div>
+        )}
+      />
 
-        <nav className="space-y-2">
-          {studyRailItems.map((item) => {
-            const Icon = item.icon;
-            const content = (
-              <div
-                className={`flex items-center gap-3 rounded-2xl border px-3 py-3 transition-all ${
-                  item.active
-                    ? 'border-emerald-500 bg-[#10A37F] text-white shadow-lg shadow-emerald-200'
-                    : 'border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-50'
-                }`}
-              >
-                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${item.active ? 'bg-white/20 text-white' : 'bg-sky-50 text-sky-500'}`}>
-                  <Icon className="h-4 w-4" />
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-sm font-bold">{item.label}</span>
-                  <span className={`block truncate text-[10px] ${item.active ? 'text-white/75' : 'text-slate-400'}`}>
-                    {item.description}
-                  </span>
-                </span>
-              </div>
-            );
-
-            return item.route ? (
-              <Link key={item.id} to={item.route} className="block">
-                {content}
-              </Link>
-            ) : (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => item.id === 'part5' && handleStartQuiz()}
-                className="block w-full text-left"
-              >
-                {content}
-              </button>
-            );
-          })}
-        </nav>
-      </aside>
-
-      <section className="min-w-0 space-y-5">
-      <motion.div
-        initial={{ opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-50 via-white to-teal-50 px-6 py-8 shadow-sm sm:px-10"
-      >
-        <div className="relative z-10 flex items-center justify-between gap-6">
+      <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
           <div>
-            <p className="mb-2 text-xs font-bold uppercase tracking-wide text-emerald-600">TOEIC Reading</p>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">TOEIC Grammar</h1>
-            <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-slate-500">
-              Study by topic, practice with smart random drills, and review your recent performance in one compact workspace.
-            </p>
+            <p className="text-[10px] font-black uppercase text-sky-700">Personalized practice</p>
+            <h2 className="mt-1 text-lg font-black text-slate-950">Practice Hub</h2>
           </div>
-          <div className="hidden h-36 w-36 shrink-0 items-center justify-center rounded-3xl bg-[#10A37F] text-white shadow-2xl shadow-emerald-200 md:flex">
-            <Icons.BookOpen className="h-16 w-16" />
-          </div>
+          <p className="text-xs font-medium text-slate-500">Short sessions based on what needs attention now</p>
         </div>
-      </motion.div>
+        <div className="grid sm:grid-cols-2 xl:grid-cols-4">
+          <button
+            type="button"
+            onClick={handleStartMistakeReview}
+            disabled={loadingQuestions}
+            className="group flex min-h-28 items-start gap-3 border-b border-slate-200 p-4 text-left transition-colors hover:bg-rose-50 disabled:cursor-wait disabled:opacity-60 sm:border-r xl:border-b-0"
+          >
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-rose-100 text-rose-700">
+              <Icons.RotateCcw className="h-5 w-5" />
+            </span>
+            <span>
+              <span className="block text-sm font-black text-slate-900">Mistakes</span>
+              <span className="mt-1 block text-xs leading-5 text-slate-500">Retry unresolved answers</span>
+              <span className="mt-2 inline-flex items-center gap-1 text-xs font-black text-rose-600">
+                Review <Icons.ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleStartQuiz(undefined, { part: activePart, count: 10 })}
+            disabled={loadingQuestions}
+            className="group flex min-h-28 items-start gap-3 border-b border-slate-200 p-4 text-left transition-colors hover:bg-sky-50 disabled:cursor-wait disabled:opacity-60 xl:border-b-0 xl:border-r"
+          >
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-sky-100 text-sky-700">
+              <Icons.Sparkles className="h-5 w-5" />
+            </span>
+            <span>
+              <span className="block text-sm font-black text-slate-900">Smart mix</span>
+              <span className="mt-1 block text-xs leading-5 text-slate-500">New, weak, and review items</span>
+              <span className="mt-2 inline-flex items-center gap-1 text-xs font-black text-sky-700">
+                Practice <Icons.ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </span>
+          </button>
+          <Link
+            to="/study/vocabulary"
+            className="group flex min-h-28 items-start gap-3 border-b border-slate-200 p-4 text-left transition-colors hover:bg-violet-50 sm:border-b-0 sm:border-r"
+          >
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-violet-100 text-violet-700">
+              <Icons.Layers3 className="h-5 w-5" />
+            </span>
+            <span>
+              <span className="block text-sm font-black text-slate-900">Word recall</span>
+              <span className="mt-1 block text-xs leading-5 text-slate-500">Spaced vocabulary review</span>
+              <span className="mt-2 inline-flex items-center gap-1 text-xs font-black text-violet-700">
+                Recall <Icons.ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </span>
+          </Link>
+          <Link
+            to="/study/listening"
+            className="group flex min-h-28 items-start gap-3 p-4 text-left transition-colors hover:bg-emerald-50"
+          >
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-emerald-100 text-emerald-700">
+              <Icons.Headphones className="h-5 w-5" />
+            </span>
+            <span>
+              <span className="block text-sm font-black text-slate-900">Listening focus</span>
+              <span className="mt-1 block text-xs leading-5 text-slate-500">Audio-first comprehension</span>
+              <span className="mt-2 inline-flex items-center gap-1 text-xs font-black text-emerald-700">
+                Listen <Icons.ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+              </span>
+            </span>
+          </Link>
+        </div>
+      </section>
 
-      <div className="inline-flex max-w-full items-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 p-1 text-xs font-bold text-slate-500">
-        <button className="flex items-center gap-2 rounded-lg bg-[#0EA5E9] px-4 py-2 text-white shadow-sm">
-          <Icons.BookOpen className="h-4 w-4" />
-          Topics
-        </button>
-        <button className="flex items-center gap-2 px-4 py-2 transition-colors hover:text-slate-800">
-          <Icons.BarChart3 className="h-4 w-4" />
-          Mixed Practice
-        </button>
-        <button className="flex items-center gap-2 px-4 py-2 transition-colors hover:text-slate-800">
-          <Icons.LineChart className="h-4 w-4" />
-          Progress
-        </button>
+      <div className="grid overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm md:grid-cols-3">
+        {([5, 6, 7] as ToeicReadingPart[]).map((part) => (
+          <button
+            key={part}
+            type="button"
+            aria-pressed={activePart === part}
+            onClick={() => setActivePart(part)}
+            className={`flex min-h-20 items-center justify-between gap-3 border-b px-5 py-4 text-left transition-colors last:border-b-0 md:border-b-0 md:border-r md:last:border-r-0 ${
+              activePart === part ? 'bg-slate-950 text-white' : 'border-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            <span>
+              <span className={`block text-[10px] font-bold uppercase ${activePart === part ? 'text-sky-300' : 'text-sky-700'}`}>
+                TOEIC Part {part}
+              </span>
+              <span className="mt-1 block text-sm font-black">{partMeta[part].shortTitle}</span>
+            </span>
+            <span className={`text-xs font-bold ${activePart === part ? 'text-slate-400' : 'text-slate-400'}`}>200 Q</span>
+          </button>
+        ))}
       </div>
 
       <button
         type="button"
-        onClick={() => handleStartQuiz()}
+        onClick={() => handleStartQuiz(undefined, { part: activePart, count: 10 })}
         disabled={loadingQuestions}
-        className="flex w-full items-center justify-between rounded-2xl border border-dashed border-sky-300 bg-white px-5 py-5 text-left shadow-sm transition-all hover:border-sky-400 hover:bg-sky-50/30 disabled:cursor-not-allowed disabled:opacity-70"
+        className="flex w-full items-center justify-between rounded-lg border border-sky-200 bg-sky-50 px-5 py-5 text-left shadow-sm transition-colors hover:border-sky-300 hover:bg-sky-100/70 disabled:cursor-not-allowed disabled:opacity-70"
       >
         <span className="flex min-w-0 items-center gap-4">
-          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-sky-100 text-sky-500">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-white text-sky-600 shadow-sm">
             <Icons.Shuffle className="h-7 w-7" />
           </span>
           <span className="min-w-0">
-            <span className="block text-lg font-black text-slate-900">Random Practice</span>
-            <span className="block truncate text-sm font-medium text-slate-500">5 smart questions selected from your current TOEIC bank</span>
+            <span className="block text-base font-black text-slate-900">Smart mixed practice</span>
+            <span className="block text-sm font-medium text-slate-500">10 questions from Part {activePart}, balanced from new, weak, and review items</span>
           </span>
         </span>
-        <span className="ml-4 hidden rounded-xl bg-[#0EA5E9] px-5 py-3 text-sm font-bold text-white shadow-sm sm:inline-flex">
+        <span className="ml-4 hidden rounded-md bg-slate-950 px-5 py-3 text-sm font-bold text-white shadow-sm sm:inline-flex">
           {loadingQuestions ? 'Loading...' : 'Start'}
         </span>
       </button>
 
-      <div className="relative">
-        <Icons.Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-        <input
-          value={searchTerm}
-          onChange={(event) => setSearchTerm(event.target.value)}
-          className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-11 pr-4 text-sm font-medium text-slate-700 outline-none transition-colors placeholder:text-slate-400 focus:border-sky-400 focus:ring-4 focus:ring-sky-100"
-          placeholder="Search lessons or grammar topics..."
-        />
-      </div>
+      <WorkspaceSearch
+        value={searchTerm}
+        onChange={setSearchTerm}
+        placeholder={`Search Part ${activePart} topics...`}
+      />
 
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="flex items-center gap-2 text-lg font-black text-slate-900">
-          <Icons.BookOpen className="h-5 w-5 text-sky-500" />
-          Grammar Topics
-        </h2>
-        <span className="text-xs font-bold text-slate-400">{filteredGrammarTopics.length} topics</span>
-      </div>
+      <LearningSectionHeading
+        title={`Part ${activePart} topics`}
+        count={`${filteredGrammarTopics.length} topics`}
+        icon={Icons.LibraryBig}
+      />
 
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
+        className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3"
       >
         {filteredGrammarTopics.map((topic) => (
           <motion.button
-            key={topic.title}
+            key={topic.topic}
             variants={cardVariants}
             type="button"
-            onClick={() => handleStartQuiz()}
-            className="group rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-md"
+            onClick={() => handleStartQuiz(undefined, { part: activePart, topic: topic.topic, count: 10 })}
+            className="group min-h-36 rounded-lg border border-slate-200 bg-white p-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md"
           >
             <div className="mb-4 flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h3 className="truncate text-base font-black text-slate-900">{topic.title}</h3>
-                <p className="mt-1 truncate text-xs font-medium text-slate-500">{topic.subtitle}</p>
+                <h3 className="text-base font-black text-slate-900">{formatTopic(topic.topic)}</h3>
+                <p className="mt-1 text-xs font-medium text-slate-500">Focused Part {activePart} practice</p>
               </div>
               <div className="flex shrink-0 gap-2 text-slate-300">
                 <Icons.Star className="h-4 w-4" />
@@ -693,9 +882,9 @@ export default function StudyPage() {
               <div>
                 <p className="flex items-center gap-1.5 text-xs font-black text-blue-600">
                   <Icons.Target className="h-4 w-4" />
-                  {topic.questions} questions
+                  {topic.count} questions
                 </p>
-                <p className="mt-5 text-xs font-bold text-slate-500">{topic.status}</p>
+                <p className="mt-5 text-xs font-bold text-slate-500">10 per smart session</p>
               </div>
               <span className="inline-flex items-center gap-1 text-xs font-black text-sky-500">
                 Practice

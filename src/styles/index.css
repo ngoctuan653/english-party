@@ -276,13 +276,13 @@ body {
   }
 
   /* AppLayout main component override */
-  main.lg\:pl-64 {
+  main.app-main {
     padding-top: calc(3.5rem + var(--safe-top)) !important;
     padding-bottom: calc(4rem + var(--safe-bottom)) !important;
   }
 
   /* AppLayout main component override when study session is active */
-  main.lg\:pl-64.session-active {
+  main.app-main.session-active {
     padding-top: var(--safe-top) !important;
     padding-bottom: var(--safe-bottom) !important;
   }

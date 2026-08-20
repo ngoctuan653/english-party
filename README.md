@@ -39,8 +39,8 @@
 
 ### 📚 Study System
 - **TOEIC Vocabulary** - Flashcard learning with spaced repetition
-- **TOEIC Part 5** - Grammar practice with multiple choice
-- **Listening Practice** - Audio-based exercises
+- **TOEIC Parts 5-7** - 200 bundled questions per reading part
+- **Listening Practice** - 200 Part 3/4 questions with device voice playback and transcripts
 - **Daily Missions** - Bite-sized tasks for consistency
 - **Progress Analytics** - Detailed performance tracking
 
@@ -174,6 +174,17 @@ study_history       → Historical performance data
   "tags": ["grammar", "passive-voice"]
 }
 ```
+
+### Bundled Learning Bank
+
+The app includes a bundled TOEIC bank that is merged with active Firestore content at runtime:
+
+- `toeic_part5_200.csv` - 200 incomplete-sentence questions
+- `toeic_part6_200.csv` - 200 text-completion questions
+- `toeic_part7_200.csv` - 200 reading-comprehension questions
+- `toeic_listening_200.csv` - 200 listening questions with transcripts
+
+Regenerate and validate the files with `npm run generate:learning-bank` and `npm run validate:learning-bank`. Admins can import the CSV files without changing IDs, so repeated imports update the same documents instead of creating duplicates.
 
 ---
 

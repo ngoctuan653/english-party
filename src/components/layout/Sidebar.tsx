@@ -24,41 +24,43 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="fixed inset-y-0 left-0 w-64 hidden lg:flex flex-col bg-white border-r border-slate-200/60 z-30">
+    <aside className="fixed inset-y-0 left-0 z-30 hidden w-56 flex-col border-r border-slate-200 bg-white lg:flex">
       {/* Logo */}
-      <div className="h-16 flex items-center px-6 border-b border-slate-100 gap-3">
-        <span className="text-2xl animate-pulse">🎉</span>
-        <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-[#0071E3] bg-clip-text text-transparent">
+      <div className="flex h-16 items-center gap-3 border-b border-slate-100 px-5">
+        <span className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-950 text-base text-white">EP</span>
+        <span className="text-lg font-black text-slate-950">
           EnglishParty
         </span>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-5">
         {NAV_ITEMS.map((item) => {
-          const isActive = location.pathname === item.path;
+          const isActive = item.path === '/'
+            ? location.pathname === '/'
+            : location.pathname.startsWith(item.path);
           const Icon = (Icons as any)[item.icon] || Icons.HelpCircle;
 
           return (
             <Link
               key={item.path}
               to={item.path}
-              className={`relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group overflow-hidden ${
+              className={`group relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 transition-colors ${
                 isActive
-                  ? 'text-[#0071E3] font-semibold bg-[#0071E3]/8 border border-[#0071E3]/15'
-                  : 'text-slate-600 hover:text-[#1d1d1f] hover:bg-slate-50 border border-transparent'
+                  ? 'border border-slate-200 bg-slate-950 font-semibold text-white'
+                  : 'border border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-950'
               }`}
             >
               {isActive && (
                 <motion.div
                   layoutId="active-nav-indicator"
-                  className="absolute left-0 w-1 h-6 bg-[#0071E3] rounded-full"
+                  className="absolute left-0 h-6 w-0.5 bg-sky-400"
                   transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                 />
               )}
               <Icon
                 className={`w-5 h-5 transition-transform duration-200 group-hover:scale-110 ${
-                  isActive ? 'text-[#0071E3]' : 'text-slate-400 group-hover:text-[#0071E3]'
+                  isActive ? 'text-sky-300' : 'text-slate-400 group-hover:text-sky-600'
                 }`}
               />
               <span>{item.label}</span>
@@ -70,7 +72,7 @@ export function Sidebar() {
         {profile?.role === 'admin' && (
           <Link
             to="/admin"
-            className={`relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group overflow-hidden ${
+            className={`group relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 transition-colors ${
               location.pathname.startsWith('/admin')
                 ? 'text-teal-600 font-semibold bg-teal-50 border border-teal-500/20'
                 : 'text-slate-600 hover:text-[#1d1d1f] hover:bg-slate-50 border border-transparent'
@@ -97,9 +99,9 @@ export function Sidebar() {
       </nav>
 
       {/* User profile & actions at bottom */}
-      <div className="p-4 border-t border-slate-100 bg-slate-50/50">
+      <div className="border-t border-slate-100 bg-slate-50/50 p-3">
         {profile && (
-          <div className="flex items-center gap-3 mb-4 p-2 rounded-xl bg-white border border-slate-200/60 shadow-sm">
+          <div className="mb-3 flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-2 shadow-sm">
             <Avatar
               fallback={profile.avatarUrl && !profile.avatarUrl.includes('/') ? profile.avatarUrl : undefined}
               src={profile.avatarUrl && profile.avatarUrl.includes('/') ? profile.avatarUrl : undefined}
@@ -125,7 +127,7 @@ export function Sidebar() {
         <Button
           variant="ghost"
           size="sm"
-          className="w-full text-slate-500 hover:text-rose-600 hover:bg-rose-50 justify-start gap-3 rounded-xl"
+          className="w-full justify-start gap-3 rounded-lg text-slate-500 hover:bg-rose-50 hover:text-rose-600"
           onClick={handleLogout}
         >
           <Icons.LogOut className="w-5 h-5" />

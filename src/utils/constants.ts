@@ -22,10 +22,10 @@ export const DIFFICULTY_LEVELS = [
 ] as const;
 
 export const NAV_ITEMS = [
-  { path: '/', label: 'Home', icon: 'Home' },
-  { path: '/leaderboard', label: 'Leaderboard', icon: 'Award' },
-  { path: '/study', label: 'Study', icon: 'BookOpen' },
-  { path: '/missions', label: 'Missions', icon: 'Target' },
+  { path: '/', label: 'Learn', icon: 'Map' },
+  { path: '/study', label: 'Practice', icon: 'Dumbbell' },
+  { path: '/leaderboard', label: 'League', icon: 'Trophy' },
+  { path: '/missions', label: 'Quests', icon: 'ListChecks' },
   { path: '/friends', label: 'Friends', icon: 'Users' },
   { path: '/profile', label: 'Profile', icon: 'User' },
 ] as const;
@@ -36,14 +36,14 @@ export const STREAK_REQUIREMENTS = {
 };
 
 export const ANTI_CHEAT = {
-  minActiveRatio: 0.6,
-  maxTabSwitches: 5,
-  minSecondsPerQuestion: 5,
-  minSingleAnswerSeconds: 1.5,
-  maxFastAnswerRatio: 0.35,
+  minActiveRatio: 0.35,
+  maxTabSwitches: 8,
+  minSecondsPerQuestion: 2,
+  minSingleAnswerSeconds: 1,
+  maxFastAnswerRatio: 0.6,
   minInteractions: 2,
-  maxIdleIntervals: 3,
-  idleTimeoutSeconds: 30,
+  maxIdleIntervals: 5,
+  idleTimeoutSeconds: 90,
 };
 
 export const AVATARS = [

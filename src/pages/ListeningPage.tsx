@@ -1,449 +1,428 @@
-/**
- * @module ListeningPage
- * @description Listening practice with audio player, set selection, questions, and transcript toggle.
- */
-
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useAuthStore } from '@/stores/authStore';
-import { startStudySession, endStudySession } from '@/services/study';
-import { formatDuration } from '@/utils/helpers';
-import { toast } from 'react-hot-toast';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import * as Icons from 'lucide-react';
+import { toast } from 'react-hot-toast';
+import { useAuthStore } from '@/stores/authStore';
+import { useUIStore } from '@/stores/uiStore';
+import { cancelStudySession, endStudySession, fetchQuestions, startStudySession } from '@/services/study';
+import { generateSmartQuizSession } from '@/services/progress';
+import { formatDuration } from '@/utils/helpers';
+import type { Question, QuestionAnswer } from '@/types/question';
 import type { SessionResults } from '@/types/study';
-import type { QuestionAnswer } from '@/types/question';
-import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
+import { Card } from '@/components/ui/Card';
+import { Progress } from '@/components/ui/Progress';
+import {
+  LearningIntro,
+  LearningModuleNav,
+  LearningStats,
+} from '@/components/study/LearningWorkspace';
+import { getBundledQuestionCount } from '@/data/questionBank';
 
-/* -------------------------------------------------------------------------- */
-/*                                 Mock Data                                  */
-/* -------------------------------------------------------------------------- */
+type ListeningPart = 3 | 4;
 
-const listeningSets = [
-  { id: 1, title: 'Office Conversation', duration: '2:45', questions: 6, difficulty: 'Intermediate', icon: '🏢' },
-  { id: 2, title: 'Phone Inquiry', duration: '1:30', questions: 4, difficulty: 'Beginner', icon: '📞' },
-  { id: 3, title: 'Business Meeting', duration: '3:10', questions: 8, difficulty: 'Advanced', icon: '💼' },
-  { id: 4, title: 'Travel Announcement', duration: '1:55', questions: 5, difficulty: 'Intermediate', icon: '✈️' },
+const listeningParts: Array<{
+  part: ListeningPart;
+  title: string;
+  description: string;
+  icon: typeof Icons.MessagesSquare;
+  tone: string;
+}> = [
+  {
+    part: 3,
+    title: 'Conversations',
+    description: 'Listen to workplace conversations and identify details, purpose, and next actions.',
+    icon: Icons.MessagesSquare,
+    tone: 'bg-sky-50 text-sky-700 border-sky-100',
+  },
+  {
+    part: 4,
+    title: 'Short Talks',
+    description: 'Practice announcements, updates, schedules, and other practical business messages.',
+    icon: Icons.Radio,
+    tone: 'bg-violet-50 text-violet-700 border-violet-100',
+  },
 ];
 
-const mockQuestion = {
-  id: 'listening_set_1_q1',
-  text: 'What does the man suggest?',
-  options: [
-    'A) Rescheduling the meeting',
-    'B) Hiring more staff',
-    'C) Ordering new equipment',
-    'D) Extending the deadline',
-  ],
-  correctAnswer: 0, // Option A
-};
-
-const mockTranscript = `Man: Good morning, Susan. I was looking at the schedule for next week, and it seems like we have a conflict on Tuesday.
-
-Woman: Oh, you're right. The client presentation and the team meeting are at the same time. What do you suggest?
-
-Man: I think we should reschedule the team meeting to Wednesday afternoon. The client presentation is more urgent.
-
-Woman: That works for me. I'll send out the updated calendar invite.`;
-
-/* -------------------------------------------------------------------------- */
-/*                               Component                                    */
-/* -------------------------------------------------------------------------- */
+function formatClock(totalSeconds: number) {
+  return `${Math.floor(totalSeconds / 60)}:${String(totalSeconds % 60).padStart(2, '0')}`;
+}
 
 export default function ListeningPage() {
   const { profile } = useAuthStore();
-  const navigate = useNavigate();
-
-  const [showTranscript, setShowTranscript] = useState(false);
+  const { setStudySessionActive } = useUIStore();
+  const [active, setActive] = useState(false);
+  const [selectedPart, setSelectedPart] = useState<ListeningPart>(3);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false);
-  const [activeSet, setActiveSet] = useState(1);
-
-  // Session states
+  const [showTranscript, setShowTranscript] = useState(false);
+  const [answers, setAnswers] = useState<QuestionAnswer[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [results, setResults] = useState<SessionResults | null>(null);
   const [secondsElapsed, setSecondsElapsed] = useState(0);
-  const [saving, setSaving] = useState(false);
-
-  // Timer refs
+  const [loading, setLoading] = useState(false);
+  const [speechRate, setSpeechRate] = useState(0.9);
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const startTimeRef = useRef<number>(0);
+  const questionStartRef = useRef(0);
+  const activeSessionIdRef = useRef<string | null>(null);
 
-  // Start study session
+  const currentQuestion = questions[currentIndex];
+
   useEffect(() => {
-    async function startSession() {
-      if (!profile?.uid || sessionId) return;
-      try {
-        const id = await startStudySession(profile.uid, 'toeic', 'listening');
-        setSessionId(id);
-        startTimeRef.current = Date.now();
-      } catch (err) {
-        console.error('Failed to start listening session:', err);
-      }
-    }
-    if (profile?.uid) {
-      startSession();
-    }
-  }, [profile?.uid, activeSet]);
+    activeSessionIdRef.current = sessionId;
+  }, [sessionId]);
 
-  // Session timer
+  useEffect(() => () => cancelStudySession(activeSessionIdRef.current), []);
+
   useEffect(() => {
-    if (sessionId && !results) {
-      timerRef.current = setInterval(() => {
-        setSecondsElapsed((prev) => prev + 1);
-      }, 1000);
-    } else {
-      if (timerRef.current) clearInterval(timerRef.current);
-    }
+    setStudySessionActive(active && !results);
+    return () => setStudySessionActive(false);
+  }, [active, results, setStudySessionActive]);
 
+  useEffect(() => {
+    if (!active || results) return;
+    timerRef.current = setInterval(() => setSecondsElapsed((value) => value + 1), 1000);
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [sessionId, results]);
+  }, [active, results]);
 
-  const handleSubmitAnswer = () => {
-    if (selectedAnswer === null || isAnswerSubmitted) return;
-    setIsAnswerSubmitted(true);
+  useEffect(() => () => window.speechSynthesis?.cancel(), []);
+
+  const stopSpeech = () => {
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    setIsSpeaking(false);
   };
 
-  const handleFinishListening = async () => {
-    if (!sessionId || !profile?.uid || selectedAnswer === null || saving) return;
+  const playTranscript = () => {
+    if (!currentQuestion?.transcript || !('speechSynthesis' in window)) {
+      toast.error('Speech playback is not supported on this device.');
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(currentQuestion.transcript);
+    utterance.lang = 'en-US';
+    utterance.rate = speechRate;
+    const voices = window.speechSynthesis.getVoices();
+    utterance.voice = voices.find((voice) => voice.lang === 'en-US') ?? voices.find((voice) => voice.lang.startsWith('en')) ?? null;
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const resetQuestionState = () => {
+    setSelectedAnswer(null);
+    setIsAnswerSubmitted(false);
+    setShowTranscript(false);
+    questionStartRef.current = Date.now();
+    stopSpeech();
+  };
+
+  const startPractice = async (part: ListeningPart) => {
+    if (!profile?.uid) return;
     try {
-      setSaving(true);
-      const isCorrect = selectedAnswer === mockQuestion.correctAnswer;
-      const timeSpent = (Date.now() - startTimeRef.current) / 1000;
+      setLoading(true);
+      const pool = await fetchQuestions({ exam: 'toeic', type: 'listening', part, count: 250 });
+      const deck = await generateSmartQuizSession(profile.uid, pool, 10);
+      if (deck.length === 0) {
+        toast.error('No listening questions are available for this part.');
+        return;
+      }
 
-      const answerRecord: QuestionAnswer = {
-        questionId: mockQuestion.id,
-        selectedAnswer: selectedAnswer,
-        isCorrect,
-        timeSpent,
-      };
-
-      const sessionResults = await endStudySession(
-        sessionId,
-        profile.uid,
-        [answerRecord],
-        profile.currentStreak
-      );
-      setResults(sessionResults);
-      toast.success('Listening set completed! 🎉');
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to save listening progress.');
+      const id = await startStudySession(profile.uid, 'toeic', 'listening');
+      setSelectedPart(part);
+      setQuestions(deck);
+      setSessionId(id);
+      setCurrentIndex(0);
+      setAnswers([]);
+      setResults(null);
+      setSecondsElapsed(0);
+      setActive(true);
+      resetQuestionState();
+    } catch (error) {
+      console.error(error);
+      toast.error('Could not start listening practice.');
     } finally {
-      setSaving(false);
+      setLoading(false);
     }
   };
 
-  const handleExitListening = () => {
-    if (results || selectedAnswer === null || window.confirm('Exit session? Current progress will not be saved.')) {
-      navigate('/study');
+  const submitAnswer = () => {
+    if (!currentQuestion || selectedAnswer === null || isAnswerSubmitted) return;
+    const answer: QuestionAnswer = {
+      questionId: currentQuestion.id,
+      selectedAnswer,
+      isCorrect: selectedAnswer === currentQuestion.correctAnswer,
+      timeSpent: Math.max(0, (Date.now() - questionStartRef.current) / 1000),
+    };
+    setAnswers((items) => [...items, answer]);
+    setIsAnswerSubmitted(true);
+    stopSpeech();
+  };
+
+  const finishPractice = async () => {
+    if (!profile?.uid || !sessionId || loading) return;
+    try {
+      setLoading(true);
+      const summary = await endStudySession(sessionId, profile.uid, answers, profile.currentStreak);
+      setResults(summary);
+      stopSpeech();
+      toast.success('Listening session completed.');
+    } catch (error) {
+      console.error(error);
+      toast.error('Could not save listening progress.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  // If results are available, render completion screen
-  if (results) {
+  const nextQuestion = () => {
+    if (currentIndex >= questions.length - 1) {
+      void finishPractice();
+      return;
+    }
+    setCurrentIndex((value) => value + 1);
+    resetQuestionState();
+  };
+
+  const exitPractice = () => {
+    if (!results && answers.length > 0 && !window.confirm('Exit listening practice? Current progress will not be saved.')) return;
+    cancelStudySession(sessionId);
+    stopSpeech();
+    setActive(false);
+    setQuestions([]);
+    setSessionId(null);
+    setResults(null);
+    setAnswers([]);
+  };
+
+  if (!active) {
     return (
-      <div className="max-w-md mx-auto pb-8 text-slate-800 animate-fade-in space-y-6 text-center">
-        <Card className="p-8 bg-white border border-slate-200/80 shadow-md space-y-6">
-          <h2 className="text-2xl font-black text-slate-800">Listening Results</h2>
-          
-          <div className="w-32 h-32 mx-auto rounded-full bg-slate-50 border-4 border-teal-500 flex flex-col justify-center items-center relative overflow-hidden shadow-md shadow-teal-500/5">
-            <div className="absolute inset-0 bg-teal-500/3 blur-xl" />
-            <p className="text-3xl font-black text-slate-800 relative z-10">{results.accuracy}%</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase relative z-10 font-sans">Accuracy</p>
-          </div>
-
-          <div className="grid grid-cols-3 gap-3 text-xs pt-4 border-t border-slate-100">
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60">
-              <p className="text-[9px] text-slate-400 font-bold uppercase">Time Spent</p>
-              <p className="text-xs font-black text-slate-800 mt-1">
-                {formatDuration(results.timeSpent)}
-              </p>
-            </div>
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60">
-              <p className="text-[9px] text-slate-400 font-bold uppercase">XP Earned</p>
-              <p className="text-xs font-black text-emerald-600 mt-1">
-                +{results.xpEarned} XP
-              </p>
-            </div>
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60">
-              <p className="text-[9px] text-slate-400 font-bold uppercase">Streak Bonus</p>
-              <p className="text-xs font-black text-amber-500 mt-1">
-                +{results.streakBonus} XP
-              </p>
-            </div>
-          </div>
-
-          {!results.isValid && (
-            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs leading-relaxed text-left flex items-start gap-2">
-              <Icons.AlertTriangle className="w-5 h-5 shrink-0 text-rose-500" />
-              <div>
-                <p className="font-bold">Session Flagged (Anti-Cheat)</p>
-                <p className="text-[10px] text-rose-600/80 mt-0.5">
-                  This session did not meet validation guidelines. XP rewards have been discarded.
-                </p>
+      <div className="mx-auto w-full max-w-[1440px] space-y-4 pb-8 text-slate-800">
+        <LearningModuleNav active="listening" />
+        <LearningIntro
+          eyebrow="TOEIC Listening"
+          title="Listening Studio"
+          description="Train with short, focused audio sessions. Listen first, answer from memory, then open the transcript to review unfamiliar phrases."
+          icon={Icons.Headphones}
+          accent="violet"
+          aside={(
+            <div className="w-full">
+              <p className="text-[10px] font-bold uppercase text-slate-400">Listening bank</p>
+              <p className="mt-1 text-3xl font-black text-slate-950">200</p>
+              <p className="mt-1 text-xs text-slate-500">questions with transcripts</p>
+              <div className="mt-4 flex items-center gap-2 text-xs font-bold text-violet-700">
+                <Icons.Volume2 className="h-4 w-4" /> Device voice playback
               </div>
             </div>
           )}
+        />
 
-          <div className="flex gap-3 justify-center pt-2">
-            <Link to="/study" className="flex-1">
-              <Button variant="secondary" className="w-full font-semibold text-xs py-2">
-                Back to Station
-              </Button>
-            </Link>
-            <Button
-              onClick={() => {
-                setResults(null);
-                setSessionId(null);
-                setSecondsElapsed(0);
-                setSelectedAnswer(null);
-                setIsAnswerSubmitted(false);
-                setShowTranscript(false);
-              }}
-              className="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs py-2"
-            >
-              Practice Again
-            </Button>
+        <LearningStats
+          items={[
+            { label: 'Part 3', value: getBundledQuestionCount(3), detail: 'Conversation questions', icon: Icons.MessagesSquare, tone: 'blue' },
+            { label: 'Part 4', value: getBundledQuestionCount(4), detail: 'Short-talk questions', icon: Icons.Radio, tone: 'violet' },
+            { label: 'Session size', value: 10, detail: 'Questions per practice', icon: Icons.ListChecks, tone: 'emerald' },
+            { label: 'Review mode', value: 'Smart', detail: 'New + weak + review', icon: Icons.Brain, tone: 'amber' },
+          ]}
+        />
+
+        <section className="grid gap-3 md:grid-cols-2">
+          {listeningParts.map((item) => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.part}
+                type="button"
+                onClick={() => startPractice(item.part)}
+                disabled={loading}
+                className="group flex min-h-48 flex-col justify-between rounded-lg border border-slate-200 bg-white p-6 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md disabled:cursor-wait disabled:opacity-60"
+              >
+                <div className="flex w-full items-start justify-between gap-4">
+                  <span className={`flex h-11 w-11 items-center justify-center rounded-md border ${item.tone}`}>
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <span className="text-xs font-bold text-slate-400">100 questions</span>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold uppercase text-sky-700">TOEIC Part {item.part}</p>
+                  <h2 className="mt-1 text-xl font-black text-slate-950">{item.title}</h2>
+                  <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">{item.description}</p>
+                  <span className="mt-4 inline-flex items-center gap-1 text-xs font-black text-sky-700">
+                    Start practice <Icons.ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </section>
+      </div>
+    );
+  }
+
+  if (results) {
+    return (
+      <div className="mx-auto w-full max-w-3xl pb-8 text-slate-800">
+        <Card className="space-y-6 rounded-lg border border-slate-200 bg-white p-7 text-center shadow-md">
+          <div>
+            <p className="text-[10px] font-bold uppercase text-violet-700">TOEIC Part {selectedPart}</p>
+            <h1 className="mt-2 text-2xl font-black text-slate-950">Listening results</h1>
+          </div>
+          <div className="mx-auto flex h-28 w-28 flex-col items-center justify-center rounded-full border-4 border-violet-500 bg-violet-50">
+            <p className="text-3xl font-black text-slate-950">{results.accuracy}%</p>
+            <p className="text-[10px] font-bold uppercase text-slate-500">Accuracy</p>
+          </div>
+          <div className="grid grid-cols-2 overflow-hidden rounded-lg border border-slate-200 sm:grid-cols-4">
+            {[
+              ['Correct', `${results.correctAnswers}/${results.totalQuestions}`],
+              ['Time', formatDuration(results.timeSpent)],
+              ['XP earned', `+${results.xpEarned}`],
+              ['Streak bonus', `+${results.streakBonus}`],
+            ].map(([label, value]) => (
+              <div key={label} className="border-b border-r border-slate-200 p-4 last:border-r-0 sm:border-b-0">
+                <p className="text-[9px] font-bold uppercase text-slate-400">{label}</p>
+                <p className="mt-1 text-lg font-black text-slate-950">{value}</p>
+              </div>
+            ))}
+          </div>
+          {!results.isValid && (
+            <div className="flex items-start gap-2 rounded-lg border border-rose-200 bg-rose-50 p-3 text-left text-xs text-rose-700">
+              <Icons.AlertTriangle className="h-5 w-5 shrink-0" />
+              <p>This session did not meet the timing or activity requirements, so XP was not awarded.</p>
+            </div>
+          )}
+          <div className="flex flex-col justify-center gap-3 sm:flex-row">
+            <Button variant="secondary" onClick={exitPractice}>Back to listening</Button>
+            <Button onClick={() => startPractice(selectedPart)} isLoading={loading}>Practice again</Button>
           </div>
         </Card>
       </div>
     );
   }
 
+  const progress = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
+
   return (
-    <div className="space-y-6 pb-8 text-slate-800 max-w-2xl mx-auto">
-      {/* Header toolbar */}
-      <div className="flex justify-between items-center bg-white p-4 border border-slate-200/60 rounded-2xl shadow-sm">
-        <button
-          onClick={handleExitListening}
-          className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
-        >
-          <Icons.X className="w-4 h-4" /> Exit Practice
+    <div className="mx-auto w-full max-w-4xl space-y-4 pb-8 text-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <button onClick={exitPractice} className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900">
+          <Icons.X className="h-4 w-4" /> Exit
         </button>
-        
-        <div className="flex items-center gap-4 text-xs font-semibold text-slate-500">
-          <span className="flex items-center gap-1">
-            <Icons.Timer className="w-3.5 h-3.5 text-teal-500" />
-            {Math.floor(secondsElapsed / 60)}:{(secondsElapsed % 60).toString().padStart(2, '0')}
-          </span>
+        <div className="flex items-center gap-3 text-xs font-bold text-slate-500">
+          <span>Part {selectedPart}</span>
           <span className="text-slate-300">|</span>
-          <span className="text-teal-600 font-bold">
-            Set {activeSet}
-          </span>
+          <span className="flex items-center gap-1"><Icons.Timer className="h-4 w-4 text-violet-600" /> {formatClock(secondsElapsed)}</span>
+          <span className="text-slate-300">|</span>
+          <span className="text-violet-700">{currentIndex + 1}/{questions.length}</span>
         </div>
+      </div>
+      <Progress value={progress} height="sm" />
 
-        {sessionId && isAnswerSubmitted && (
-          <Button
-            onClick={handleFinishListening}
-            disabled={saving}
-            size="sm"
-            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-3.5 py-1.5 rounded-xl cursor-pointer"
+      <section className="rounded-lg border border-slate-200 bg-slate-950 p-5 text-white shadow-sm">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+          <button
+            type="button"
+            onClick={isSpeaking ? stopSpeech : playTranscript}
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white text-slate-950 transition-transform hover:scale-105"
+            aria-label={isSpeaking ? 'Stop audio' : 'Play audio'}
           >
-            {saving ? 'Saving...' : 'Finish & Save'}
-          </Button>
-        )}
-      </div>
-
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold sm:text-3xl">
-          <span className="bg-gradient-to-r from-blue-600 to-[#0071E3] bg-clip-text text-transparent">
-            Listening Practice
-          </span>
-        </h1>
-        <p className="mt-1 text-sm text-slate-505">
-          Improve your TOEIC listening comprehension skills
-        </p>
-      </div>
-
-      {/* Listening Set Cards */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {listeningSets.map((set) => (
-          <motion.button
-            key={set.id}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => {
-              if (!isAnswerSubmitted || window.confirm('Switch set? Current set progress will not be saved.')) {
-                setActiveSet(set.id);
-                setSelectedAnswer(null);
-                setIsAnswerSubmitted(false);
-                setShowTranscript(false);
-                setSessionId(null); // Will trigger a new session start
-              }
-            }}
-            className={`rounded-2xl border p-4 text-left transition-all duration-205 cursor-pointer ${
-              activeSet === set.id
-                ? 'border-[#0071E3] bg-blue-50/50 shadow-sm'
-                : 'border-slate-200/60 bg-white hover:border-slate-300 hover:bg-slate-50'
-            }`}
-          >
-            <span className="mb-2 block text-2xl">{set.icon}</span>
-            <p className="text-sm font-semibold text-slate-800">{set.title}</p>
-            <div className="mt-2 flex items-center gap-2 text-[11px] text-slate-500">
-              <span>⏱ {set.duration}</span>
-              <span>·</span>
-              <span>{set.questions} Q</span>
-            </div>
-            <span
-              className={`mt-2 inline-block rounded-full px-2 py-0.5 text-[10px] font-bold border ${
-                set.difficulty === 'Beginner'
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
-                  : set.difficulty === 'Advanced'
-                    ? 'bg-rose-50 text-rose-700 border-rose-100'
-                    : 'bg-amber-50 text-amber-700 border-amber-100'
-              }`}
-            >
-              {set.difficulty}
-            </span>
-          </motion.button>
-        ))}
-      </div>
-
-      {/* Audio Player */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm"
-      >
-        <div className="flex items-center gap-4">
-          {/* Play Button */}
-          <button className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white shadow-md transition-all cursor-pointer">
-            <svg className="ml-1 h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z" />
-            </svg>
+            {isSpeaking ? <Icons.Square className="h-5 w-5" fill="currentColor" /> : <Icons.Play className="ml-0.5 h-6 w-6" fill="currentColor" />}
           </button>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-bold uppercase text-sky-300">Listen before answering</p>
+            <p className="mt-1 text-sm text-slate-300">Use replay when needed. The transcript unlocks after you submit.</p>
+          </div>
+          <label className="flex items-center gap-2 text-xs font-bold text-slate-300">
+            Speed
+            <select
+              value={speechRate}
+              onChange={(event) => setSpeechRate(Number(event.target.value))}
+              className="rounded-md border border-white/15 bg-white/10 px-2 py-1.5 text-white outline-none"
+            >
+              <option className="text-slate-950" value={0.75}>0.75x</option>
+              <option className="text-slate-950" value={0.9}>0.9x</option>
+              <option className="text-slate-950" value={1}>1.0x</option>
+              <option className="text-slate-950" value={1.15}>1.15x</option>
+            </select>
+          </label>
+        </div>
+      </section>
 
-          {/* Progress Bar */}
-          <div className="flex-1">
-            <div className="mb-2 h-2 w-full overflow-hidden rounded-full bg-slate-100">
-              <div className="h-full w-1/3 rounded-full bg-[#0071E3]" />
-            </div>
-            <div className="flex justify-between text-[11px] tabular-nums text-slate-505">
-              <span>0:52</span>
-              <span>2:45</span>
-            </div>
+      <AnimatePresence mode="wait">
+        <motion.section
+          key={currentQuestion?.id}
+          initial={{ opacity: 0, x: 16 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -16 }}
+          className="space-y-4 rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
+        >
+          <div>
+            <p className="text-[10px] font-bold uppercase text-sky-700">Question {currentIndex + 1}</p>
+            <h1 className="mt-2 text-xl font-black leading-7 text-slate-950">{currentQuestion?.question}</h1>
+          </div>
+          <div className="grid gap-2">
+            {currentQuestion?.choices.map((choice, index) => {
+              const isSelected = selectedAnswer === index;
+              const isCorrect = currentQuestion.correctAnswer === index;
+              let style = 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50';
+              if (isSelected && !isAnswerSubmitted) style = 'border-sky-500 bg-sky-50 text-sky-800';
+              if (isAnswerSubmitted && isCorrect) style = 'border-emerald-500 bg-emerald-50 text-emerald-800';
+              if (isAnswerSubmitted && isSelected && !isCorrect) style = 'border-rose-500 bg-rose-50 text-rose-800';
+              if (isAnswerSubmitted && !isSelected && !isCorrect) style = 'border-slate-100 bg-slate-50 text-slate-400';
+              return (
+                <button
+                  key={choice}
+                  type="button"
+                  disabled={isAnswerSubmitted}
+                  onClick={() => setSelectedAnswer(index)}
+                  className={`flex min-h-14 items-center gap-3 rounded-lg border p-4 text-left text-sm font-semibold transition-colors ${style}`}
+                >
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-current text-xs font-black">
+                    {String.fromCharCode(65 + index)}
+                  </span>
+                  <span className="flex-1">{choice}</span>
+                  {isAnswerSubmitted && isCorrect && <Icons.Check className="h-5 w-5" />}
+                  {isAnswerSubmitted && isSelected && !isCorrect && <Icons.X className="h-5 w-5" />}
+                </button>
+              );
+            })}
           </div>
 
-          {/* Volume */}
-          <button className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-600 transition-colors hover:text-slate-800 cursor-pointer">
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M11 5L6 9H2v6h4l5 4V5z" />
-            </svg>
-          </button>
-        </div>
-
-        {/* Playback Controls */}
-        <div className="mt-4 flex items-center justify-center gap-3">
-          <button className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs text-slate-600 transition-colors hover:bg-slate-200 hover:text-slate-900 cursor-pointer">
-            ⏮ -10s
-          </button>
-          <button className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs text-slate-600 transition-colors hover:bg-slate-200 hover:text-slate-900 cursor-pointer">
-            0.75×
-          </button>
-          <button className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs text-slate-600 transition-colors hover:bg-slate-200 hover:text-slate-900 cursor-pointer font-bold">
-            1.0×
-          </button>
-          <button className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs text-slate-600 transition-colors hover:bg-slate-200 hover:text-slate-900 cursor-pointer">
-            1.25×
-          </button>
-          <button className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs text-slate-600 transition-colors hover:bg-slate-200 hover:text-slate-900 cursor-pointer">
-            +10s ⏭
-          </button>
-        </div>
-      </motion.div>
-
-      {/* Question */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm"
-      >
-        <div className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-          Question 1 of 6 (Set {activeSet})
-        </div>
-        <h3 className="mb-4 text-lg font-semibold text-slate-800">{mockQuestion.text}</h3>
-
-        <div className="space-y-2">
-          {mockQuestion.options.map((option, idx) => {
-            const isSelected = selectedAnswer === idx;
-            const isCorrect = idx === mockQuestion.correctAnswer;
-
-            let borderClass = 'border-slate-200 bg-white hover:border-slate-350 hover:bg-slate-50 text-slate-700';
-            if (isSelected && !isAnswerSubmitted) {
-              borderClass = 'border-[#0071E3] bg-[#0071E3]/5 text-[#0071E3]';
-            } else if (isAnswerSubmitted) {
-              if (isCorrect) {
-                borderClass = 'border-emerald-500 bg-emerald-50 text-emerald-700';
-              } else if (isSelected) {
-                borderClass = 'border-rose-500 bg-rose-50 text-rose-700';
-              } else {
-                borderClass = 'border-slate-100 bg-slate-50/50 opacity-40 text-slate-400';
-              }
-            }
-
-            return (
+          {isAnswerSubmitted && (
+            <div className="space-y-3 rounded-lg border border-sky-100 bg-sky-50 p-4 text-sm leading-6 text-slate-700">
+              <p className="font-bold text-sky-800">Explanation</p>
+              <p>{currentQuestion?.explanation}</p>
               <button
-                key={option}
-                onClick={() => !isAnswerSubmitted && setSelectedAnswer(idx)}
-                disabled={isAnswerSubmitted}
-                className={`w-full rounded-xl border p-4 text-left text-sm font-medium transition-all duration-200 cursor-pointer ${borderClass}`}
+                type="button"
+                onClick={() => setShowTranscript((value) => !value)}
+                className="inline-flex items-center gap-1 text-xs font-black text-sky-700"
               >
-                {option}
+                <Icons.FileText className="h-4 w-4" /> {showTranscript ? 'Hide transcript' : 'Review transcript'}
               </button>
-            );
-          })}
-        </div>
-
-        <div className="mt-4 flex items-center justify-between">
-          <button
-            onClick={() => setShowTranscript(!showTranscript)}
-            className="text-sm font-medium text-slate-500 transition-colors hover:text-slate-800 cursor-pointer"
-          >
-            {showTranscript ? '🔽 Hide Transcript' : '▶️ Show Transcript'}
-          </button>
-          
-          {!isAnswerSubmitted ? (
-            <button
-              onClick={handleSubmitAnswer}
-              disabled={selectedAnswer === null}
-              className={`rounded-xl bg-[#0071E3] hover:bg-[#0077ED] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
-            >
-              Submit Answer
-            </button>
-          ) : (
-            <button
-              onClick={handleFinishListening}
-              disabled={saving}
-              className="rounded-xl bg-emerald-600 hover:bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all cursor-pointer disabled:opacity-50"
-            >
-              {saving ? 'Saving...' : 'Finish & Save'}
-            </button>
+              {showTranscript && (
+                <div className="whitespace-pre-line border-t border-sky-200 pt-3 text-slate-600">
+                  {currentQuestion?.transcript}
+                </div>
+              )}
+            </div>
           )}
-        </div>
-      </motion.div>
 
-      {/* Transcript */}
-      {showTranscript && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          className="rounded-2xl border border-slate-200/60 bg-white p-6 shadow-sm"
-        >
-          <h3 className="mb-3 text-sm font-semibold text-slate-800">📜 Transcript</h3>
-          <p className="whitespace-pre-line text-sm leading-relaxed text-slate-650">
-            {mockTranscript}
-          </p>
-        </motion.div>
-      )}
+          <div className="flex justify-end pt-1">
+            {!isAnswerSubmitted ? (
+              <Button onClick={submitAnswer} disabled={selectedAnswer === null}>Submit answer</Button>
+            ) : (
+              <Button onClick={nextQuestion} isLoading={loading}>
+                {currentIndex < questions.length - 1 ? 'Next question' : 'Finish session'}
+              </Button>
+            )}
+          </div>
+        </motion.section>
+      </AnimatePresence>
     </div>
   );
 }

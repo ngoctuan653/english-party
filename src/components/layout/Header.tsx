@@ -39,12 +39,12 @@ export function Header() {
   // Compute page title based on path
   const getPageTitle = () => {
     const path = location.pathname;
-    if (path === '/') return 'Dashboard';
+    if (path === '/') return 'Learning Path';
     if (path.startsWith('/study/vocabulary')) return 'Vocabulary Practice';
     if (path.startsWith('/study/listening')) return 'Listening Comprehension';
-    if (path === '/study') return 'Study Station';
-    if (path === '/missions') return 'Daily Missions';
-    if (path === '/leaderboard') return 'Leaderboard';
+    if (path === '/study') return 'Practice Hub';
+    if (path === '/missions') return 'Daily Quests';
+    if (path === '/leaderboard') return 'Weekly League';
     if (path === '/friends') return 'Friend Circle';
     if (path === '/profile') return 'Student Profile';
     if (path === '/settings') return 'Account Settings';
@@ -69,23 +69,23 @@ export function Header() {
   };
 
   return (
-    <header className="h-16 hidden lg:flex items-center justify-between px-8 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 fixed top-0 right-0 left-64 z-20">
+    <header className="fixed left-56 right-0 top-0 z-20 hidden h-16 items-center justify-between border-b border-slate-200 bg-white/90 px-6 backdrop-blur-xl lg:flex">
       {/* Title */}
-      <h2 className="text-lg font-bold text-slate-800 tracking-wide">{getPageTitle()}</h2>
+      <h2 className="text-base font-black text-slate-900">{getPageTitle()}</h2>
 
       {/* Actions */}
       <div className="flex items-center gap-6">
         {/* Streak & XP Quick Display */}
         {profile && (
-          <div className="flex items-center gap-4 bg-slate-50 px-3 py-1.5 rounded-full border border-slate-200/60 text-xs text-slate-600 font-medium">
+          <div className="flex items-center gap-4 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600">
             <span className="flex items-center gap-1.5">
-              <span className="text-sm">🔥</span>
-              <span className="text-slate-800 font-bold">{profile.currentStreak}</span> days
+              <Icons.Flame className="h-4 w-4 fill-amber-400 text-amber-500" />
+              <span className="font-bold text-slate-800">{profile.currentStreak}</span> days
             </span>
             <div className="w-px h-3 bg-slate-200" />
             <span className="flex items-center gap-1.5">
-              <span className="text-sm text-yellow-500">⭐</span>
-              <span className="text-slate-800 font-bold">{profile.xp}</span> XP
+              <Icons.Zap className="h-4 w-4 fill-violet-200 text-violet-600" />
+              <span className="font-bold text-slate-800">{profile.xp}</span> XP
             </span>
           </div>
         )}

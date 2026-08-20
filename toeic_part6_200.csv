@@ -1,0 +1,761 @@
+id,question,choiceA,choiceB,choiceC,choiceD,correctAnswer,explanation,part,type,topic,difficulty,context,transcript
+"local-p6-001","Choose the best option for blank [1].","will","has","being","was","A","“Will be closed” is the correct future passive form. | “Will be closed” là dạng bị động tương lai đúng.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Northstar office in Boston [1] be closed on June 4 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Ms. Carter.",""
+"local-p6-002","Choose the best option for blank [2].","before","although","because of","during","A","“Before” correctly links saving work to leaving. | “Before” diễn tả việc lưu công việc trước khi rời đi.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Northstar office in Boston [1] be closed on June 4 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Ms. Carter.",""
+"local-p6-003","Why will the office close?","For a staff celebration","For a ventilation inspection","For employee training","For a public holiday","B","The notice states that technicians will inspect the ventilation system. | Thông báo nêu rõ kỹ thuật viên sẽ kiểm tra hệ thống thông gió.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Northstar office in Boston [1] be closed on June 4 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Ms. Carter.",""
+"local-p6-004","What should employees do?","Work at the office overnight","Call a customer","Save their work before leaving","Move to another company","C","Employees are specifically asked to save their work before leaving. | Nhân viên được yêu cầu lưu công việc trước khi rời đi.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Northstar office in Boston [1] be closed on June 4 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Ms. Carter.",""
+"local-p6-005","Who should receive questions?","Ms. Carter","The building owner","The sales team","A technician","A","The final sentence directs questions to Ms. Carter. | Câu cuối hướng dẫn gửi câu hỏi cho Ms. Carter.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Northstar office in Boston [1] be closed on June 4 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Ms. Carter.",""
+"local-p6-006","Choose the best option for blank [1].","must","would","used to","had","A","“Must register” expresses the workshop requirement. | “Must register” diễn tả yêu cầu đăng ký.","6","reading","emails","650","To: sales team
+From: Ms. Carter
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Boston branch on June 4. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-007","Choose the best option for blank [2].","however","therefore","otherwise","meanwhile","B","Limited space is the reason for early registration, so “therefore” fits. | Vì chỗ có hạn nên “therefore” nối kết quả hợp lý.","6","reading","emails","650","To: sales team
+From: Ms. Carter
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Boston branch on June 4. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-008","What is the email mainly about?","A new employee portal","A customer service workshop","A branch relocation","A workbook sale","B","The message announces and explains a customer service workshop. | Email thông báo và hướng dẫn về hội thảo dịch vụ khách hàng.","6","reading","emails","650","To: sales team
+From: Ms. Carter
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Boston branch on June 4. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-009","How will participants receive the workbook?","By postal mail","At reception","By email","From a customer","C","The workbook will be sent by email. | Tài liệu sẽ được gửi qua email.","6","reading","emails","650","To: sales team
+From: Ms. Carter
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Boston branch on June 4. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-010","When will the workbook be sent?","On the day of the session","Two days before the session","One week after the session","During registration","B","The last sentence says it will arrive two days before the session. | Câu cuối cho biết tài liệu được gửi trước buổi học hai ngày.","6","reading","emails","650","To: sales team
+From: Ms. Carter
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Boston branch on June 4. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-011","Choose the best option for blank [1].","will","has","was","would have","A","The scheduled future action requires “will leave”. | Hành động dự kiến trong tương lai dùng “will leave”.","6","reading","shipping","650","Dear Customer,
+
+Your Northstar order #3100 [1] leave our warehouse on June 4. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Boston normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-012","Choose the best option for blank [2].","it","them","its","itself","A","“It” refers to the singular package. | “It” thay cho danh từ số ít “the package”.","6","reading","shipping","650","Dear Customer,
+
+Your Northstar order #3100 [1] leave our warehouse on June 4. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Boston normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-013","What is the purpose of the message?","To confirm a shipment schedule","To request a refund","To advertise a warehouse","To change an address","A","The message tells the customer when the order will ship and how to track it. | Tin nhắn xác nhận lịch gửi hàng và cách theo dõi.","6","reading","shipping","650","Dear Customer,
+
+Your Northstar order #3100 [1] leave our warehouse on June 4. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Boston normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-014","How long does delivery normally take?","One day","Two days","Three business days","One week","C","The message gives an estimated delivery time of three business days. | Thời gian giao dự kiến là ba ngày làm việc.","6","reading","shipping","650","Dear Customer,
+
+Your Northstar order #3100 [1] leave our warehouse on June 4. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Boston normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-015","When should the customer contact the company?","Before placing an order","If tracking does not update within 24 hours","Immediately after delivery","When visiting the warehouse","B","The final sentence gives this instruction. | Câu cuối đưa ra hướng dẫn này.","6","reading","shipping","650","Dear Customer,
+
+Your Northstar order #3100 [1] leave our warehouse on June 4. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Boston normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-016","Choose the best option for blank [1].","takes","makes","does","brings","A","The fixed expression is “take effect”. | Cụm cố định đúng là “take effect”.","6","reading","memos","700","MEMORANDUM
+To: All Northstar supervisors
+From: Ms. Carter
+
+The revised remote-work policy [1] effect on June 4. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-017","Choose the best option for blank [2].","to","of","for","with","C","The fixed pattern is “be responsible for” followed by a gerund. | Cấu trúc đúng là “be responsible for” + V-ing.","6","reading","memos","700","MEMORANDUM
+To: All Northstar supervisors
+From: Ms. Carter
+
+The revised remote-work policy [1] effect on June 4. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-018","Who is the memo addressed to?","All customers","All Northstar supervisors","Only new employees","Building technicians","B","The recipient line names all supervisors. | Dòng người nhận ghi rõ tất cả quản lý.","6","reading","memos","700","MEMORANDUM
+To: All Northstar supervisors
+From: Ms. Carter
+
+The revised remote-work policy [1] effect on June 4. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-019","How often may employees work remotely?","Every day","One day per month","Up to two days per week","Only on weekends","C","The policy permits up to two remote days each week. | Chính sách cho phép tối đa hai ngày làm từ xa mỗi tuần.","6","reading","memos","700","MEMORANDUM
+To: All Northstar supervisors
+From: Ms. Carter
+
+The revised remote-work policy [1] effect on June 4. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-020","What is required before remote days are taken?","Customer approval","Advance manager approval","A medical certificate","A new computer","B","Managers must approve the requested days in advance. | Quản lý phải duyệt trước những ngày được yêu cầu.","6","reading","memos","700","MEMORANDUM
+To: All Northstar supervisors
+From: Ms. Carter
+
+The revised remote-work policy [1] effect on June 4. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-021","Choose the best option for blank [1].","will be","has","was being","to be","A","A future passive form is required: “will be held”. | Cần dạng bị động tương lai “will be held”.","6","reading","events","700","Northstar COMMUNITY DAY
+
+Our annual community event [1] held at Boston Central Park on June 4. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Ms. Carter will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-022","Choose the best option for blank [2].","for","by","with","from","A","“For” correctly expresses the purpose of arriving early. | “For” diễn tả mục đích đến sớm để đăng ký.","6","reading","events","700","Northstar COMMUNITY DAY
+
+Our annual community event [1] held at Boston Central Park on June 4. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Ms. Carter will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-023","What will volunteers prepare?","Office furniture","Food packages","Marketing reports","Travel documents","B","The announcement says volunteers will prepare food packages. | Thông báo cho biết tình nguyện viên sẽ chuẩn bị các gói thực phẩm.","6","reading","events","700","Northstar COMMUNITY DAY
+
+Our annual community event [1] held at Boston Central Park on June 4. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Ms. Carter will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-024","What should volunteers bring?","A laptop","A printed ticket","A reusable water bottle","A safety uniform","C","Participants are asked to bring a reusable water bottle. | Người tham gia được yêu cầu mang bình nước tái sử dụng.","6","reading","events","700","Northstar COMMUNITY DAY
+
+Our annual community event [1] held at Boston Central Park on June 4. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Ms. Carter will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-025","What will happen at 8:30 A.M.?","Registration will close","Lunch will begin","A safety briefing will begin","The park will open","C","The text says Ms. Carter will lead a safety briefing at 8:30 A.M. | Bài đọc cho biết buổi hướng dẫn an toàn bắt đầu lúc 8:30.","6","reading","events","700","Northstar COMMUNITY DAY
+
+Our annual community event [1] held at Boston Central Park on June 4. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Ms. Carter will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-026","Choose the best option for blank [1].","will","has","being","was","A","“Will be closed” is the correct future passive form. | “Will be closed” là dạng bị động tương lai đúng.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the BluePeak office in Seattle [1] be closed on June 11 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Mr. Lee.",""
+"local-p6-027","Choose the best option for blank [2].","before","although","because of","during","A","“Before” correctly links saving work to leaving. | “Before” diễn tả việc lưu công việc trước khi rời đi.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the BluePeak office in Seattle [1] be closed on June 11 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Mr. Lee.",""
+"local-p6-028","Why will the office close?","For a staff celebration","For a ventilation inspection","For employee training","For a public holiday","B","The notice states that technicians will inspect the ventilation system. | Thông báo nêu rõ kỹ thuật viên sẽ kiểm tra hệ thống thông gió.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the BluePeak office in Seattle [1] be closed on June 11 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Mr. Lee.",""
+"local-p6-029","What should employees do?","Work at the office overnight","Call a customer","Save their work before leaving","Move to another company","C","Employees are specifically asked to save their work before leaving. | Nhân viên được yêu cầu lưu công việc trước khi rời đi.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the BluePeak office in Seattle [1] be closed on June 11 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Mr. Lee.",""
+"local-p6-030","Who should receive questions?","Mr. Lee","The building owner","The sales team","A technician","A","The final sentence directs questions to Mr. Lee. | Câu cuối hướng dẫn gửi câu hỏi cho Mr. Lee.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the BluePeak office in Seattle [1] be closed on June 11 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Mr. Lee.",""
+"local-p6-031","Choose the best option for blank [1].","must","would","used to","had","A","“Must register” expresses the workshop requirement. | “Must register” diễn tả yêu cầu đăng ký.","6","reading","emails","650","To: finance department
+From: Mr. Lee
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Seattle branch on June 11. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-032","Choose the best option for blank [2].","however","therefore","otherwise","meanwhile","B","Limited space is the reason for early registration, so “therefore” fits. | Vì chỗ có hạn nên “therefore” nối kết quả hợp lý.","6","reading","emails","650","To: finance department
+From: Mr. Lee
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Seattle branch on June 11. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-033","What is the email mainly about?","A new employee portal","A customer service workshop","A branch relocation","A workbook sale","B","The message announces and explains a customer service workshop. | Email thông báo và hướng dẫn về hội thảo dịch vụ khách hàng.","6","reading","emails","650","To: finance department
+From: Mr. Lee
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Seattle branch on June 11. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-034","How will participants receive the workbook?","By postal mail","At reception","By email","From a customer","C","The workbook will be sent by email. | Tài liệu sẽ được gửi qua email.","6","reading","emails","650","To: finance department
+From: Mr. Lee
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Seattle branch on June 11. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-035","When will the workbook be sent?","On the day of the session","Two days before the session","One week after the session","During registration","B","The last sentence says it will arrive two days before the session. | Câu cuối cho biết tài liệu được gửi trước buổi học hai ngày.","6","reading","emails","650","To: finance department
+From: Mr. Lee
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Seattle branch on June 11. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-036","Choose the best option for blank [1].","will","has","was","would have","A","The scheduled future action requires “will leave”. | Hành động dự kiến trong tương lai dùng “will leave”.","6","reading","shipping","650","Dear Customer,
+
+Your BluePeak order #3117 [1] leave our warehouse on June 11. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Seattle normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-037","Choose the best option for blank [2].","it","them","its","itself","A","“It” refers to the singular package. | “It” thay cho danh từ số ít “the package”.","6","reading","shipping","650","Dear Customer,
+
+Your BluePeak order #3117 [1] leave our warehouse on June 11. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Seattle normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-038","What is the purpose of the message?","To confirm a shipment schedule","To request a refund","To advertise a warehouse","To change an address","A","The message tells the customer when the order will ship and how to track it. | Tin nhắn xác nhận lịch gửi hàng và cách theo dõi.","6","reading","shipping","650","Dear Customer,
+
+Your BluePeak order #3117 [1] leave our warehouse on June 11. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Seattle normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-039","How long does delivery normally take?","One day","Two days","Three business days","One week","C","The message gives an estimated delivery time of three business days. | Thời gian giao dự kiến là ba ngày làm việc.","6","reading","shipping","650","Dear Customer,
+
+Your BluePeak order #3117 [1] leave our warehouse on June 11. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Seattle normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-040","When should the customer contact the company?","Before placing an order","If tracking does not update within 24 hours","Immediately after delivery","When visiting the warehouse","B","The final sentence gives this instruction. | Câu cuối đưa ra hướng dẫn này.","6","reading","shipping","650","Dear Customer,
+
+Your BluePeak order #3117 [1] leave our warehouse on June 11. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Seattle normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-041","Choose the best option for blank [1].","takes","makes","does","brings","A","The fixed expression is “take effect”. | Cụm cố định đúng là “take effect”.","6","reading","memos","700","MEMORANDUM
+To: All BluePeak supervisors
+From: Mr. Lee
+
+The revised remote-work policy [1] effect on June 11. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-042","Choose the best option for blank [2].","to","of","for","with","C","The fixed pattern is “be responsible for” followed by a gerund. | Cấu trúc đúng là “be responsible for” + V-ing.","6","reading","memos","700","MEMORANDUM
+To: All BluePeak supervisors
+From: Mr. Lee
+
+The revised remote-work policy [1] effect on June 11. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-043","Who is the memo addressed to?","All customers","All BluePeak supervisors","Only new employees","Building technicians","B","The recipient line names all supervisors. | Dòng người nhận ghi rõ tất cả quản lý.","6","reading","memos","700","MEMORANDUM
+To: All BluePeak supervisors
+From: Mr. Lee
+
+The revised remote-work policy [1] effect on June 11. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-044","How often may employees work remotely?","Every day","One day per month","Up to two days per week","Only on weekends","C","The policy permits up to two remote days each week. | Chính sách cho phép tối đa hai ngày làm từ xa mỗi tuần.","6","reading","memos","700","MEMORANDUM
+To: All BluePeak supervisors
+From: Mr. Lee
+
+The revised remote-work policy [1] effect on June 11. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-045","What is required before remote days are taken?","Customer approval","Advance manager approval","A medical certificate","A new computer","B","Managers must approve the requested days in advance. | Quản lý phải duyệt trước những ngày được yêu cầu.","6","reading","memos","700","MEMORANDUM
+To: All BluePeak supervisors
+From: Mr. Lee
+
+The revised remote-work policy [1] effect on June 11. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-046","Choose the best option for blank [1].","will be","has","was being","to be","A","A future passive form is required: “will be held”. | Cần dạng bị động tương lai “will be held”.","6","reading","events","700","BluePeak COMMUNITY DAY
+
+Our annual community event [1] held at Seattle Central Park on June 11. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Mr. Lee will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-047","Choose the best option for blank [2].","for","by","with","from","A","“For” correctly expresses the purpose of arriving early. | “For” diễn tả mục đích đến sớm để đăng ký.","6","reading","events","700","BluePeak COMMUNITY DAY
+
+Our annual community event [1] held at Seattle Central Park on June 11. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Mr. Lee will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-048","What will volunteers prepare?","Office furniture","Food packages","Marketing reports","Travel documents","B","The announcement says volunteers will prepare food packages. | Thông báo cho biết tình nguyện viên sẽ chuẩn bị các gói thực phẩm.","6","reading","events","700","BluePeak COMMUNITY DAY
+
+Our annual community event [1] held at Seattle Central Park on June 11. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Mr. Lee will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-049","What should volunteers bring?","A laptop","A printed ticket","A reusable water bottle","A safety uniform","C","Participants are asked to bring a reusable water bottle. | Người tham gia được yêu cầu mang bình nước tái sử dụng.","6","reading","events","700","BluePeak COMMUNITY DAY
+
+Our annual community event [1] held at Seattle Central Park on June 11. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Mr. Lee will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-050","What will happen at 8:30 A.M.?","Registration will close","Lunch will begin","A safety briefing will begin","The park will open","C","The text says Mr. Lee will lead a safety briefing at 8:30 A.M. | Bài đọc cho biết buổi hướng dẫn an toàn bắt đầu lúc 8:30.","6","reading","events","700","BluePeak COMMUNITY DAY
+
+Our annual community event [1] held at Seattle Central Park on June 11. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Mr. Lee will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-051","Choose the best option for blank [1].","will","has","being","was","A","“Will be closed” is the correct future passive form. | “Will be closed” là dạng bị động tương lai đúng.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Greenfield office in Denver [1] be closed on June 18 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Ms. Nguyen.",""
+"local-p6-052","Choose the best option for blank [2].","before","although","because of","during","A","“Before” correctly links saving work to leaving. | “Before” diễn tả việc lưu công việc trước khi rời đi.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Greenfield office in Denver [1] be closed on June 18 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Ms. Nguyen.",""
+"local-p6-053","Why will the office close?","For a staff celebration","For a ventilation inspection","For employee training","For a public holiday","B","The notice states that technicians will inspect the ventilation system. | Thông báo nêu rõ kỹ thuật viên sẽ kiểm tra hệ thống thông gió.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Greenfield office in Denver [1] be closed on June 18 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Ms. Nguyen.",""
+"local-p6-054","What should employees do?","Work at the office overnight","Call a customer","Save their work before leaving","Move to another company","C","Employees are specifically asked to save their work before leaving. | Nhân viên được yêu cầu lưu công việc trước khi rời đi.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Greenfield office in Denver [1] be closed on June 18 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Ms. Nguyen.",""
+"local-p6-055","Who should receive questions?","Ms. Nguyen","The building owner","The sales team","A technician","A","The final sentence directs questions to Ms. Nguyen. | Câu cuối hướng dẫn gửi câu hỏi cho Ms. Nguyen.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Greenfield office in Denver [1] be closed on June 18 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Ms. Nguyen.",""
+"local-p6-056","Choose the best option for blank [1].","must","would","used to","had","A","“Must register” expresses the workshop requirement. | “Must register” diễn tả yêu cầu đăng ký.","6","reading","emails","650","To: marketing unit
+From: Ms. Nguyen
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Denver branch on June 18. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-057","Choose the best option for blank [2].","however","therefore","otherwise","meanwhile","B","Limited space is the reason for early registration, so “therefore” fits. | Vì chỗ có hạn nên “therefore” nối kết quả hợp lý.","6","reading","emails","650","To: marketing unit
+From: Ms. Nguyen
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Denver branch on June 18. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-058","What is the email mainly about?","A new employee portal","A customer service workshop","A branch relocation","A workbook sale","B","The message announces and explains a customer service workshop. | Email thông báo và hướng dẫn về hội thảo dịch vụ khách hàng.","6","reading","emails","650","To: marketing unit
+From: Ms. Nguyen
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Denver branch on June 18. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-059","How will participants receive the workbook?","By postal mail","At reception","By email","From a customer","C","The workbook will be sent by email. | Tài liệu sẽ được gửi qua email.","6","reading","emails","650","To: marketing unit
+From: Ms. Nguyen
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Denver branch on June 18. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-060","When will the workbook be sent?","On the day of the session","Two days before the session","One week after the session","During registration","B","The last sentence says it will arrive two days before the session. | Câu cuối cho biết tài liệu được gửi trước buổi học hai ngày.","6","reading","emails","650","To: marketing unit
+From: Ms. Nguyen
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Denver branch on June 18. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-061","Choose the best option for blank [1].","will","has","was","would have","A","The scheduled future action requires “will leave”. | Hành động dự kiến trong tương lai dùng “will leave”.","6","reading","shipping","650","Dear Customer,
+
+Your Greenfield order #3134 [1] leave our warehouse on June 18. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Denver normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-062","Choose the best option for blank [2].","it","them","its","itself","A","“It” refers to the singular package. | “It” thay cho danh từ số ít “the package”.","6","reading","shipping","650","Dear Customer,
+
+Your Greenfield order #3134 [1] leave our warehouse on June 18. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Denver normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-063","What is the purpose of the message?","To confirm a shipment schedule","To request a refund","To advertise a warehouse","To change an address","A","The message tells the customer when the order will ship and how to track it. | Tin nhắn xác nhận lịch gửi hàng và cách theo dõi.","6","reading","shipping","650","Dear Customer,
+
+Your Greenfield order #3134 [1] leave our warehouse on June 18. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Denver normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-064","How long does delivery normally take?","One day","Two days","Three business days","One week","C","The message gives an estimated delivery time of three business days. | Thời gian giao dự kiến là ba ngày làm việc.","6","reading","shipping","650","Dear Customer,
+
+Your Greenfield order #3134 [1] leave our warehouse on June 18. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Denver normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-065","When should the customer contact the company?","Before placing an order","If tracking does not update within 24 hours","Immediately after delivery","When visiting the warehouse","B","The final sentence gives this instruction. | Câu cuối đưa ra hướng dẫn này.","6","reading","shipping","650","Dear Customer,
+
+Your Greenfield order #3134 [1] leave our warehouse on June 18. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Denver normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-066","Choose the best option for blank [1].","takes","makes","does","brings","A","The fixed expression is “take effect”. | Cụm cố định đúng là “take effect”.","6","reading","memos","700","MEMORANDUM
+To: All Greenfield supervisors
+From: Ms. Nguyen
+
+The revised remote-work policy [1] effect on June 18. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-067","Choose the best option for blank [2].","to","of","for","with","C","The fixed pattern is “be responsible for” followed by a gerund. | Cấu trúc đúng là “be responsible for” + V-ing.","6","reading","memos","700","MEMORANDUM
+To: All Greenfield supervisors
+From: Ms. Nguyen
+
+The revised remote-work policy [1] effect on June 18. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-068","Who is the memo addressed to?","All customers","All Greenfield supervisors","Only new employees","Building technicians","B","The recipient line names all supervisors. | Dòng người nhận ghi rõ tất cả quản lý.","6","reading","memos","700","MEMORANDUM
+To: All Greenfield supervisors
+From: Ms. Nguyen
+
+The revised remote-work policy [1] effect on June 18. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-069","How often may employees work remotely?","Every day","One day per month","Up to two days per week","Only on weekends","C","The policy permits up to two remote days each week. | Chính sách cho phép tối đa hai ngày làm từ xa mỗi tuần.","6","reading","memos","700","MEMORANDUM
+To: All Greenfield supervisors
+From: Ms. Nguyen
+
+The revised remote-work policy [1] effect on June 18. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-070","What is required before remote days are taken?","Customer approval","Advance manager approval","A medical certificate","A new computer","B","Managers must approve the requested days in advance. | Quản lý phải duyệt trước những ngày được yêu cầu.","6","reading","memos","700","MEMORANDUM
+To: All Greenfield supervisors
+From: Ms. Nguyen
+
+The revised remote-work policy [1] effect on June 18. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-071","Choose the best option for blank [1].","will be","has","was being","to be","A","A future passive form is required: “will be held”. | Cần dạng bị động tương lai “will be held”.","6","reading","events","700","Greenfield COMMUNITY DAY
+
+Our annual community event [1] held at Denver Central Park on June 18. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Ms. Nguyen will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-072","Choose the best option for blank [2].","for","by","with","from","A","“For” correctly expresses the purpose of arriving early. | “For” diễn tả mục đích đến sớm để đăng ký.","6","reading","events","700","Greenfield COMMUNITY DAY
+
+Our annual community event [1] held at Denver Central Park on June 18. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Ms. Nguyen will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-073","What will volunteers prepare?","Office furniture","Food packages","Marketing reports","Travel documents","B","The announcement says volunteers will prepare food packages. | Thông báo cho biết tình nguyện viên sẽ chuẩn bị các gói thực phẩm.","6","reading","events","700","Greenfield COMMUNITY DAY
+
+Our annual community event [1] held at Denver Central Park on June 18. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Ms. Nguyen will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-074","What should volunteers bring?","A laptop","A printed ticket","A reusable water bottle","A safety uniform","C","Participants are asked to bring a reusable water bottle. | Người tham gia được yêu cầu mang bình nước tái sử dụng.","6","reading","events","700","Greenfield COMMUNITY DAY
+
+Our annual community event [1] held at Denver Central Park on June 18. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Ms. Nguyen will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-075","What will happen at 8:30 A.M.?","Registration will close","Lunch will begin","A safety briefing will begin","The park will open","C","The text says Ms. Nguyen will lead a safety briefing at 8:30 A.M. | Bài đọc cho biết buổi hướng dẫn an toàn bắt đầu lúc 8:30.","6","reading","events","700","Greenfield COMMUNITY DAY
+
+Our annual community event [1] held at Denver Central Park on June 18. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Ms. Nguyen will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-076","Choose the best option for blank [1].","will","has","being","was","A","“Will be closed” is the correct future passive form. | “Will be closed” là dạng bị động tương lai đúng.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Summit office in Austin [1] be closed on July 2 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Mr. Wilson.",""
+"local-p6-077","Choose the best option for blank [2].","before","although","because of","during","A","“Before” correctly links saving work to leaving. | “Before” diễn tả việc lưu công việc trước khi rời đi.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Summit office in Austin [1] be closed on July 2 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Mr. Wilson.",""
+"local-p6-078","Why will the office close?","For a staff celebration","For a ventilation inspection","For employee training","For a public holiday","B","The notice states that technicians will inspect the ventilation system. | Thông báo nêu rõ kỹ thuật viên sẽ kiểm tra hệ thống thông gió.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Summit office in Austin [1] be closed on July 2 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Mr. Wilson.",""
+"local-p6-079","What should employees do?","Work at the office overnight","Call a customer","Save their work before leaving","Move to another company","C","Employees are specifically asked to save their work before leaving. | Nhân viên được yêu cầu lưu công việc trước khi rời đi.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Summit office in Austin [1] be closed on July 2 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Mr. Wilson.",""
+"local-p6-080","Who should receive questions?","Mr. Wilson","The building owner","The sales team","A technician","A","The final sentence directs questions to Mr. Wilson. | Câu cuối hướng dẫn gửi câu hỏi cho Mr. Wilson.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Summit office in Austin [1] be closed on July 2 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Mr. Wilson.",""
+"local-p6-081","Choose the best option for blank [1].","must","would","used to","had","A","“Must register” expresses the workshop requirement. | “Must register” diễn tả yêu cầu đăng ký.","6","reading","emails","650","To: operations group
+From: Mr. Wilson
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Austin branch on July 2. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-082","Choose the best option for blank [2].","however","therefore","otherwise","meanwhile","B","Limited space is the reason for early registration, so “therefore” fits. | Vì chỗ có hạn nên “therefore” nối kết quả hợp lý.","6","reading","emails","650","To: operations group
+From: Mr. Wilson
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Austin branch on July 2. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-083","What is the email mainly about?","A new employee portal","A customer service workshop","A branch relocation","A workbook sale","B","The message announces and explains a customer service workshop. | Email thông báo và hướng dẫn về hội thảo dịch vụ khách hàng.","6","reading","emails","650","To: operations group
+From: Mr. Wilson
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Austin branch on July 2. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-084","How will participants receive the workbook?","By postal mail","At reception","By email","From a customer","C","The workbook will be sent by email. | Tài liệu sẽ được gửi qua email.","6","reading","emails","650","To: operations group
+From: Mr. Wilson
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Austin branch on July 2. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-085","When will the workbook be sent?","On the day of the session","Two days before the session","One week after the session","During registration","B","The last sentence says it will arrive two days before the session. | Câu cuối cho biết tài liệu được gửi trước buổi học hai ngày.","6","reading","emails","650","To: operations group
+From: Mr. Wilson
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Austin branch on July 2. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-086","Choose the best option for blank [1].","will","has","was","would have","A","The scheduled future action requires “will leave”. | Hành động dự kiến trong tương lai dùng “will leave”.","6","reading","shipping","650","Dear Customer,
+
+Your Summit order #3151 [1] leave our warehouse on July 2. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Austin normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-087","Choose the best option for blank [2].","it","them","its","itself","A","“It” refers to the singular package. | “It” thay cho danh từ số ít “the package”.","6","reading","shipping","650","Dear Customer,
+
+Your Summit order #3151 [1] leave our warehouse on July 2. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Austin normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-088","What is the purpose of the message?","To confirm a shipment schedule","To request a refund","To advertise a warehouse","To change an address","A","The message tells the customer when the order will ship and how to track it. | Tin nhắn xác nhận lịch gửi hàng và cách theo dõi.","6","reading","shipping","650","Dear Customer,
+
+Your Summit order #3151 [1] leave our warehouse on July 2. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Austin normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-089","How long does delivery normally take?","One day","Two days","Three business days","One week","C","The message gives an estimated delivery time of three business days. | Thời gian giao dự kiến là ba ngày làm việc.","6","reading","shipping","650","Dear Customer,
+
+Your Summit order #3151 [1] leave our warehouse on July 2. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Austin normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-090","When should the customer contact the company?","Before placing an order","If tracking does not update within 24 hours","Immediately after delivery","When visiting the warehouse","B","The final sentence gives this instruction. | Câu cuối đưa ra hướng dẫn này.","6","reading","shipping","650","Dear Customer,
+
+Your Summit order #3151 [1] leave our warehouse on July 2. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Austin normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-091","Choose the best option for blank [1].","takes","makes","does","brings","A","The fixed expression is “take effect”. | Cụm cố định đúng là “take effect”.","6","reading","memos","700","MEMORANDUM
+To: All Summit supervisors
+From: Mr. Wilson
+
+The revised remote-work policy [1] effect on July 2. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-092","Choose the best option for blank [2].","to","of","for","with","C","The fixed pattern is “be responsible for” followed by a gerund. | Cấu trúc đúng là “be responsible for” + V-ing.","6","reading","memos","700","MEMORANDUM
+To: All Summit supervisors
+From: Mr. Wilson
+
+The revised remote-work policy [1] effect on July 2. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-093","Who is the memo addressed to?","All customers","All Summit supervisors","Only new employees","Building technicians","B","The recipient line names all supervisors. | Dòng người nhận ghi rõ tất cả quản lý.","6","reading","memos","700","MEMORANDUM
+To: All Summit supervisors
+From: Mr. Wilson
+
+The revised remote-work policy [1] effect on July 2. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-094","How often may employees work remotely?","Every day","One day per month","Up to two days per week","Only on weekends","C","The policy permits up to two remote days each week. | Chính sách cho phép tối đa hai ngày làm từ xa mỗi tuần.","6","reading","memos","700","MEMORANDUM
+To: All Summit supervisors
+From: Mr. Wilson
+
+The revised remote-work policy [1] effect on July 2. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-095","What is required before remote days are taken?","Customer approval","Advance manager approval","A medical certificate","A new computer","B","Managers must approve the requested days in advance. | Quản lý phải duyệt trước những ngày được yêu cầu.","6","reading","memos","700","MEMORANDUM
+To: All Summit supervisors
+From: Mr. Wilson
+
+The revised remote-work policy [1] effect on July 2. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-096","Choose the best option for blank [1].","will be","has","was being","to be","A","A future passive form is required: “will be held”. | Cần dạng bị động tương lai “will be held”.","6","reading","events","700","Summit COMMUNITY DAY
+
+Our annual community event [1] held at Austin Central Park on July 2. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Mr. Wilson will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-097","Choose the best option for blank [2].","for","by","with","from","A","“For” correctly expresses the purpose of arriving early. | “For” diễn tả mục đích đến sớm để đăng ký.","6","reading","events","700","Summit COMMUNITY DAY
+
+Our annual community event [1] held at Austin Central Park on July 2. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Mr. Wilson will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-098","What will volunteers prepare?","Office furniture","Food packages","Marketing reports","Travel documents","B","The announcement says volunteers will prepare food packages. | Thông báo cho biết tình nguyện viên sẽ chuẩn bị các gói thực phẩm.","6","reading","events","700","Summit COMMUNITY DAY
+
+Our annual community event [1] held at Austin Central Park on July 2. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Mr. Wilson will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-099","What should volunteers bring?","A laptop","A printed ticket","A reusable water bottle","A safety uniform","C","Participants are asked to bring a reusable water bottle. | Người tham gia được yêu cầu mang bình nước tái sử dụng.","6","reading","events","700","Summit COMMUNITY DAY
+
+Our annual community event [1] held at Austin Central Park on July 2. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Mr. Wilson will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-100","What will happen at 8:30 A.M.?","Registration will close","Lunch will begin","A safety briefing will begin","The park will open","C","The text says Mr. Wilson will lead a safety briefing at 8:30 A.M. | Bài đọc cho biết buổi hướng dẫn an toàn bắt đầu lúc 8:30.","6","reading","events","700","Summit COMMUNITY DAY
+
+Our annual community event [1] held at Austin Central Park on July 2. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Mr. Wilson will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-101","Choose the best option for blank [1].","will","has","being","was","A","“Will be closed” is the correct future passive form. | “Will be closed” là dạng bị động tương lai đúng.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Riverside office in Chicago [1] be closed on July 9 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Ms. Patel.",""
+"local-p6-102","Choose the best option for blank [2].","before","although","because of","during","A","“Before” correctly links saving work to leaving. | “Before” diễn tả việc lưu công việc trước khi rời đi.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Riverside office in Chicago [1] be closed on July 9 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Ms. Patel.",""
+"local-p6-103","Why will the office close?","For a staff celebration","For a ventilation inspection","For employee training","For a public holiday","B","The notice states that technicians will inspect the ventilation system. | Thông báo nêu rõ kỹ thuật viên sẽ kiểm tra hệ thống thông gió.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Riverside office in Chicago [1] be closed on July 9 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Ms. Patel.",""
+"local-p6-104","What should employees do?","Work at the office overnight","Call a customer","Save their work before leaving","Move to another company","C","Employees are specifically asked to save their work before leaving. | Nhân viên được yêu cầu lưu công việc trước khi rời đi.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Riverside office in Chicago [1] be closed on July 9 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Ms. Patel.",""
+"local-p6-105","Who should receive questions?","Ms. Patel","The building owner","The sales team","A technician","A","The final sentence directs questions to Ms. Patel. | Câu cuối hướng dẫn gửi câu hỏi cho Ms. Patel.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Riverside office in Chicago [1] be closed on July 9 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Ms. Patel.",""
+"local-p6-106","Choose the best option for blank [1].","must","would","used to","had","A","“Must register” expresses the workshop requirement. | “Must register” diễn tả yêu cầu đăng ký.","6","reading","emails","650","To: customer service team
+From: Ms. Patel
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Chicago branch on July 9. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-107","Choose the best option for blank [2].","however","therefore","otherwise","meanwhile","B","Limited space is the reason for early registration, so “therefore” fits. | Vì chỗ có hạn nên “therefore” nối kết quả hợp lý.","6","reading","emails","650","To: customer service team
+From: Ms. Patel
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Chicago branch on July 9. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-108","What is the email mainly about?","A new employee portal","A customer service workshop","A branch relocation","A workbook sale","B","The message announces and explains a customer service workshop. | Email thông báo và hướng dẫn về hội thảo dịch vụ khách hàng.","6","reading","emails","650","To: customer service team
+From: Ms. Patel
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Chicago branch on July 9. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-109","How will participants receive the workbook?","By postal mail","At reception","By email","From a customer","C","The workbook will be sent by email. | Tài liệu sẽ được gửi qua email.","6","reading","emails","650","To: customer service team
+From: Ms. Patel
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Chicago branch on July 9. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-110","When will the workbook be sent?","On the day of the session","Two days before the session","One week after the session","During registration","B","The last sentence says it will arrive two days before the session. | Câu cuối cho biết tài liệu được gửi trước buổi học hai ngày.","6","reading","emails","650","To: customer service team
+From: Ms. Patel
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Chicago branch on July 9. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-111","Choose the best option for blank [1].","will","has","was","would have","A","The scheduled future action requires “will leave”. | Hành động dự kiến trong tương lai dùng “will leave”.","6","reading","shipping","650","Dear Customer,
+
+Your Riverside order #3168 [1] leave our warehouse on July 9. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Chicago normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-112","Choose the best option for blank [2].","it","them","its","itself","A","“It” refers to the singular package. | “It” thay cho danh từ số ít “the package”.","6","reading","shipping","650","Dear Customer,
+
+Your Riverside order #3168 [1] leave our warehouse on July 9. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Chicago normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-113","What is the purpose of the message?","To confirm a shipment schedule","To request a refund","To advertise a warehouse","To change an address","A","The message tells the customer when the order will ship and how to track it. | Tin nhắn xác nhận lịch gửi hàng và cách theo dõi.","6","reading","shipping","650","Dear Customer,
+
+Your Riverside order #3168 [1] leave our warehouse on July 9. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Chicago normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-114","How long does delivery normally take?","One day","Two days","Three business days","One week","C","The message gives an estimated delivery time of three business days. | Thời gian giao dự kiến là ba ngày làm việc.","6","reading","shipping","650","Dear Customer,
+
+Your Riverside order #3168 [1] leave our warehouse on July 9. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Chicago normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-115","When should the customer contact the company?","Before placing an order","If tracking does not update within 24 hours","Immediately after delivery","When visiting the warehouse","B","The final sentence gives this instruction. | Câu cuối đưa ra hướng dẫn này.","6","reading","shipping","650","Dear Customer,
+
+Your Riverside order #3168 [1] leave our warehouse on July 9. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Chicago normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-116","Choose the best option for blank [1].","takes","makes","does","brings","A","The fixed expression is “take effect”. | Cụm cố định đúng là “take effect”.","6","reading","memos","700","MEMORANDUM
+To: All Riverside supervisors
+From: Ms. Patel
+
+The revised remote-work policy [1] effect on July 9. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-117","Choose the best option for blank [2].","to","of","for","with","C","The fixed pattern is “be responsible for” followed by a gerund. | Cấu trúc đúng là “be responsible for” + V-ing.","6","reading","memos","700","MEMORANDUM
+To: All Riverside supervisors
+From: Ms. Patel
+
+The revised remote-work policy [1] effect on July 9. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-118","Who is the memo addressed to?","All customers","All Riverside supervisors","Only new employees","Building technicians","B","The recipient line names all supervisors. | Dòng người nhận ghi rõ tất cả quản lý.","6","reading","memos","700","MEMORANDUM
+To: All Riverside supervisors
+From: Ms. Patel
+
+The revised remote-work policy [1] effect on July 9. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-119","How often may employees work remotely?","Every day","One day per month","Up to two days per week","Only on weekends","C","The policy permits up to two remote days each week. | Chính sách cho phép tối đa hai ngày làm từ xa mỗi tuần.","6","reading","memos","700","MEMORANDUM
+To: All Riverside supervisors
+From: Ms. Patel
+
+The revised remote-work policy [1] effect on July 9. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-120","What is required before remote days are taken?","Customer approval","Advance manager approval","A medical certificate","A new computer","B","Managers must approve the requested days in advance. | Quản lý phải duyệt trước những ngày được yêu cầu.","6","reading","memos","700","MEMORANDUM
+To: All Riverside supervisors
+From: Ms. Patel
+
+The revised remote-work policy [1] effect on July 9. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-121","Choose the best option for blank [1].","will be","has","was being","to be","A","A future passive form is required: “will be held”. | Cần dạng bị động tương lai “will be held”.","6","reading","events","700","Riverside COMMUNITY DAY
+
+Our annual community event [1] held at Chicago Central Park on July 9. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Ms. Patel will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-122","Choose the best option for blank [2].","for","by","with","from","A","“For” correctly expresses the purpose of arriving early. | “For” diễn tả mục đích đến sớm để đăng ký.","6","reading","events","700","Riverside COMMUNITY DAY
+
+Our annual community event [1] held at Chicago Central Park on July 9. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Ms. Patel will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-123","What will volunteers prepare?","Office furniture","Food packages","Marketing reports","Travel documents","B","The announcement says volunteers will prepare food packages. | Thông báo cho biết tình nguyện viên sẽ chuẩn bị các gói thực phẩm.","6","reading","events","700","Riverside COMMUNITY DAY
+
+Our annual community event [1] held at Chicago Central Park on July 9. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Ms. Patel will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-124","What should volunteers bring?","A laptop","A printed ticket","A reusable water bottle","A safety uniform","C","Participants are asked to bring a reusable water bottle. | Người tham gia được yêu cầu mang bình nước tái sử dụng.","6","reading","events","700","Riverside COMMUNITY DAY
+
+Our annual community event [1] held at Chicago Central Park on July 9. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Ms. Patel will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-125","What will happen at 8:30 A.M.?","Registration will close","Lunch will begin","A safety briefing will begin","The park will open","C","The text says Ms. Patel will lead a safety briefing at 8:30 A.M. | Bài đọc cho biết buổi hướng dẫn an toàn bắt đầu lúc 8:30.","6","reading","events","700","Riverside COMMUNITY DAY
+
+Our annual community event [1] held at Chicago Central Park on July 9. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Ms. Patel will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-126","Choose the best option for blank [1].","will","has","being","was","A","“Will be closed” is the correct future passive form. | “Will be closed” là dạng bị động tương lai đúng.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the BrightPath office in Portland [1] be closed on July 16 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Mr. Brown.",""
+"local-p6-127","Choose the best option for blank [2].","before","although","because of","during","A","“Before” correctly links saving work to leaving. | “Before” diễn tả việc lưu công việc trước khi rời đi.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the BrightPath office in Portland [1] be closed on July 16 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Mr. Brown.",""
+"local-p6-128","Why will the office close?","For a staff celebration","For a ventilation inspection","For employee training","For a public holiday","B","The notice states that technicians will inspect the ventilation system. | Thông báo nêu rõ kỹ thuật viên sẽ kiểm tra hệ thống thông gió.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the BrightPath office in Portland [1] be closed on July 16 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Mr. Brown.",""
+"local-p6-129","What should employees do?","Work at the office overnight","Call a customer","Save their work before leaving","Move to another company","C","Employees are specifically asked to save their work before leaving. | Nhân viên được yêu cầu lưu công việc trước khi rời đi.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the BrightPath office in Portland [1] be closed on July 16 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Mr. Brown.",""
+"local-p6-130","Who should receive questions?","Mr. Brown","The building owner","The sales team","A technician","A","The final sentence directs questions to Mr. Brown. | Câu cuối hướng dẫn gửi câu hỏi cho Mr. Brown.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the BrightPath office in Portland [1] be closed on July 16 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Mr. Brown.",""
+"local-p6-131","Choose the best option for blank [1].","must","would","used to","had","A","“Must register” expresses the workshop requirement. | “Must register” diễn tả yêu cầu đăng ký.","6","reading","emails","650","To: research division
+From: Mr. Brown
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Portland branch on July 16. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-132","Choose the best option for blank [2].","however","therefore","otherwise","meanwhile","B","Limited space is the reason for early registration, so “therefore” fits. | Vì chỗ có hạn nên “therefore” nối kết quả hợp lý.","6","reading","emails","650","To: research division
+From: Mr. Brown
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Portland branch on July 16. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-133","What is the email mainly about?","A new employee portal","A customer service workshop","A branch relocation","A workbook sale","B","The message announces and explains a customer service workshop. | Email thông báo và hướng dẫn về hội thảo dịch vụ khách hàng.","6","reading","emails","650","To: research division
+From: Mr. Brown
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Portland branch on July 16. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-134","How will participants receive the workbook?","By postal mail","At reception","By email","From a customer","C","The workbook will be sent by email. | Tài liệu sẽ được gửi qua email.","6","reading","emails","650","To: research division
+From: Mr. Brown
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Portland branch on July 16. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-135","When will the workbook be sent?","On the day of the session","Two days before the session","One week after the session","During registration","B","The last sentence says it will arrive two days before the session. | Câu cuối cho biết tài liệu được gửi trước buổi học hai ngày.","6","reading","emails","650","To: research division
+From: Mr. Brown
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Portland branch on July 16. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-136","Choose the best option for blank [1].","will","has","was","would have","A","The scheduled future action requires “will leave”. | Hành động dự kiến trong tương lai dùng “will leave”.","6","reading","shipping","650","Dear Customer,
+
+Your BrightPath order #3185 [1] leave our warehouse on July 16. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Portland normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-137","Choose the best option for blank [2].","it","them","its","itself","A","“It” refers to the singular package. | “It” thay cho danh từ số ít “the package”.","6","reading","shipping","650","Dear Customer,
+
+Your BrightPath order #3185 [1] leave our warehouse on July 16. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Portland normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-138","What is the purpose of the message?","To confirm a shipment schedule","To request a refund","To advertise a warehouse","To change an address","A","The message tells the customer when the order will ship and how to track it. | Tin nhắn xác nhận lịch gửi hàng và cách theo dõi.","6","reading","shipping","650","Dear Customer,
+
+Your BrightPath order #3185 [1] leave our warehouse on July 16. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Portland normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-139","How long does delivery normally take?","One day","Two days","Three business days","One week","C","The message gives an estimated delivery time of three business days. | Thời gian giao dự kiến là ba ngày làm việc.","6","reading","shipping","650","Dear Customer,
+
+Your BrightPath order #3185 [1] leave our warehouse on July 16. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Portland normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-140","When should the customer contact the company?","Before placing an order","If tracking does not update within 24 hours","Immediately after delivery","When visiting the warehouse","B","The final sentence gives this instruction. | Câu cuối đưa ra hướng dẫn này.","6","reading","shipping","650","Dear Customer,
+
+Your BrightPath order #3185 [1] leave our warehouse on July 16. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Portland normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-141","Choose the best option for blank [1].","takes","makes","does","brings","A","The fixed expression is “take effect”. | Cụm cố định đúng là “take effect”.","6","reading","memos","700","MEMORANDUM
+To: All BrightPath supervisors
+From: Mr. Brown
+
+The revised remote-work policy [1] effect on July 16. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-142","Choose the best option for blank [2].","to","of","for","with","C","The fixed pattern is “be responsible for” followed by a gerund. | Cấu trúc đúng là “be responsible for” + V-ing.","6","reading","memos","700","MEMORANDUM
+To: All BrightPath supervisors
+From: Mr. Brown
+
+The revised remote-work policy [1] effect on July 16. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-143","Who is the memo addressed to?","All customers","All BrightPath supervisors","Only new employees","Building technicians","B","The recipient line names all supervisors. | Dòng người nhận ghi rõ tất cả quản lý.","6","reading","memos","700","MEMORANDUM
+To: All BrightPath supervisors
+From: Mr. Brown
+
+The revised remote-work policy [1] effect on July 16. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-144","How often may employees work remotely?","Every day","One day per month","Up to two days per week","Only on weekends","C","The policy permits up to two remote days each week. | Chính sách cho phép tối đa hai ngày làm từ xa mỗi tuần.","6","reading","memos","700","MEMORANDUM
+To: All BrightPath supervisors
+From: Mr. Brown
+
+The revised remote-work policy [1] effect on July 16. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-145","What is required before remote days are taken?","Customer approval","Advance manager approval","A medical certificate","A new computer","B","Managers must approve the requested days in advance. | Quản lý phải duyệt trước những ngày được yêu cầu.","6","reading","memos","700","MEMORANDUM
+To: All BrightPath supervisors
+From: Mr. Brown
+
+The revised remote-work policy [1] effect on July 16. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-146","Choose the best option for blank [1].","will be","has","was being","to be","A","A future passive form is required: “will be held”. | Cần dạng bị động tương lai “will be held”.","6","reading","events","700","BrightPath COMMUNITY DAY
+
+Our annual community event [1] held at Portland Central Park on July 16. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Mr. Brown will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-147","Choose the best option for blank [2].","for","by","with","from","A","“For” correctly expresses the purpose of arriving early. | “For” diễn tả mục đích đến sớm để đăng ký.","6","reading","events","700","BrightPath COMMUNITY DAY
+
+Our annual community event [1] held at Portland Central Park on July 16. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Mr. Brown will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-148","What will volunteers prepare?","Office furniture","Food packages","Marketing reports","Travel documents","B","The announcement says volunteers will prepare food packages. | Thông báo cho biết tình nguyện viên sẽ chuẩn bị các gói thực phẩm.","6","reading","events","700","BrightPath COMMUNITY DAY
+
+Our annual community event [1] held at Portland Central Park on July 16. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Mr. Brown will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-149","What should volunteers bring?","A laptop","A printed ticket","A reusable water bottle","A safety uniform","C","Participants are asked to bring a reusable water bottle. | Người tham gia được yêu cầu mang bình nước tái sử dụng.","6","reading","events","700","BrightPath COMMUNITY DAY
+
+Our annual community event [1] held at Portland Central Park on July 16. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Mr. Brown will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-150","What will happen at 8:30 A.M.?","Registration will close","Lunch will begin","A safety briefing will begin","The park will open","C","The text says Mr. Brown will lead a safety briefing at 8:30 A.M. | Bài đọc cho biết buổi hướng dẫn an toàn bắt đầu lúc 8:30.","6","reading","events","700","BrightPath COMMUNITY DAY
+
+Our annual community event [1] held at Portland Central Park on July 16. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Mr. Brown will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-151","Choose the best option for blank [1].","will","has","being","was","A","“Will be closed” is the correct future passive form. | “Will be closed” là dạng bị động tương lai đúng.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Harborview office in Atlanta [1] be closed on August 6 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Ms. Garcia.",""
+"local-p6-152","Choose the best option for blank [2].","before","although","because of","during","A","“Before” correctly links saving work to leaving. | “Before” diễn tả việc lưu công việc trước khi rời đi.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Harborview office in Atlanta [1] be closed on August 6 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Ms. Garcia.",""
+"local-p6-153","Why will the office close?","For a staff celebration","For a ventilation inspection","For employee training","For a public holiday","B","The notice states that technicians will inspect the ventilation system. | Thông báo nêu rõ kỹ thuật viên sẽ kiểm tra hệ thống thông gió.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Harborview office in Atlanta [1] be closed on August 6 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Ms. Garcia.",""
+"local-p6-154","What should employees do?","Work at the office overnight","Call a customer","Save their work before leaving","Move to another company","C","Employees are specifically asked to save their work before leaving. | Nhân viên được yêu cầu lưu công việc trước khi rời đi.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Harborview office in Atlanta [1] be closed on August 6 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Ms. Garcia.",""
+"local-p6-155","Who should receive questions?","Ms. Garcia","The building owner","The sales team","A technician","A","The final sentence directs questions to Ms. Garcia. | Câu cuối hướng dẫn gửi câu hỏi cho Ms. Garcia.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Harborview office in Atlanta [1] be closed on August 6 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Ms. Garcia.",""
+"local-p6-156","Choose the best option for blank [1].","must","would","used to","had","A","“Must register” expresses the workshop requirement. | “Must register” diễn tả yêu cầu đăng ký.","6","reading","emails","650","To: human resources office
+From: Ms. Garcia
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Atlanta branch on August 6. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-157","Choose the best option for blank [2].","however","therefore","otherwise","meanwhile","B","Limited space is the reason for early registration, so “therefore” fits. | Vì chỗ có hạn nên “therefore” nối kết quả hợp lý.","6","reading","emails","650","To: human resources office
+From: Ms. Garcia
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Atlanta branch on August 6. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-158","What is the email mainly about?","A new employee portal","A customer service workshop","A branch relocation","A workbook sale","B","The message announces and explains a customer service workshop. | Email thông báo và hướng dẫn về hội thảo dịch vụ khách hàng.","6","reading","emails","650","To: human resources office
+From: Ms. Garcia
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Atlanta branch on August 6. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-159","How will participants receive the workbook?","By postal mail","At reception","By email","From a customer","C","The workbook will be sent by email. | Tài liệu sẽ được gửi qua email.","6","reading","emails","650","To: human resources office
+From: Ms. Garcia
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Atlanta branch on August 6. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-160","When will the workbook be sent?","On the day of the session","Two days before the session","One week after the session","During registration","B","The last sentence says it will arrive two days before the session. | Câu cuối cho biết tài liệu được gửi trước buổi học hai ngày.","6","reading","emails","650","To: human resources office
+From: Ms. Garcia
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Atlanta branch on August 6. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-161","Choose the best option for blank [1].","will","has","was","would have","A","The scheduled future action requires “will leave”. | Hành động dự kiến trong tương lai dùng “will leave”.","6","reading","shipping","650","Dear Customer,
+
+Your Harborview order #3202 [1] leave our warehouse on August 6. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Atlanta normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-162","Choose the best option for blank [2].","it","them","its","itself","A","“It” refers to the singular package. | “It” thay cho danh từ số ít “the package”.","6","reading","shipping","650","Dear Customer,
+
+Your Harborview order #3202 [1] leave our warehouse on August 6. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Atlanta normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-163","What is the purpose of the message?","To confirm a shipment schedule","To request a refund","To advertise a warehouse","To change an address","A","The message tells the customer when the order will ship and how to track it. | Tin nhắn xác nhận lịch gửi hàng và cách theo dõi.","6","reading","shipping","650","Dear Customer,
+
+Your Harborview order #3202 [1] leave our warehouse on August 6. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Atlanta normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-164","How long does delivery normally take?","One day","Two days","Three business days","One week","C","The message gives an estimated delivery time of three business days. | Thời gian giao dự kiến là ba ngày làm việc.","6","reading","shipping","650","Dear Customer,
+
+Your Harborview order #3202 [1] leave our warehouse on August 6. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Atlanta normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-165","When should the customer contact the company?","Before placing an order","If tracking does not update within 24 hours","Immediately after delivery","When visiting the warehouse","B","The final sentence gives this instruction. | Câu cuối đưa ra hướng dẫn này.","6","reading","shipping","650","Dear Customer,
+
+Your Harborview order #3202 [1] leave our warehouse on August 6. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Atlanta normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-166","Choose the best option for blank [1].","takes","makes","does","brings","A","The fixed expression is “take effect”. | Cụm cố định đúng là “take effect”.","6","reading","memos","700","MEMORANDUM
+To: All Harborview supervisors
+From: Ms. Garcia
+
+The revised remote-work policy [1] effect on August 6. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-167","Choose the best option for blank [2].","to","of","for","with","C","The fixed pattern is “be responsible for” followed by a gerund. | Cấu trúc đúng là “be responsible for” + V-ing.","6","reading","memos","700","MEMORANDUM
+To: All Harborview supervisors
+From: Ms. Garcia
+
+The revised remote-work policy [1] effect on August 6. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-168","Who is the memo addressed to?","All customers","All Harborview supervisors","Only new employees","Building technicians","B","The recipient line names all supervisors. | Dòng người nhận ghi rõ tất cả quản lý.","6","reading","memos","700","MEMORANDUM
+To: All Harborview supervisors
+From: Ms. Garcia
+
+The revised remote-work policy [1] effect on August 6. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-169","How often may employees work remotely?","Every day","One day per month","Up to two days per week","Only on weekends","C","The policy permits up to two remote days each week. | Chính sách cho phép tối đa hai ngày làm từ xa mỗi tuần.","6","reading","memos","700","MEMORANDUM
+To: All Harborview supervisors
+From: Ms. Garcia
+
+The revised remote-work policy [1] effect on August 6. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-170","What is required before remote days are taken?","Customer approval","Advance manager approval","A medical certificate","A new computer","B","Managers must approve the requested days in advance. | Quản lý phải duyệt trước những ngày được yêu cầu.","6","reading","memos","700","MEMORANDUM
+To: All Harborview supervisors
+From: Ms. Garcia
+
+The revised remote-work policy [1] effect on August 6. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-171","Choose the best option for blank [1].","will be","has","was being","to be","A","A future passive form is required: “will be held”. | Cần dạng bị động tương lai “will be held”.","6","reading","events","700","Harborview COMMUNITY DAY
+
+Our annual community event [1] held at Atlanta Central Park on August 6. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Ms. Garcia will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-172","Choose the best option for blank [2].","for","by","with","from","A","“For” correctly expresses the purpose of arriving early. | “For” diễn tả mục đích đến sớm để đăng ký.","6","reading","events","700","Harborview COMMUNITY DAY
+
+Our annual community event [1] held at Atlanta Central Park on August 6. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Ms. Garcia will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-173","What will volunteers prepare?","Office furniture","Food packages","Marketing reports","Travel documents","B","The announcement says volunteers will prepare food packages. | Thông báo cho biết tình nguyện viên sẽ chuẩn bị các gói thực phẩm.","6","reading","events","700","Harborview COMMUNITY DAY
+
+Our annual community event [1] held at Atlanta Central Park on August 6. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Ms. Garcia will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-174","What should volunteers bring?","A laptop","A printed ticket","A reusable water bottle","A safety uniform","C","Participants are asked to bring a reusable water bottle. | Người tham gia được yêu cầu mang bình nước tái sử dụng.","6","reading","events","700","Harborview COMMUNITY DAY
+
+Our annual community event [1] held at Atlanta Central Park on August 6. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Ms. Garcia will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-175","What will happen at 8:30 A.M.?","Registration will close","Lunch will begin","A safety briefing will begin","The park will open","C","The text says Ms. Garcia will lead a safety briefing at 8:30 A.M. | Bài đọc cho biết buổi hướng dẫn an toàn bắt đầu lúc 8:30.","6","reading","events","700","Harborview COMMUNITY DAY
+
+Our annual community event [1] held at Atlanta Central Park on August 6. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Ms. Garcia will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-176","Choose the best option for blank [1].","will","has","being","was","A","“Will be closed” is the correct future passive form. | “Will be closed” là dạng bị động tương lai đúng.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Silverline office in Phoenix [1] be closed on August 13 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Mr. Kim.",""
+"local-p6-177","Choose the best option for blank [2].","before","although","because of","during","A","“Before” correctly links saving work to leaving. | “Before” diễn tả việc lưu công việc trước khi rời đi.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Silverline office in Phoenix [1] be closed on August 13 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Mr. Kim.",""
+"local-p6-178","Why will the office close?","For a staff celebration","For a ventilation inspection","For employee training","For a public holiday","B","The notice states that technicians will inspect the ventilation system. | Thông báo nêu rõ kỹ thuật viên sẽ kiểm tra hệ thống thông gió.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Silverline office in Phoenix [1] be closed on August 13 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Mr. Kim.",""
+"local-p6-179","What should employees do?","Work at the office overnight","Call a customer","Save their work before leaving","Move to another company","C","Employees are specifically asked to save their work before leaving. | Nhân viên được yêu cầu lưu công việc trước khi rời đi.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Silverline office in Phoenix [1] be closed on August 13 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Mr. Kim.",""
+"local-p6-180","Who should receive questions?","Mr. Kim","The building owner","The sales team","A technician","A","The final sentence directs questions to Mr. Kim. | Câu cuối hướng dẫn gửi câu hỏi cho Mr. Kim.","6","reading","notices","600","NOTICE TO STAFF
+
+Please note that the Silverline office in Phoenix [1] be closed on August 13 while technicians inspect the ventilation system. Employees should save their work [2] they leave on the previous afternoon. Normal operations will resume the following business day. Questions may be directed to Mr. Kim.",""
+"local-p6-181","Choose the best option for blank [1].","must","would","used to","had","A","“Must register” expresses the workshop requirement. | “Must register” diễn tả yêu cầu đăng ký.","6","reading","emails","650","To: shipping department
+From: Mr. Kim
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Phoenix branch on August 13. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-182","Choose the best option for blank [2].","however","therefore","otherwise","meanwhile","B","Limited space is the reason for early registration, so “therefore” fits. | Vì chỗ có hạn nên “therefore” nối kết quả hợp lý.","6","reading","emails","650","To: shipping department
+From: Mr. Kim
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Phoenix branch on August 13. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-183","What is the email mainly about?","A new employee portal","A customer service workshop","A branch relocation","A workbook sale","B","The message announces and explains a customer service workshop. | Email thông báo và hướng dẫn về hội thảo dịch vụ khách hàng.","6","reading","emails","650","To: shipping department
+From: Mr. Kim
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Phoenix branch on August 13. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-184","How will participants receive the workbook?","By postal mail","At reception","By email","From a customer","C","The workbook will be sent by email. | Tài liệu sẽ được gửi qua email.","6","reading","emails","650","To: shipping department
+From: Mr. Kim
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Phoenix branch on August 13. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-185","When will the workbook be sent?","On the day of the session","Two days before the session","One week after the session","During registration","B","The last sentence says it will arrive two days before the session. | Câu cuối cho biết tài liệu được gửi trước buổi học hai ngày.","6","reading","emails","650","To: shipping department
+From: Mr. Kim
+Subject: Customer Service Workshop
+
+A customer service workshop will take place at our Phoenix branch on August 13. Employees who wish to attend [1] register through the staff portal. Space is limited; [2], early registration is strongly recommended. Participants will receive the workbook by email two days before the session.",""
+"local-p6-186","Choose the best option for blank [1].","will","has","was","would have","A","The scheduled future action requires “will leave”. | Hành động dự kiến trong tương lai dùng “will leave”.","6","reading","shipping","650","Dear Customer,
+
+Your Silverline order #3219 [1] leave our warehouse on August 13. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Phoenix normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-187","Choose the best option for blank [2].","it","them","its","itself","A","“It” refers to the singular package. | “It” thay cho danh từ số ít “the package”.","6","reading","shipping","650","Dear Customer,
+
+Your Silverline order #3219 [1] leave our warehouse on August 13. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Phoenix normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-188","What is the purpose of the message?","To confirm a shipment schedule","To request a refund","To advertise a warehouse","To change an address","A","The message tells the customer when the order will ship and how to track it. | Tin nhắn xác nhận lịch gửi hàng và cách theo dõi.","6","reading","shipping","650","Dear Customer,
+
+Your Silverline order #3219 [1] leave our warehouse on August 13. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Phoenix normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-189","How long does delivery normally take?","One day","Two days","Three business days","One week","C","The message gives an estimated delivery time of three business days. | Thời gian giao dự kiến là ba ngày làm việc.","6","reading","shipping","650","Dear Customer,
+
+Your Silverline order #3219 [1] leave our warehouse on August 13. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Phoenix normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-190","When should the customer contact the company?","Before placing an order","If tracking does not update within 24 hours","Immediately after delivery","When visiting the warehouse","B","The final sentence gives this instruction. | Câu cuối đưa ra hướng dẫn này.","6","reading","shipping","650","Dear Customer,
+
+Your Silverline order #3219 [1] leave our warehouse on August 13. Once the package has been collected by the carrier, you can track [2] using the link in your account. Delivery to Phoenix normally takes three business days. Please contact us if the tracking page does not update within 24 hours.",""
+"local-p6-191","Choose the best option for blank [1].","takes","makes","does","brings","A","The fixed expression is “take effect”. | Cụm cố định đúng là “take effect”.","6","reading","memos","700","MEMORANDUM
+To: All Silverline supervisors
+From: Mr. Kim
+
+The revised remote-work policy [1] effect on August 13. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-192","Choose the best option for blank [2].","to","of","for","with","C","The fixed pattern is “be responsible for” followed by a gerund. | Cấu trúc đúng là “be responsible for” + V-ing.","6","reading","memos","700","MEMORANDUM
+To: All Silverline supervisors
+From: Mr. Kim
+
+The revised remote-work policy [1] effect on August 13. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-193","Who is the memo addressed to?","All customers","All Silverline supervisors","Only new employees","Building technicians","B","The recipient line names all supervisors. | Dòng người nhận ghi rõ tất cả quản lý.","6","reading","memos","700","MEMORANDUM
+To: All Silverline supervisors
+From: Mr. Kim
+
+The revised remote-work policy [1] effect on August 13. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-194","How often may employees work remotely?","Every day","One day per month","Up to two days per week","Only on weekends","C","The policy permits up to two remote days each week. | Chính sách cho phép tối đa hai ngày làm từ xa mỗi tuần.","6","reading","memos","700","MEMORANDUM
+To: All Silverline supervisors
+From: Mr. Kim
+
+The revised remote-work policy [1] effect on August 13. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-195","What is required before remote days are taken?","Customer approval","Advance manager approval","A medical certificate","A new computer","B","Managers must approve the requested days in advance. | Quản lý phải duyệt trước những ngày được yêu cầu.","6","reading","memos","700","MEMORANDUM
+To: All Silverline supervisors
+From: Mr. Kim
+
+The revised remote-work policy [1] effect on August 13. Supervisors are responsible [2] explaining the scheduling rules to their teams. Employees may work remotely up to two days per week, provided that their managers approve the requested days in advance.",""
+"local-p6-196","Choose the best option for blank [1].","will be","has","was being","to be","A","A future passive form is required: “will be held”. | Cần dạng bị động tương lai “will be held”.","6","reading","events","700","Silverline COMMUNITY DAY
+
+Our annual community event [1] held at Phoenix Central Park on August 13. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Mr. Kim will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-197","Choose the best option for blank [2].","for","by","with","from","A","“For” correctly expresses the purpose of arriving early. | “For” diễn tả mục đích đến sớm để đăng ký.","6","reading","events","700","Silverline COMMUNITY DAY
+
+Our annual community event [1] held at Phoenix Central Park on August 13. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Mr. Kim will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-198","What will volunteers prepare?","Office furniture","Food packages","Marketing reports","Travel documents","B","The announcement says volunteers will prepare food packages. | Thông báo cho biết tình nguyện viên sẽ chuẩn bị các gói thực phẩm.","6","reading","events","700","Silverline COMMUNITY DAY
+
+Our annual community event [1] held at Phoenix Central Park on August 13. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Mr. Kim will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-199","What should volunteers bring?","A laptop","A printed ticket","A reusable water bottle","A safety uniform","C","Participants are asked to bring a reusable water bottle. | Người tham gia được yêu cầu mang bình nước tái sử dụng.","6","reading","events","700","Silverline COMMUNITY DAY
+
+Our annual community event [1] held at Phoenix Central Park on August 13. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Mr. Kim will lead a short safety briefing at 8:30 A.M.",""
+"local-p6-200","What will happen at 8:30 A.M.?","Registration will close","Lunch will begin","A safety briefing will begin","The park will open","C","The text says Mr. Kim will lead a safety briefing at 8:30 A.M. | Bài đọc cho biết buổi hướng dẫn an toàn bắt đầu lúc 8:30.","6","reading","events","700","Silverline COMMUNITY DAY
+
+Our annual community event [1] held at Phoenix Central Park on August 13. Volunteers will help prepare food packages for local families. Please arrive early [2] registration and bring a reusable water bottle. Mr. Kim will lead a short safety briefing at 8:30 A.M.",""

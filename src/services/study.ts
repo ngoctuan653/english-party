@@ -17,10 +17,16 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/services/firebase/config';
 import type { Question, QuestionAnswer } from '@/types/question';
-import type { StudySession, SessionResults, SessionType } from '@/types/study';
+import type { StudySession, SessionResults, SessionType, SessionValidationIssue } from '@/types/study';
 import type { DailyProgress, MissionProgress, MissionType } from '@/types/gamification';
 import type { UserProfile } from '@/types/user';
-import { startAntiCheatTracking, stopAntiCheatTracking, validateAnswerTiming } from '@/services/anticheat';
+import {
+  cancelAntiCheatTracking,
+  startAntiCheatTracking,
+  stopAntiCheatTracking,
+  validateAnswerTiming,
+} from '@/services/anticheat';
+import type { AntiCheatData } from '@/services/anticheat';
 import { ANTI_CHEAT } from '@/utils/constants';
 import {
   calculateSessionXP,
@@ -30,6 +36,7 @@ import {
 import { calculateLevel } from '@/types/gamification';
 import { getTodayDateString } from '@/utils/helpers';
 import { batchUpdateQuestionProgress, batchUpdateVocabProgress } from '@/services/progress';
+import { getBundledQuestions } from '@/data/questionBank';
 
 // ============================================
 // Fetch Questions
@@ -43,6 +50,7 @@ export async function fetchQuestions(options: {
   type?: string;
   count?: number;
 }): Promise<Question[]> {
+  const bundled = getBundledQuestions(options);
   const questionsRef = collection(db, 'questions');
   const constraints: Parameters<typeof query>[1][] = [
     where('isActive', '==', true),
@@ -57,15 +65,23 @@ export async function fetchQuestions(options: {
   constraints.push(limit(options.count || 20));
 
   const q = query(questionsRef, ...constraints);
-  const snapshot = await getDocs(q);
+  const remoteQuestions: Question[] = [];
 
-  const questions: Question[] = [];
-  snapshot.forEach((doc) => {
-    questions.push({ id: doc.id, ...doc.data() } as Question);
-  });
+  try {
+    const snapshot = await getDocs(q);
+    snapshot.forEach((snapshotDoc) => {
+      remoteQuestions.push({ id: snapshotDoc.id, ...snapshotDoc.data() } as Question);
+    });
+  } catch (error) {
+    if (bundled.length === 0) throw error;
+    console.warn('Using bundled TOEIC question bank because Firestore could not be reached.', error);
+  }
 
-  // Shuffle questions
-  return shuffleArray(questions);
+  const merged = new Map<string, Question>();
+  bundled.forEach((item) => merged.set(item.id, item));
+  remoteQuestions.forEach((item) => merged.set(item.id, item));
+
+  return shuffleArray(Array.from(merged.values())).slice(0, options.count || 20);
 }
 
 function shuffleArray<T>(array: T[]): T[] {
@@ -89,9 +105,13 @@ export async function startStudySession(
   const sessionId = `${userId}_${exam}_${type}_${Date.now()}`;
 
   // Start anti-cheat tracking
-  startAntiCheatTracking();
+  startAntiCheatTracking(sessionId);
 
   return sessionId;
+}
+
+export function cancelStudySession(sessionId: string | null | undefined): void {
+  if (sessionId) cancelAntiCheatTracking(sessionId);
 }
 
 const MAX_SESSION_ITEMS = 200;
@@ -168,49 +188,89 @@ function applyMissionProgress(
   return { missions: updatedMissions, completedRewards };
 }
 
-function validateSessionInput(
+export function getSessionInputIssues(
   answers: QuestionAnswer[],
   totalQuestions: number,
   correctAnswers: number,
   sessionType: SessionType,
   totalSeconds: number,
   customMetrics?: { total: number; correct: number }
-): boolean {
-  if (totalQuestions <= 0 || totalQuestions > MAX_SESSION_ITEMS) return false;
-  if (correctAnswers < 0 || correctAnswers > totalQuestions) return false;
+): SessionValidationIssue[] {
+  if (totalQuestions <= 0 || totalQuestions > MAX_SESSION_ITEMS) return ['invalid-session-data'];
+  if (correctAnswers < 0 || correctAnswers > totalQuestions) return ['invalid-session-data'];
 
   const answersAreWellFormed = answers.every((answer) =>
     answer.questionId &&
     Number.isInteger(answer.selectedAnswer) &&
+    answer.selectedAnswer >= 0 &&
+    typeof answer.isCorrect === 'boolean' &&
     Number.isFinite(answer.timeSpent) &&
     answer.timeSpent >= 0
   );
-  if (!answersAreWellFormed) return false;
+  if (!answersAreWellFormed) return ['invalid-session-data'];
 
   if (!customMetrics) {
-    if (answers.length !== totalQuestions) return false;
+    if (answers.length !== totalQuestions) return ['invalid-session-data'];
     const uniqueQuestionIds = new Set(answers.map((answer) => answer.questionId));
-    if (uniqueQuestionIds.size !== answers.length) return false;
+    if (uniqueQuestionIds.size !== answers.length) return ['invalid-session-data'];
   } else if (sessionType !== 'vocabulary' && customMetrics.total !== answers.length) {
-    return false;
+    return ['invalid-session-data'];
   }
 
-  if (sessionType === 'quiz') {
-    if (!validateAnswerTiming(totalQuestions, totalSeconds)) return false;
+  const recordedAnswerSeconds = answers.reduce(
+    (sum, answer) => sum + Math.min(answer.timeSpent, 60 * 60),
+    0,
+  );
+
+  if (sessionType === 'quiz' || sessionType === 'listening') {
     const fastAnswers = answers.filter((answer) => answer.timeSpent < ANTI_CHEAT.minSingleAnswerSeconds).length;
     const fastAnswerRatio = answers.length > 0 ? fastAnswers / answers.length : 0;
-    if (fastAnswerRatio > ANTI_CHEAT.maxFastAnswerRatio) return false;
-  }
-
-  if (sessionType === 'listening') {
-    return totalSeconds >= ANTI_CHEAT.minSecondsPerQuestion;
+    const recordedAverage = answers.length > 0 ? recordedAnswerSeconds / answers.length : 0;
+    const hasImplausibleTiming =
+      !validateAnswerTiming(totalQuestions, totalSeconds) &&
+      recordedAverage < ANTI_CHEAT.minSecondsPerQuestion &&
+      fastAnswerRatio > ANTI_CHEAT.maxFastAnswerRatio;
+    if (hasImplausibleTiming) return ['implausibly-fast'];
   }
 
   if (sessionType === 'vocabulary') {
-    return totalSeconds >= Math.min(totalQuestions, 30);
+    const minimumReviewSeconds = Math.min(totalQuestions, 30);
+    if (totalSeconds < minimumReviewSeconds && recordedAnswerSeconds < minimumReviewSeconds) {
+      return ['implausibly-fast'];
+    }
   }
 
-  return true;
+  return [];
+}
+
+export function resolveSessionTiming(
+  sessionId: string,
+  answers: QuestionAnswer[],
+  antiCheatData: Pick<AntiCheatData, 'activeSeconds' | 'totalSeconds' | 'trackingAvailable'>,
+  nowMs = Date.now(),
+) {
+  const timestampStr = sessionId.split('_').at(-1) ?? '';
+  const startTimestampMs = Number(timestampStr);
+  const hasValidStartTimestamp =
+    Number.isFinite(startTimestampMs) &&
+    startTimestampMs > 0 &&
+    startTimestampMs <= nowMs + 5000;
+  const startedAtDate = hasValidStartTimestamp ? new Date(startTimestampMs) : new Date(nowMs);
+  const wallClockSeconds = hasValidStartTimestamp
+    ? Math.max(0, Math.round((nowMs - startTimestampMs) / 1000))
+    : 0;
+  const recordedAnswerSeconds = Math.round(
+    answers.reduce(
+      (sum, answer) => sum + (Number.isFinite(answer.timeSpent) ? Math.min(Math.max(0, answer.timeSpent), 60 * 60) : 0),
+      0,
+    ),
+  );
+  const totalSeconds = Math.max(antiCheatData.totalSeconds, wallClockSeconds, recordedAnswerSeconds);
+  const activeSeconds = antiCheatData.trackingAvailable
+    ? Math.min(totalSeconds, antiCheatData.activeSeconds)
+    : Math.min(totalSeconds, recordedAnswerSeconds);
+
+  return { activeSeconds, hasValidStartTimestamp, recordedAnswerSeconds, startedAtDate, totalSeconds };
 }
 
 function buildSessionResults(session: StudySession): SessionResults {
@@ -222,6 +282,7 @@ function buildSessionResults(session: StudySession): SessionResults {
     streakBonus: session.streakBonus ?? 0,
     timeSpent: session.totalSeconds,
     isValid: session.isValid,
+    validationIssues: session.validationIssues,
   };
 }
 
@@ -232,7 +293,7 @@ export async function endStudySession(
   currentStreak: number,
   customMetrics?: { total: number; correct: number }
 ): Promise<SessionResults> {
-  const antiCheatData = stopAntiCheatTracking();
+  const antiCheatData = stopAntiCheatTracking(sessionId);
 
   const totalQuestions = customMetrics
     ? clampInteger(customMetrics.total, 0, MAX_SESSION_ITEMS)
@@ -250,6 +311,7 @@ export async function endStudySession(
       streakBonus: 0,
       timeSpent: antiCheatData.totalSeconds,
       isValid: false,
+      validationIssues: ['invalid-session-data'],
     };
   }
 
@@ -257,23 +319,26 @@ export async function endStudySession(
   const isPerfect = accuracy === 100 && totalQuestions >= 5 && !customMetrics;
 
   const parts = sessionId.split('_');
-  const timestampStr = parts[parts.length - 1];
   const sessionType = (parts[parts.length - 2] || 'quiz') as SessionType;
   const exam = parts[parts.length - 3] || 'toeic';
 
-  const startTimestampMs = Number(timestampStr);
-  const startedAtDate = isNaN(startTimestampMs) ? new Date() : new Date(startTimestampMs);
+  const timing = resolveSessionTiming(sessionId, answers, antiCheatData);
+  const { activeSeconds, startedAtDate, totalSeconds } = timing;
   const startedAt = Timestamp.fromDate(startedAtDate);
 
-  const inputValid = validateSessionInput(
+  const inputIssues = getSessionInputIssues(
     answers,
     totalQuestions,
     correctAnswers,
     sessionType,
-    antiCheatData.totalSeconds,
+    totalSeconds,
     customMetrics
   );
-  const isValid = antiCheatData.isValid && inputValid;
+  const validationIssues = Array.from(new Set([
+    ...antiCheatData.validationIssues,
+    ...inputIssues,
+  ]));
+  const isValid = validationIssues.length === 0;
 
   const sessionRef = doc(db, 'study_sessions', sessionId);
   const userRef = doc(db, 'users', userId);
@@ -307,7 +372,7 @@ export async function endStudySession(
       updatedAt: now,
     };
 
-    const activeMinutes = Math.floor(antiCheatData.activeSeconds / 60);
+    const activeMinutes = Math.floor(activeSeconds / 60);
     const wrongAnswers = totalQuestions - correctAnswers;
     let xpCalc = emptyXP();
     let missionBonus = 0;
@@ -395,11 +460,13 @@ export async function endStudySession(
       missionBonus,
       startedAt,
       endedAt: now,
-      activeSeconds: antiCheatData.activeSeconds,
-      totalSeconds: antiCheatData.totalSeconds,
+      activeSeconds,
+      totalSeconds,
       tabSwitches: antiCheatData.tabSwitches,
       idleIntervals: antiCheatData.idleIntervals,
       interactionCount: antiCheatData.interactionCount,
+      trackingAvailable: antiCheatData.trackingAvailable,
+      validationIssues,
       isValid,
       answers,
       createdAt: startedAt,

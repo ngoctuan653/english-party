@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { getBundledQuestions } from '@/data/questionBank';
 
 interface SessionReviewModalProps {
   isOpen: boolean;
@@ -19,23 +20,6 @@ interface SessionReviewModalProps {
   session: StudySession | null;
   onPracticeQuizAgain?: (questions: Question[]) => void;
 }
-
-const LISTENING_QUESTIONS_MOCK: Record<string, any> = {
-  'listening_set_1_q1': {
-    id: 'listening_set_1_q1',
-    question: 'What does the man suggest?',
-    choices: [
-      'Rescheduling the meeting',
-      'Hiring more staff',
-      'Ordering new equipment',
-      'Extending the deadline'
-    ],
-    correctAnswer: 0,
-    explanation: 'The man says "I think we should reschedule the team meeting to Wednesday afternoon." | Dịch nghĩa: Tôi nghĩ chúng ta nên dời cuộc họp nhóm sang chiều thứ Tư. | Giải thích: Người đàn ông đề xuất dời lịch cuộc họp đội nhóm.',
-    topic: 'Office Conversation',
-    part: 3,
-  }
-};
 
 export default function SessionReviewModal({
   isOpen,
@@ -61,29 +45,24 @@ export default function SessionReviewModal({
           return;
         }
 
-        if (session!.type === 'listening') {
-          // Use listening mocks
-          const mockData = ids.map(id => LISTENING_QUESTIONS_MOCK[id] || {
-            id,
-            question: 'Listening Question',
-            choices: ['A', 'B', 'C', 'D'],
-            correctAnswer: 0,
-            explanation: 'Listening practice session item.'
-          });
-          setItems(mockData);
-        } else {
-          const collectionName = session!.type === 'vocabulary' ? 'vocabulary' : 'questions';
-          const fetchedItems = await Promise.all(
-            ids.map(async (id) => {
+        const collectionName = session!.type === 'vocabulary' ? 'vocabulary' : 'questions';
+        const bundledMap = session!.type === 'vocabulary'
+          ? new Map<string, Question>()
+          : new Map(getBundledQuestions().map((item) => [item.id, item]));
+        const fetchedItems = await Promise.all(
+          ids.map(async (id) => {
+            try {
               const snap = await getDoc(doc(db, collectionName, id));
               if (snap.exists()) {
                 return { id: snap.id, ...snap.data() };
               }
-              return null;
-            })
-          );
-          setItems(fetchedItems.filter(Boolean));
-        }
+            } catch (error) {
+              console.warn(`Could not load ${id} from Firestore; using bundled content when available.`, error);
+            }
+            return bundledMap.get(id) ?? null;
+          })
+        );
+        setItems(fetchedItems.filter(Boolean));
       } catch (err) {
         console.error('Failed to load session details:', err);
         toast.error('Failed to load study items details.');
@@ -135,8 +114,10 @@ export default function SessionReviewModal({
       const practiceIds = targetItems.map((w) => w.id);
       navigate('/study/vocabulary', { state: { practiceIds } });
       toast.success(wrongOnly ? 'Retrying wrong words only! 📚' : 'Restarting vocabulary study session! 📚');
+    } else if (session.type === 'listening') {
+      navigate('/study/listening');
+      toast.success('Starting a new smart listening session.');
     } else {
-      // Quiz / Listening
       if (onPracticeQuizAgain) {
         onPracticeQuizAgain(targetItems);
         toast.success(wrongOnly ? 'Retrying wrong questions only! 📝' : 'Restarting quiz session! 📝');
@@ -356,6 +337,11 @@ export default function SessionReviewModal({
                             </div>
 
                             {/* Question text */}
+                            {q.transcript && (
+                              <div className="whitespace-pre-line rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs leading-5 text-slate-600">
+                                {q.transcript}
+                              </div>
+                            )}
                             <h4 className="text-sm font-bold leading-relaxed text-slate-800">
                               {q.question}
                             </h4>

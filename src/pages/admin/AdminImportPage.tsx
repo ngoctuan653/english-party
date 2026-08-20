@@ -147,8 +147,12 @@ export default function AdminImportPage() {
       ? `${explanationEn} | ${explanationVi}`
       : explanationEn;
     const part = Number(row.part || 5);
+    const type = row.type || (part === 5 ? 'mcq' : 'reading');
     const topic = row.topic || 'general';
     const difficulty = Number(row.difficulty || 700);
+    const context = row.context || '';
+    const transcript = row.transcript || '';
+    const audioUrl = row.audioUrl || row.audiourl || '';
 
     if (!question) throw new Error('Missing question text.');
     if (!choiceA || !choiceB || !choiceC || !choiceD) {
@@ -169,20 +173,24 @@ export default function AdminImportPage() {
       throw new Error('Correct answer must be A, B, C, D or 0, 1, 2, 3.');
     }
 
-    const id = `q_csv_${Date.now()}_${rowNum}`;
+    const id = row.id || `q_csv_${Date.now()}_${rowNum}`;
     const docRef = doc(db, 'questions', id);
 
     batch.set(docRef, {
       id,
       exam: 'toeic',
       part,
-      type: 'mcq',
+      type,
       topic,
       difficulty,
       question,
       choices: [choiceA, choiceB, choiceC, choiceD],
       correctAnswer,
       explanation,
+      ...(context ? { context } : {}),
+      ...(transcript ? { transcript } : {}),
+      ...(audioUrl ? { audioUrl } : {}),
+      tags: [`part-${part}`, topic],
       isActive: true,
       timesAnswered: 0,
       timesCorrect: 0,
@@ -281,7 +289,7 @@ export default function AdminImportPage() {
               </p>
               {importType === 'questions' ? (
                 <code className="block bg-white p-2 rounded border border-slate-200 font-mono text-[9px] break-all text-slate-700">
-                  question,choiceA,choiceB,choiceC,choiceD,correctAnswer,explanation,explanationVi,part,topic,difficulty
+                  id,question,choiceA,choiceB,choiceC,choiceD,correctAnswer,explanation,explanationVi,part,type,topic,difficulty,context,transcript,audioUrl
                 </code>
               ) : (
                 <code className="block bg-white p-2 rounded border border-slate-200 font-mono text-[9px] break-all text-slate-700">

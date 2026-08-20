@@ -1,0 +1,1161 @@
+id,question,choiceA,choiceB,choiceC,choiceD,correctAnswer,explanation,part,type,topic,difficulty,context,transcript
+"local-p7-001","What is the purpose of the document?","To confirm a hotel booking","To advertise a restaurant","To request payment for a flight","To announce a meeting","A","The heading and booking details show that this is a hotel confirmation. | Tiêu đề và thông tin đặt phòng cho thấy đây là xác nhận khách sạn.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Ms. Carter
+Location: Boston
+Check-in: June 4, after 3:00 P.M.
+Room: Business King
+Rate: $85 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-002","What is included in the room rate?","Dinner and parking","Breakfast and Internet","Airport tickets","Laundry service","B","Breakfast and wireless Internet are explicitly included. | Bữa sáng và Internet không dây được bao gồm.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Ms. Carter
+Location: Boston
+Check-in: June 4, after 3:00 P.M.
+Room: Business King
+Rate: $85 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-003","When can the guest check in?","Before noon","After 3:00 P.M.","Only at midnight","Two days early","B","The confirmation lists check-in after 3:00 P.M. | Xác nhận ghi giờ nhận phòng sau 3 giờ chiều.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Ms. Carter
+Location: Boston
+Check-in: June 4, after 3:00 P.M.
+Room: Business King
+Rate: $85 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-004","How can the guest avoid a cancellation fee?","Cancel at least 48 hours early","Call after check-in","Reserve the shuttle","Change the room type","A","Cancellations at least 48 hours before check-in are free. | Hủy trước ít nhất 48 giờ sẽ không mất phí.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Ms. Carter
+Location: Boston
+Check-in: June 4, after 3:00 P.M.
+Room: Business King
+Rate: $85 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-005","What requires an advance reservation?","Breakfast","Wireless Internet","The airport shuttle","The business room","C","The airport shuttle must be reserved by noon before arrival. | Xe đưa đón sân bay phải được đặt trước.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Ms. Carter
+Location: Boston
+Check-in: June 4, after 3:00 P.M.
+Room: Business King
+Rate: $85 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-006","What position is available?","Sales director","Operations coordinator","Software engineer","Hotel manager","B","The posting is for an operations coordinator. | Tin tuyển dụng dành cho vị trí điều phối vận hành.","7","reading","jobs","650","Northstar IS HIRING: OPERATIONS COORDINATOR
+Location: Boston
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@northstar.example by June 4. Interviews will take place the following week.",""
+"local-p7-007","Which task is part of the job?","Designing buildings","Organizing delivery schedules","Teaching language classes","Repairing vehicles","B","Organizing delivery schedules is listed as a responsibility. | Sắp xếp lịch giao hàng là một nhiệm vụ được nêu.","7","reading","jobs","650","Northstar IS HIRING: OPERATIONS COORDINATOR
+Location: Boston
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@northstar.example by June 4. Interviews will take place the following week.",""
+"local-p7-008","What experience is required?","Two years of office experience","Five years abroad","No previous experience","Restaurant experience only","A","Applicants need at least two years of office experience. | Ứng viên cần ít nhất hai năm kinh nghiệm văn phòng.","7","reading","jobs","650","Northstar IS HIRING: OPERATIONS COORDINATOR
+Location: Boston
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@northstar.example by June 4. Interviews will take place the following week.",""
+"local-p7-009","What must applicants send?","A portfolio only","A resume and cover letter","A training certificate only","A weekly report","B","The posting requests both a resume and a cover letter. | Tin tuyển dụng yêu cầu CV và thư xin việc.","7","reading","jobs","650","Northstar IS HIRING: OPERATIONS COORDINATOR
+Location: Boston
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@northstar.example by June 4. Interviews will take place the following week.",""
+"local-p7-010","When are interviews expected?","On the application deadline","The following week","Next year","Before applications open","B","Interviews will occur in the week after the deadline. | Phỏng vấn diễn ra vào tuần tiếp theo.","7","reading","jobs","650","Northstar IS HIRING: OPERATIONS COORDINATOR
+Location: Boston
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@northstar.example by June 4. Interviews will take place the following week.",""
+"local-p7-011","What product is being advertised?","A travel mug","A coffee machine","A delivery vehicle","A refrigerator","A","The advertisement introduces a travel mug. | Quảng cáo giới thiệu một chiếc cốc du lịch.","7","reading","advertisements","650","INTRODUCING THE NORTHSTAR TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before June 4 and use code EP24 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-012","How long can the mug keep drinks cold?","Two hours","Eight hours","Twelve hours","Twenty hours","C","It keeps cold drinks cold for twelve hours. | Cốc giữ lạnh trong mười hai giờ.","7","reading","advertisements","650","INTRODUCING THE NORTHSTAR TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before June 4 and use code EP24 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-013","What does every mug include?","Free coffee","A two-year warranty","A second lid","A gift card","B","Every mug comes with a two-year warranty. | Mỗi cốc đi kèm bảo hành hai năm.","7","reading","advertisements","650","INTRODUCING THE NORTHSTAR TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before June 4 and use code EP24 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-014","What is the purpose of code EP24?","To track delivery","To receive a discount","To extend the warranty","To select a color","B","The code provides a 20 percent discount. | Mã dùng để nhận giảm giá 20 phần trăm.","7","reading","advertisements","650","INTRODUCING THE NORTHSTAR TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before June 4 and use code EP24 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-015","When is delivery free?","For every order","For orders over $50","Only on June 4","With store pickup","B","Orders over $50 qualify for free delivery. | Đơn hàng trên 50 đô la được giao miễn phí.","7","reading","advertisements","650","INTRODUCING THE NORTHSTAR TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before June 4 and use code EP24 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-016","Where will the forum take place?","Boston Conference Center","Northstar headquarters","Hall A Restaurant","The city library","A","The venue is listed directly below the event date. | Địa điểm được ghi ngay dưới ngày tổ chức.","7","reading","schedules","700","Northstar SMALL BUSINESS FORUM - June 4
+Venue: Boston Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Ms. Carter
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-017","Who will speak about digital branding?","Ms. Carter","A finance officer","A supplier","The reception manager","A","Ms. Carter is named beside the digital-brand session. | Ms. Carter được ghi cạnh phiên về thương hiệu số.","7","reading","schedules","700","Northstar SMALL BUSINESS FORUM - June 4
+Venue: Boston Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Ms. Carter
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-018","What begins at 11:00 A.M.?","Opening remarks","A finance session","Lunch","Networking","B","The finance session is scheduled for 11:00 A.M. | Phiên tài chính bắt đầu lúc 11 giờ.","7","reading","schedules","700","Northstar SMALL BUSINESS FORUM - June 4
+Venue: Boston Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Ms. Carter
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-019","Where will lunch be served?","At the entrance","In Hall B","At headquarters","In the workshop room","B","The schedule places lunch in Hall B. | Lịch ghi bữa trưa ở Hội trường B.","7","reading","schedules","700","Northstar SMALL BUSINESS FORUM - June 4
+Venue: Boston Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Ms. Carter
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-020","What must attendees present?","A passport","A supplier invoice","A registration code","A printed resume","C","A registration code is required at the entrance. | Người tham dự phải xuất trình mã đăng ký ở lối vào.","7","reading","schedules","700","Northstar SMALL BUSINESS FORUM - June 4
+Venue: Boston Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Ms. Carter
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-021","Why was the message sent?","To explain an order delay","To advertise a new product","To request a product review","To confirm a job interview","A","The message explains why an order was delayed and gives a new date. | Email giải thích việc đơn hàng bị chậm và cung cấp ngày mới.","7","reading","customer-service","700","From: support@northstar.example
+To: Ms. Carter
+Subject: Update on order #7200
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Boston distribution center yesterday. The package is now expected to arrive on June 4. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-022","What caused the delay?","A payment problem","Severe weather","An incorrect address","A product shortage","B","Severe weather stopped the carrier from reaching the center. | Thời tiết xấu khiến đơn vị vận chuyển không đến được trung tâm.","7","reading","customer-service","700","From: support@northstar.example
+To: Ms. Carter
+Subject: Update on order #7200
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Boston distribution center yesterday. The package is now expected to arrive on June 4. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-023","What has the company refunded?","The full order price","The express-delivery charge","A membership fee","A warranty charge","B","The express-delivery charge was refunded. | Phí giao hàng nhanh đã được hoàn lại.","7","reading","customer-service","700","From: support@northstar.example
+To: Ms. Carter
+Subject: Update on order #7200
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Boston distribution center yesterday. The package is now expected to arrive on June 4. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-024","How will the refund be paid?","By store credit","By check","To the original payment method","In cash at the warehouse","C","The refund goes to the original payment method. | Khoản hoàn tiền được trả về phương thức thanh toán ban đầu.","7","reading","customer-service","700","From: support@northstar.example
+To: Ms. Carter
+Subject: Update on order #7200
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Boston distribution center yesterday. The package is now expected to arrive on June 4. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-025","How long may the refund take to appear?","One hour","One day","Three to five business days","Two weeks exactly","C","The message states three to five business days. | Email nêu thời gian từ ba đến năm ngày làm việc.","7","reading","customer-service","700","From: support@northstar.example
+To: Ms. Carter
+Subject: Update on order #7200
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Boston distribution center yesterday. The package is now expected to arrive on June 4. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-026","What is the purpose of the document?","To confirm a hotel booking","To advertise a restaurant","To request payment for a flight","To announce a meeting","A","The heading and booking details show that this is a hotel confirmation. | Tiêu đề và thông tin đặt phòng cho thấy đây là xác nhận khách sạn.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Mr. Lee
+Location: Seattle
+Check-in: June 11, after 3:00 P.M.
+Room: Business King
+Rate: $95 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-027","What is included in the room rate?","Dinner and parking","Breakfast and Internet","Airport tickets","Laundry service","B","Breakfast and wireless Internet are explicitly included. | Bữa sáng và Internet không dây được bao gồm.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Mr. Lee
+Location: Seattle
+Check-in: June 11, after 3:00 P.M.
+Room: Business King
+Rate: $95 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-028","When can the guest check in?","Before noon","After 3:00 P.M.","Only at midnight","Two days early","B","The confirmation lists check-in after 3:00 P.M. | Xác nhận ghi giờ nhận phòng sau 3 giờ chiều.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Mr. Lee
+Location: Seattle
+Check-in: June 11, after 3:00 P.M.
+Room: Business King
+Rate: $95 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-029","How can the guest avoid a cancellation fee?","Cancel at least 48 hours early","Call after check-in","Reserve the shuttle","Change the room type","A","Cancellations at least 48 hours before check-in are free. | Hủy trước ít nhất 48 giờ sẽ không mất phí.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Mr. Lee
+Location: Seattle
+Check-in: June 11, after 3:00 P.M.
+Room: Business King
+Rate: $95 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-030","What requires an advance reservation?","Breakfast","Wireless Internet","The airport shuttle","The business room","C","The airport shuttle must be reserved by noon before arrival. | Xe đưa đón sân bay phải được đặt trước.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Mr. Lee
+Location: Seattle
+Check-in: June 11, after 3:00 P.M.
+Room: Business King
+Rate: $95 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-031","What position is available?","Sales director","Operations coordinator","Software engineer","Hotel manager","B","The posting is for an operations coordinator. | Tin tuyển dụng dành cho vị trí điều phối vận hành.","7","reading","jobs","650","BluePeak IS HIRING: OPERATIONS COORDINATOR
+Location: Seattle
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@bluepeak.example by June 11. Interviews will take place the following week.",""
+"local-p7-032","Which task is part of the job?","Designing buildings","Organizing delivery schedules","Teaching language classes","Repairing vehicles","B","Organizing delivery schedules is listed as a responsibility. | Sắp xếp lịch giao hàng là một nhiệm vụ được nêu.","7","reading","jobs","650","BluePeak IS HIRING: OPERATIONS COORDINATOR
+Location: Seattle
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@bluepeak.example by June 11. Interviews will take place the following week.",""
+"local-p7-033","What experience is required?","Two years of office experience","Five years abroad","No previous experience","Restaurant experience only","A","Applicants need at least two years of office experience. | Ứng viên cần ít nhất hai năm kinh nghiệm văn phòng.","7","reading","jobs","650","BluePeak IS HIRING: OPERATIONS COORDINATOR
+Location: Seattle
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@bluepeak.example by June 11. Interviews will take place the following week.",""
+"local-p7-034","What must applicants send?","A portfolio only","A resume and cover letter","A training certificate only","A weekly report","B","The posting requests both a resume and a cover letter. | Tin tuyển dụng yêu cầu CV và thư xin việc.","7","reading","jobs","650","BluePeak IS HIRING: OPERATIONS COORDINATOR
+Location: Seattle
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@bluepeak.example by June 11. Interviews will take place the following week.",""
+"local-p7-035","When are interviews expected?","On the application deadline","The following week","Next year","Before applications open","B","Interviews will occur in the week after the deadline. | Phỏng vấn diễn ra vào tuần tiếp theo.","7","reading","jobs","650","BluePeak IS HIRING: OPERATIONS COORDINATOR
+Location: Seattle
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@bluepeak.example by June 11. Interviews will take place the following week.",""
+"local-p7-036","What product is being advertised?","A travel mug","A coffee machine","A delivery vehicle","A refrigerator","A","The advertisement introduces a travel mug. | Quảng cáo giới thiệu một chiếc cốc du lịch.","7","reading","advertisements","650","INTRODUCING THE BLUEPEAK TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before June 11 and use code EP25 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-037","How long can the mug keep drinks cold?","Two hours","Eight hours","Twelve hours","Twenty hours","C","It keeps cold drinks cold for twelve hours. | Cốc giữ lạnh trong mười hai giờ.","7","reading","advertisements","650","INTRODUCING THE BLUEPEAK TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before June 11 and use code EP25 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-038","What does every mug include?","Free coffee","A two-year warranty","A second lid","A gift card","B","Every mug comes with a two-year warranty. | Mỗi cốc đi kèm bảo hành hai năm.","7","reading","advertisements","650","INTRODUCING THE BLUEPEAK TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before June 11 and use code EP25 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-039","What is the purpose of code EP25?","To track delivery","To receive a discount","To extend the warranty","To select a color","B","The code provides a 20 percent discount. | Mã dùng để nhận giảm giá 20 phần trăm.","7","reading","advertisements","650","INTRODUCING THE BLUEPEAK TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before June 11 and use code EP25 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-040","When is delivery free?","For every order","For orders over $50","Only on June 11","With store pickup","B","Orders over $50 qualify for free delivery. | Đơn hàng trên 50 đô la được giao miễn phí.","7","reading","advertisements","650","INTRODUCING THE BLUEPEAK TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before June 11 and use code EP25 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-041","Where will the forum take place?","Seattle Conference Center","BluePeak headquarters","Hall A Restaurant","The city library","A","The venue is listed directly below the event date. | Địa điểm được ghi ngay dưới ngày tổ chức.","7","reading","schedules","700","BluePeak SMALL BUSINESS FORUM - June 11
+Venue: Seattle Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Mr. Lee
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-042","Who will speak about digital branding?","Mr. Lee","A finance officer","A supplier","The reception manager","A","Mr. Lee is named beside the digital-brand session. | Mr. Lee được ghi cạnh phiên về thương hiệu số.","7","reading","schedules","700","BluePeak SMALL BUSINESS FORUM - June 11
+Venue: Seattle Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Mr. Lee
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-043","What begins at 11:00 A.M.?","Opening remarks","A finance session","Lunch","Networking","B","The finance session is scheduled for 11:00 A.M. | Phiên tài chính bắt đầu lúc 11 giờ.","7","reading","schedules","700","BluePeak SMALL BUSINESS FORUM - June 11
+Venue: Seattle Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Mr. Lee
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-044","Where will lunch be served?","At the entrance","In Hall B","At headquarters","In the workshop room","B","The schedule places lunch in Hall B. | Lịch ghi bữa trưa ở Hội trường B.","7","reading","schedules","700","BluePeak SMALL BUSINESS FORUM - June 11
+Venue: Seattle Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Mr. Lee
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-045","What must attendees present?","A passport","A supplier invoice","A registration code","A printed resume","C","A registration code is required at the entrance. | Người tham dự phải xuất trình mã đăng ký ở lối vào.","7","reading","schedules","700","BluePeak SMALL BUSINESS FORUM - June 11
+Venue: Seattle Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Mr. Lee
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-046","Why was the message sent?","To explain an order delay","To advertise a new product","To request a product review","To confirm a job interview","A","The message explains why an order was delayed and gives a new date. | Email giải thích việc đơn hàng bị chậm và cung cấp ngày mới.","7","reading","customer-service","700","From: support@bluepeak.example
+To: Mr. Lee
+Subject: Update on order #7223
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Seattle distribution center yesterday. The package is now expected to arrive on June 11. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-047","What caused the delay?","A payment problem","Severe weather","An incorrect address","A product shortage","B","Severe weather stopped the carrier from reaching the center. | Thời tiết xấu khiến đơn vị vận chuyển không đến được trung tâm.","7","reading","customer-service","700","From: support@bluepeak.example
+To: Mr. Lee
+Subject: Update on order #7223
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Seattle distribution center yesterday. The package is now expected to arrive on June 11. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-048","What has the company refunded?","The full order price","The express-delivery charge","A membership fee","A warranty charge","B","The express-delivery charge was refunded. | Phí giao hàng nhanh đã được hoàn lại.","7","reading","customer-service","700","From: support@bluepeak.example
+To: Mr. Lee
+Subject: Update on order #7223
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Seattle distribution center yesterday. The package is now expected to arrive on June 11. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-049","How will the refund be paid?","By store credit","By check","To the original payment method","In cash at the warehouse","C","The refund goes to the original payment method. | Khoản hoàn tiền được trả về phương thức thanh toán ban đầu.","7","reading","customer-service","700","From: support@bluepeak.example
+To: Mr. Lee
+Subject: Update on order #7223
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Seattle distribution center yesterday. The package is now expected to arrive on June 11. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-050","How long may the refund take to appear?","One hour","One day","Three to five business days","Two weeks exactly","C","The message states three to five business days. | Email nêu thời gian từ ba đến năm ngày làm việc.","7","reading","customer-service","700","From: support@bluepeak.example
+To: Mr. Lee
+Subject: Update on order #7223
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Seattle distribution center yesterday. The package is now expected to arrive on June 11. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-051","What is the purpose of the document?","To confirm a hotel booking","To advertise a restaurant","To request payment for a flight","To announce a meeting","A","The heading and booking details show that this is a hotel confirmation. | Tiêu đề và thông tin đặt phòng cho thấy đây là xác nhận khách sạn.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Ms. Nguyen
+Location: Denver
+Check-in: June 18, after 3:00 P.M.
+Room: Business King
+Rate: $105 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-052","What is included in the room rate?","Dinner and parking","Breakfast and Internet","Airport tickets","Laundry service","B","Breakfast and wireless Internet are explicitly included. | Bữa sáng và Internet không dây được bao gồm.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Ms. Nguyen
+Location: Denver
+Check-in: June 18, after 3:00 P.M.
+Room: Business King
+Rate: $105 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-053","When can the guest check in?","Before noon","After 3:00 P.M.","Only at midnight","Two days early","B","The confirmation lists check-in after 3:00 P.M. | Xác nhận ghi giờ nhận phòng sau 3 giờ chiều.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Ms. Nguyen
+Location: Denver
+Check-in: June 18, after 3:00 P.M.
+Room: Business King
+Rate: $105 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-054","How can the guest avoid a cancellation fee?","Cancel at least 48 hours early","Call after check-in","Reserve the shuttle","Change the room type","A","Cancellations at least 48 hours before check-in are free. | Hủy trước ít nhất 48 giờ sẽ không mất phí.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Ms. Nguyen
+Location: Denver
+Check-in: June 18, after 3:00 P.M.
+Room: Business King
+Rate: $105 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-055","What requires an advance reservation?","Breakfast","Wireless Internet","The airport shuttle","The business room","C","The airport shuttle must be reserved by noon before arrival. | Xe đưa đón sân bay phải được đặt trước.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Ms. Nguyen
+Location: Denver
+Check-in: June 18, after 3:00 P.M.
+Room: Business King
+Rate: $105 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-056","What position is available?","Sales director","Operations coordinator","Software engineer","Hotel manager","B","The posting is for an operations coordinator. | Tin tuyển dụng dành cho vị trí điều phối vận hành.","7","reading","jobs","650","Greenfield IS HIRING: OPERATIONS COORDINATOR
+Location: Denver
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@greenfield.example by June 18. Interviews will take place the following week.",""
+"local-p7-057","Which task is part of the job?","Designing buildings","Organizing delivery schedules","Teaching language classes","Repairing vehicles","B","Organizing delivery schedules is listed as a responsibility. | Sắp xếp lịch giao hàng là một nhiệm vụ được nêu.","7","reading","jobs","650","Greenfield IS HIRING: OPERATIONS COORDINATOR
+Location: Denver
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@greenfield.example by June 18. Interviews will take place the following week.",""
+"local-p7-058","What experience is required?","Two years of office experience","Five years abroad","No previous experience","Restaurant experience only","A","Applicants need at least two years of office experience. | Ứng viên cần ít nhất hai năm kinh nghiệm văn phòng.","7","reading","jobs","650","Greenfield IS HIRING: OPERATIONS COORDINATOR
+Location: Denver
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@greenfield.example by June 18. Interviews will take place the following week.",""
+"local-p7-059","What must applicants send?","A portfolio only","A resume and cover letter","A training certificate only","A weekly report","B","The posting requests both a resume and a cover letter. | Tin tuyển dụng yêu cầu CV và thư xin việc.","7","reading","jobs","650","Greenfield IS HIRING: OPERATIONS COORDINATOR
+Location: Denver
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@greenfield.example by June 18. Interviews will take place the following week.",""
+"local-p7-060","When are interviews expected?","On the application deadline","The following week","Next year","Before applications open","B","Interviews will occur in the week after the deadline. | Phỏng vấn diễn ra vào tuần tiếp theo.","7","reading","jobs","650","Greenfield IS HIRING: OPERATIONS COORDINATOR
+Location: Denver
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@greenfield.example by June 18. Interviews will take place the following week.",""
+"local-p7-061","What product is being advertised?","A travel mug","A coffee machine","A delivery vehicle","A refrigerator","A","The advertisement introduces a travel mug. | Quảng cáo giới thiệu một chiếc cốc du lịch.","7","reading","advertisements","650","INTRODUCING THE GREENFIELD TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before June 18 and use code EP26 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-062","How long can the mug keep drinks cold?","Two hours","Eight hours","Twelve hours","Twenty hours","C","It keeps cold drinks cold for twelve hours. | Cốc giữ lạnh trong mười hai giờ.","7","reading","advertisements","650","INTRODUCING THE GREENFIELD TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before June 18 and use code EP26 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-063","What does every mug include?","Free coffee","A two-year warranty","A second lid","A gift card","B","Every mug comes with a two-year warranty. | Mỗi cốc đi kèm bảo hành hai năm.","7","reading","advertisements","650","INTRODUCING THE GREENFIELD TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before June 18 and use code EP26 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-064","What is the purpose of code EP26?","To track delivery","To receive a discount","To extend the warranty","To select a color","B","The code provides a 20 percent discount. | Mã dùng để nhận giảm giá 20 phần trăm.","7","reading","advertisements","650","INTRODUCING THE GREENFIELD TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before June 18 and use code EP26 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-065","When is delivery free?","For every order","For orders over $50","Only on June 18","With store pickup","B","Orders over $50 qualify for free delivery. | Đơn hàng trên 50 đô la được giao miễn phí.","7","reading","advertisements","650","INTRODUCING THE GREENFIELD TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before June 18 and use code EP26 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-066","Where will the forum take place?","Denver Conference Center","Greenfield headquarters","Hall A Restaurant","The city library","A","The venue is listed directly below the event date. | Địa điểm được ghi ngay dưới ngày tổ chức.","7","reading","schedules","700","Greenfield SMALL BUSINESS FORUM - June 18
+Venue: Denver Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Ms. Nguyen
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-067","Who will speak about digital branding?","Ms. Nguyen","A finance officer","A supplier","The reception manager","A","Ms. Nguyen is named beside the digital-brand session. | Ms. Nguyen được ghi cạnh phiên về thương hiệu số.","7","reading","schedules","700","Greenfield SMALL BUSINESS FORUM - June 18
+Venue: Denver Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Ms. Nguyen
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-068","What begins at 11:00 A.M.?","Opening remarks","A finance session","Lunch","Networking","B","The finance session is scheduled for 11:00 A.M. | Phiên tài chính bắt đầu lúc 11 giờ.","7","reading","schedules","700","Greenfield SMALL BUSINESS FORUM - June 18
+Venue: Denver Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Ms. Nguyen
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-069","Where will lunch be served?","At the entrance","In Hall B","At headquarters","In the workshop room","B","The schedule places lunch in Hall B. | Lịch ghi bữa trưa ở Hội trường B.","7","reading","schedules","700","Greenfield SMALL BUSINESS FORUM - June 18
+Venue: Denver Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Ms. Nguyen
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-070","What must attendees present?","A passport","A supplier invoice","A registration code","A printed resume","C","A registration code is required at the entrance. | Người tham dự phải xuất trình mã đăng ký ở lối vào.","7","reading","schedules","700","Greenfield SMALL BUSINESS FORUM - June 18
+Venue: Denver Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Ms. Nguyen
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-071","Why was the message sent?","To explain an order delay","To advertise a new product","To request a product review","To confirm a job interview","A","The message explains why an order was delayed and gives a new date. | Email giải thích việc đơn hàng bị chậm và cung cấp ngày mới.","7","reading","customer-service","700","From: support@greenfield.example
+To: Ms. Nguyen
+Subject: Update on order #7246
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Denver distribution center yesterday. The package is now expected to arrive on June 18. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-072","What caused the delay?","A payment problem","Severe weather","An incorrect address","A product shortage","B","Severe weather stopped the carrier from reaching the center. | Thời tiết xấu khiến đơn vị vận chuyển không đến được trung tâm.","7","reading","customer-service","700","From: support@greenfield.example
+To: Ms. Nguyen
+Subject: Update on order #7246
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Denver distribution center yesterday. The package is now expected to arrive on June 18. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-073","What has the company refunded?","The full order price","The express-delivery charge","A membership fee","A warranty charge","B","The express-delivery charge was refunded. | Phí giao hàng nhanh đã được hoàn lại.","7","reading","customer-service","700","From: support@greenfield.example
+To: Ms. Nguyen
+Subject: Update on order #7246
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Denver distribution center yesterday. The package is now expected to arrive on June 18. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-074","How will the refund be paid?","By store credit","By check","To the original payment method","In cash at the warehouse","C","The refund goes to the original payment method. | Khoản hoàn tiền được trả về phương thức thanh toán ban đầu.","7","reading","customer-service","700","From: support@greenfield.example
+To: Ms. Nguyen
+Subject: Update on order #7246
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Denver distribution center yesterday. The package is now expected to arrive on June 18. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-075","How long may the refund take to appear?","One hour","One day","Three to five business days","Two weeks exactly","C","The message states three to five business days. | Email nêu thời gian từ ba đến năm ngày làm việc.","7","reading","customer-service","700","From: support@greenfield.example
+To: Ms. Nguyen
+Subject: Update on order #7246
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Denver distribution center yesterday. The package is now expected to arrive on June 18. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-076","What is the purpose of the document?","To confirm a hotel booking","To advertise a restaurant","To request payment for a flight","To announce a meeting","A","The heading and booking details show that this is a hotel confirmation. | Tiêu đề và thông tin đặt phòng cho thấy đây là xác nhận khách sạn.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Mr. Wilson
+Location: Austin
+Check-in: July 2, after 3:00 P.M.
+Room: Business King
+Rate: $115 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-077","What is included in the room rate?","Dinner and parking","Breakfast and Internet","Airport tickets","Laundry service","B","Breakfast and wireless Internet are explicitly included. | Bữa sáng và Internet không dây được bao gồm.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Mr. Wilson
+Location: Austin
+Check-in: July 2, after 3:00 P.M.
+Room: Business King
+Rate: $115 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-078","When can the guest check in?","Before noon","After 3:00 P.M.","Only at midnight","Two days early","B","The confirmation lists check-in after 3:00 P.M. | Xác nhận ghi giờ nhận phòng sau 3 giờ chiều.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Mr. Wilson
+Location: Austin
+Check-in: July 2, after 3:00 P.M.
+Room: Business King
+Rate: $115 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-079","How can the guest avoid a cancellation fee?","Cancel at least 48 hours early","Call after check-in","Reserve the shuttle","Change the room type","A","Cancellations at least 48 hours before check-in are free. | Hủy trước ít nhất 48 giờ sẽ không mất phí.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Mr. Wilson
+Location: Austin
+Check-in: July 2, after 3:00 P.M.
+Room: Business King
+Rate: $115 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-080","What requires an advance reservation?","Breakfast","Wireless Internet","The airport shuttle","The business room","C","The airport shuttle must be reserved by noon before arrival. | Xe đưa đón sân bay phải được đặt trước.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Mr. Wilson
+Location: Austin
+Check-in: July 2, after 3:00 P.M.
+Room: Business King
+Rate: $115 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-081","What position is available?","Sales director","Operations coordinator","Software engineer","Hotel manager","B","The posting is for an operations coordinator. | Tin tuyển dụng dành cho vị trí điều phối vận hành.","7","reading","jobs","650","Summit IS HIRING: OPERATIONS COORDINATOR
+Location: Austin
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@summit.example by July 2. Interviews will take place the following week.",""
+"local-p7-082","Which task is part of the job?","Designing buildings","Organizing delivery schedules","Teaching language classes","Repairing vehicles","B","Organizing delivery schedules is listed as a responsibility. | Sắp xếp lịch giao hàng là một nhiệm vụ được nêu.","7","reading","jobs","650","Summit IS HIRING: OPERATIONS COORDINATOR
+Location: Austin
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@summit.example by July 2. Interviews will take place the following week.",""
+"local-p7-083","What experience is required?","Two years of office experience","Five years abroad","No previous experience","Restaurant experience only","A","Applicants need at least two years of office experience. | Ứng viên cần ít nhất hai năm kinh nghiệm văn phòng.","7","reading","jobs","650","Summit IS HIRING: OPERATIONS COORDINATOR
+Location: Austin
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@summit.example by July 2. Interviews will take place the following week.",""
+"local-p7-084","What must applicants send?","A portfolio only","A resume and cover letter","A training certificate only","A weekly report","B","The posting requests both a resume and a cover letter. | Tin tuyển dụng yêu cầu CV và thư xin việc.","7","reading","jobs","650","Summit IS HIRING: OPERATIONS COORDINATOR
+Location: Austin
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@summit.example by July 2. Interviews will take place the following week.",""
+"local-p7-085","When are interviews expected?","On the application deadline","The following week","Next year","Before applications open","B","Interviews will occur in the week after the deadline. | Phỏng vấn diễn ra vào tuần tiếp theo.","7","reading","jobs","650","Summit IS HIRING: OPERATIONS COORDINATOR
+Location: Austin
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@summit.example by July 2. Interviews will take place the following week.",""
+"local-p7-086","What product is being advertised?","A travel mug","A coffee machine","A delivery vehicle","A refrigerator","A","The advertisement introduces a travel mug. | Quảng cáo giới thiệu một chiếc cốc du lịch.","7","reading","advertisements","650","INTRODUCING THE SUMMIT TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before July 2 and use code EP27 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-087","How long can the mug keep drinks cold?","Two hours","Eight hours","Twelve hours","Twenty hours","C","It keeps cold drinks cold for twelve hours. | Cốc giữ lạnh trong mười hai giờ.","7","reading","advertisements","650","INTRODUCING THE SUMMIT TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before July 2 and use code EP27 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-088","What does every mug include?","Free coffee","A two-year warranty","A second lid","A gift card","B","Every mug comes with a two-year warranty. | Mỗi cốc đi kèm bảo hành hai năm.","7","reading","advertisements","650","INTRODUCING THE SUMMIT TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before July 2 and use code EP27 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-089","What is the purpose of code EP27?","To track delivery","To receive a discount","To extend the warranty","To select a color","B","The code provides a 20 percent discount. | Mã dùng để nhận giảm giá 20 phần trăm.","7","reading","advertisements","650","INTRODUCING THE SUMMIT TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before July 2 and use code EP27 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-090","When is delivery free?","For every order","For orders over $50","Only on July 2","With store pickup","B","Orders over $50 qualify for free delivery. | Đơn hàng trên 50 đô la được giao miễn phí.","7","reading","advertisements","650","INTRODUCING THE SUMMIT TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before July 2 and use code EP27 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-091","Where will the forum take place?","Austin Conference Center","Summit headquarters","Hall A Restaurant","The city library","A","The venue is listed directly below the event date. | Địa điểm được ghi ngay dưới ngày tổ chức.","7","reading","schedules","700","Summit SMALL BUSINESS FORUM - July 2
+Venue: Austin Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Mr. Wilson
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-092","Who will speak about digital branding?","Mr. Wilson","A finance officer","A supplier","The reception manager","A","Mr. Wilson is named beside the digital-brand session. | Mr. Wilson được ghi cạnh phiên về thương hiệu số.","7","reading","schedules","700","Summit SMALL BUSINESS FORUM - July 2
+Venue: Austin Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Mr. Wilson
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-093","What begins at 11:00 A.M.?","Opening remarks","A finance session","Lunch","Networking","B","The finance session is scheduled for 11:00 A.M. | Phiên tài chính bắt đầu lúc 11 giờ.","7","reading","schedules","700","Summit SMALL BUSINESS FORUM - July 2
+Venue: Austin Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Mr. Wilson
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-094","Where will lunch be served?","At the entrance","In Hall B","At headquarters","In the workshop room","B","The schedule places lunch in Hall B. | Lịch ghi bữa trưa ở Hội trường B.","7","reading","schedules","700","Summit SMALL BUSINESS FORUM - July 2
+Venue: Austin Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Mr. Wilson
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-095","What must attendees present?","A passport","A supplier invoice","A registration code","A printed resume","C","A registration code is required at the entrance. | Người tham dự phải xuất trình mã đăng ký ở lối vào.","7","reading","schedules","700","Summit SMALL BUSINESS FORUM - July 2
+Venue: Austin Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Mr. Wilson
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-096","Why was the message sent?","To explain an order delay","To advertise a new product","To request a product review","To confirm a job interview","A","The message explains why an order was delayed and gives a new date. | Email giải thích việc đơn hàng bị chậm và cung cấp ngày mới.","7","reading","customer-service","700","From: support@summit.example
+To: Mr. Wilson
+Subject: Update on order #7269
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Austin distribution center yesterday. The package is now expected to arrive on July 2. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-097","What caused the delay?","A payment problem","Severe weather","An incorrect address","A product shortage","B","Severe weather stopped the carrier from reaching the center. | Thời tiết xấu khiến đơn vị vận chuyển không đến được trung tâm.","7","reading","customer-service","700","From: support@summit.example
+To: Mr. Wilson
+Subject: Update on order #7269
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Austin distribution center yesterday. The package is now expected to arrive on July 2. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-098","What has the company refunded?","The full order price","The express-delivery charge","A membership fee","A warranty charge","B","The express-delivery charge was refunded. | Phí giao hàng nhanh đã được hoàn lại.","7","reading","customer-service","700","From: support@summit.example
+To: Mr. Wilson
+Subject: Update on order #7269
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Austin distribution center yesterday. The package is now expected to arrive on July 2. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-099","How will the refund be paid?","By store credit","By check","To the original payment method","In cash at the warehouse","C","The refund goes to the original payment method. | Khoản hoàn tiền được trả về phương thức thanh toán ban đầu.","7","reading","customer-service","700","From: support@summit.example
+To: Mr. Wilson
+Subject: Update on order #7269
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Austin distribution center yesterday. The package is now expected to arrive on July 2. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-100","How long may the refund take to appear?","One hour","One day","Three to five business days","Two weeks exactly","C","The message states three to five business days. | Email nêu thời gian từ ba đến năm ngày làm việc.","7","reading","customer-service","700","From: support@summit.example
+To: Mr. Wilson
+Subject: Update on order #7269
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Austin distribution center yesterday. The package is now expected to arrive on July 2. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-101","What is the purpose of the document?","To confirm a hotel booking","To advertise a restaurant","To request payment for a flight","To announce a meeting","A","The heading and booking details show that this is a hotel confirmation. | Tiêu đề và thông tin đặt phòng cho thấy đây là xác nhận khách sạn.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Ms. Patel
+Location: Chicago
+Check-in: July 9, after 3:00 P.M.
+Room: Business King
+Rate: $125 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-102","What is included in the room rate?","Dinner and parking","Breakfast and Internet","Airport tickets","Laundry service","B","Breakfast and wireless Internet are explicitly included. | Bữa sáng và Internet không dây được bao gồm.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Ms. Patel
+Location: Chicago
+Check-in: July 9, after 3:00 P.M.
+Room: Business King
+Rate: $125 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-103","When can the guest check in?","Before noon","After 3:00 P.M.","Only at midnight","Two days early","B","The confirmation lists check-in after 3:00 P.M. | Xác nhận ghi giờ nhận phòng sau 3 giờ chiều.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Ms. Patel
+Location: Chicago
+Check-in: July 9, after 3:00 P.M.
+Room: Business King
+Rate: $125 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-104","How can the guest avoid a cancellation fee?","Cancel at least 48 hours early","Call after check-in","Reserve the shuttle","Change the room type","A","Cancellations at least 48 hours before check-in are free. | Hủy trước ít nhất 48 giờ sẽ không mất phí.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Ms. Patel
+Location: Chicago
+Check-in: July 9, after 3:00 P.M.
+Room: Business King
+Rate: $125 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-105","What requires an advance reservation?","Breakfast","Wireless Internet","The airport shuttle","The business room","C","The airport shuttle must be reserved by noon before arrival. | Xe đưa đón sân bay phải được đặt trước.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Ms. Patel
+Location: Chicago
+Check-in: July 9, after 3:00 P.M.
+Room: Business King
+Rate: $125 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-106","What position is available?","Sales director","Operations coordinator","Software engineer","Hotel manager","B","The posting is for an operations coordinator. | Tin tuyển dụng dành cho vị trí điều phối vận hành.","7","reading","jobs","650","Riverside IS HIRING: OPERATIONS COORDINATOR
+Location: Chicago
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@riverside.example by July 9. Interviews will take place the following week.",""
+"local-p7-107","Which task is part of the job?","Designing buildings","Organizing delivery schedules","Teaching language classes","Repairing vehicles","B","Organizing delivery schedules is listed as a responsibility. | Sắp xếp lịch giao hàng là một nhiệm vụ được nêu.","7","reading","jobs","650","Riverside IS HIRING: OPERATIONS COORDINATOR
+Location: Chicago
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@riverside.example by July 9. Interviews will take place the following week.",""
+"local-p7-108","What experience is required?","Two years of office experience","Five years abroad","No previous experience","Restaurant experience only","A","Applicants need at least two years of office experience. | Ứng viên cần ít nhất hai năm kinh nghiệm văn phòng.","7","reading","jobs","650","Riverside IS HIRING: OPERATIONS COORDINATOR
+Location: Chicago
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@riverside.example by July 9. Interviews will take place the following week.",""
+"local-p7-109","What must applicants send?","A portfolio only","A resume and cover letter","A training certificate only","A weekly report","B","The posting requests both a resume and a cover letter. | Tin tuyển dụng yêu cầu CV và thư xin việc.","7","reading","jobs","650","Riverside IS HIRING: OPERATIONS COORDINATOR
+Location: Chicago
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@riverside.example by July 9. Interviews will take place the following week.",""
+"local-p7-110","When are interviews expected?","On the application deadline","The following week","Next year","Before applications open","B","Interviews will occur in the week after the deadline. | Phỏng vấn diễn ra vào tuần tiếp theo.","7","reading","jobs","650","Riverside IS HIRING: OPERATIONS COORDINATOR
+Location: Chicago
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@riverside.example by July 9. Interviews will take place the following week.",""
+"local-p7-111","What product is being advertised?","A travel mug","A coffee machine","A delivery vehicle","A refrigerator","A","The advertisement introduces a travel mug. | Quảng cáo giới thiệu một chiếc cốc du lịch.","7","reading","advertisements","650","INTRODUCING THE RIVERSIDE TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before July 9 and use code EP28 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-112","How long can the mug keep drinks cold?","Two hours","Eight hours","Twelve hours","Twenty hours","C","It keeps cold drinks cold for twelve hours. | Cốc giữ lạnh trong mười hai giờ.","7","reading","advertisements","650","INTRODUCING THE RIVERSIDE TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before July 9 and use code EP28 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-113","What does every mug include?","Free coffee","A two-year warranty","A second lid","A gift card","B","Every mug comes with a two-year warranty. | Mỗi cốc đi kèm bảo hành hai năm.","7","reading","advertisements","650","INTRODUCING THE RIVERSIDE TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before July 9 and use code EP28 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-114","What is the purpose of code EP28?","To track delivery","To receive a discount","To extend the warranty","To select a color","B","The code provides a 20 percent discount. | Mã dùng để nhận giảm giá 20 phần trăm.","7","reading","advertisements","650","INTRODUCING THE RIVERSIDE TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before July 9 and use code EP28 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-115","When is delivery free?","For every order","For orders over $50","Only on July 9","With store pickup","B","Orders over $50 qualify for free delivery. | Đơn hàng trên 50 đô la được giao miễn phí.","7","reading","advertisements","650","INTRODUCING THE RIVERSIDE TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before July 9 and use code EP28 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-116","Where will the forum take place?","Chicago Conference Center","Riverside headquarters","Hall A Restaurant","The city library","A","The venue is listed directly below the event date. | Địa điểm được ghi ngay dưới ngày tổ chức.","7","reading","schedules","700","Riverside SMALL BUSINESS FORUM - July 9
+Venue: Chicago Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Ms. Patel
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-117","Who will speak about digital branding?","Ms. Patel","A finance officer","A supplier","The reception manager","A","Ms. Patel is named beside the digital-brand session. | Ms. Patel được ghi cạnh phiên về thương hiệu số.","7","reading","schedules","700","Riverside SMALL BUSINESS FORUM - July 9
+Venue: Chicago Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Ms. Patel
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-118","What begins at 11:00 A.M.?","Opening remarks","A finance session","Lunch","Networking","B","The finance session is scheduled for 11:00 A.M. | Phiên tài chính bắt đầu lúc 11 giờ.","7","reading","schedules","700","Riverside SMALL BUSINESS FORUM - July 9
+Venue: Chicago Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Ms. Patel
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-119","Where will lunch be served?","At the entrance","In Hall B","At headquarters","In the workshop room","B","The schedule places lunch in Hall B. | Lịch ghi bữa trưa ở Hội trường B.","7","reading","schedules","700","Riverside SMALL BUSINESS FORUM - July 9
+Venue: Chicago Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Ms. Patel
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-120","What must attendees present?","A passport","A supplier invoice","A registration code","A printed resume","C","A registration code is required at the entrance. | Người tham dự phải xuất trình mã đăng ký ở lối vào.","7","reading","schedules","700","Riverside SMALL BUSINESS FORUM - July 9
+Venue: Chicago Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Ms. Patel
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-121","Why was the message sent?","To explain an order delay","To advertise a new product","To request a product review","To confirm a job interview","A","The message explains why an order was delayed and gives a new date. | Email giải thích việc đơn hàng bị chậm và cung cấp ngày mới.","7","reading","customer-service","700","From: support@riverside.example
+To: Ms. Patel
+Subject: Update on order #7292
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Chicago distribution center yesterday. The package is now expected to arrive on July 9. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-122","What caused the delay?","A payment problem","Severe weather","An incorrect address","A product shortage","B","Severe weather stopped the carrier from reaching the center. | Thời tiết xấu khiến đơn vị vận chuyển không đến được trung tâm.","7","reading","customer-service","700","From: support@riverside.example
+To: Ms. Patel
+Subject: Update on order #7292
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Chicago distribution center yesterday. The package is now expected to arrive on July 9. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-123","What has the company refunded?","The full order price","The express-delivery charge","A membership fee","A warranty charge","B","The express-delivery charge was refunded. | Phí giao hàng nhanh đã được hoàn lại.","7","reading","customer-service","700","From: support@riverside.example
+To: Ms. Patel
+Subject: Update on order #7292
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Chicago distribution center yesterday. The package is now expected to arrive on July 9. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-124","How will the refund be paid?","By store credit","By check","To the original payment method","In cash at the warehouse","C","The refund goes to the original payment method. | Khoản hoàn tiền được trả về phương thức thanh toán ban đầu.","7","reading","customer-service","700","From: support@riverside.example
+To: Ms. Patel
+Subject: Update on order #7292
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Chicago distribution center yesterday. The package is now expected to arrive on July 9. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-125","How long may the refund take to appear?","One hour","One day","Three to five business days","Two weeks exactly","C","The message states three to five business days. | Email nêu thời gian từ ba đến năm ngày làm việc.","7","reading","customer-service","700","From: support@riverside.example
+To: Ms. Patel
+Subject: Update on order #7292
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Chicago distribution center yesterday. The package is now expected to arrive on July 9. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-126","What is the purpose of the document?","To confirm a hotel booking","To advertise a restaurant","To request payment for a flight","To announce a meeting","A","The heading and booking details show that this is a hotel confirmation. | Tiêu đề và thông tin đặt phòng cho thấy đây là xác nhận khách sạn.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Mr. Brown
+Location: Portland
+Check-in: July 16, after 3:00 P.M.
+Room: Business King
+Rate: $135 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-127","What is included in the room rate?","Dinner and parking","Breakfast and Internet","Airport tickets","Laundry service","B","Breakfast and wireless Internet are explicitly included. | Bữa sáng và Internet không dây được bao gồm.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Mr. Brown
+Location: Portland
+Check-in: July 16, after 3:00 P.M.
+Room: Business King
+Rate: $135 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-128","When can the guest check in?","Before noon","After 3:00 P.M.","Only at midnight","Two days early","B","The confirmation lists check-in after 3:00 P.M. | Xác nhận ghi giờ nhận phòng sau 3 giờ chiều.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Mr. Brown
+Location: Portland
+Check-in: July 16, after 3:00 P.M.
+Room: Business King
+Rate: $135 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-129","How can the guest avoid a cancellation fee?","Cancel at least 48 hours early","Call after check-in","Reserve the shuttle","Change the room type","A","Cancellations at least 48 hours before check-in are free. | Hủy trước ít nhất 48 giờ sẽ không mất phí.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Mr. Brown
+Location: Portland
+Check-in: July 16, after 3:00 P.M.
+Room: Business King
+Rate: $135 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-130","What requires an advance reservation?","Breakfast","Wireless Internet","The airport shuttle","The business room","C","The airport shuttle must be reserved by noon before arrival. | Xe đưa đón sân bay phải được đặt trước.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Mr. Brown
+Location: Portland
+Check-in: July 16, after 3:00 P.M.
+Room: Business King
+Rate: $135 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-131","What position is available?","Sales director","Operations coordinator","Software engineer","Hotel manager","B","The posting is for an operations coordinator. | Tin tuyển dụng dành cho vị trí điều phối vận hành.","7","reading","jobs","650","BrightPath IS HIRING: OPERATIONS COORDINATOR
+Location: Portland
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@brightpath.example by July 16. Interviews will take place the following week.",""
+"local-p7-132","Which task is part of the job?","Designing buildings","Organizing delivery schedules","Teaching language classes","Repairing vehicles","B","Organizing delivery schedules is listed as a responsibility. | Sắp xếp lịch giao hàng là một nhiệm vụ được nêu.","7","reading","jobs","650","BrightPath IS HIRING: OPERATIONS COORDINATOR
+Location: Portland
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@brightpath.example by July 16. Interviews will take place the following week.",""
+"local-p7-133","What experience is required?","Two years of office experience","Five years abroad","No previous experience","Restaurant experience only","A","Applicants need at least two years of office experience. | Ứng viên cần ít nhất hai năm kinh nghiệm văn phòng.","7","reading","jobs","650","BrightPath IS HIRING: OPERATIONS COORDINATOR
+Location: Portland
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@brightpath.example by July 16. Interviews will take place the following week.",""
+"local-p7-134","What must applicants send?","A portfolio only","A resume and cover letter","A training certificate only","A weekly report","B","The posting requests both a resume and a cover letter. | Tin tuyển dụng yêu cầu CV và thư xin việc.","7","reading","jobs","650","BrightPath IS HIRING: OPERATIONS COORDINATOR
+Location: Portland
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@brightpath.example by July 16. Interviews will take place the following week.",""
+"local-p7-135","When are interviews expected?","On the application deadline","The following week","Next year","Before applications open","B","Interviews will occur in the week after the deadline. | Phỏng vấn diễn ra vào tuần tiếp theo.","7","reading","jobs","650","BrightPath IS HIRING: OPERATIONS COORDINATOR
+Location: Portland
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@brightpath.example by July 16. Interviews will take place the following week.",""
+"local-p7-136","What product is being advertised?","A travel mug","A coffee machine","A delivery vehicle","A refrigerator","A","The advertisement introduces a travel mug. | Quảng cáo giới thiệu một chiếc cốc du lịch.","7","reading","advertisements","650","INTRODUCING THE BRIGHTPATH TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before July 16 and use code EP29 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-137","How long can the mug keep drinks cold?","Two hours","Eight hours","Twelve hours","Twenty hours","C","It keeps cold drinks cold for twelve hours. | Cốc giữ lạnh trong mười hai giờ.","7","reading","advertisements","650","INTRODUCING THE BRIGHTPATH TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before July 16 and use code EP29 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-138","What does every mug include?","Free coffee","A two-year warranty","A second lid","A gift card","B","Every mug comes with a two-year warranty. | Mỗi cốc đi kèm bảo hành hai năm.","7","reading","advertisements","650","INTRODUCING THE BRIGHTPATH TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before July 16 and use code EP29 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-139","What is the purpose of code EP29?","To track delivery","To receive a discount","To extend the warranty","To select a color","B","The code provides a 20 percent discount. | Mã dùng để nhận giảm giá 20 phần trăm.","7","reading","advertisements","650","INTRODUCING THE BRIGHTPATH TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before July 16 and use code EP29 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-140","When is delivery free?","For every order","For orders over $50","Only on July 16","With store pickup","B","Orders over $50 qualify for free delivery. | Đơn hàng trên 50 đô la được giao miễn phí.","7","reading","advertisements","650","INTRODUCING THE BRIGHTPATH TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before July 16 and use code EP29 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-141","Where will the forum take place?","Portland Conference Center","BrightPath headquarters","Hall A Restaurant","The city library","A","The venue is listed directly below the event date. | Địa điểm được ghi ngay dưới ngày tổ chức.","7","reading","schedules","700","BrightPath SMALL BUSINESS FORUM - July 16
+Venue: Portland Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Mr. Brown
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-142","Who will speak about digital branding?","Mr. Brown","A finance officer","A supplier","The reception manager","A","Mr. Brown is named beside the digital-brand session. | Mr. Brown được ghi cạnh phiên về thương hiệu số.","7","reading","schedules","700","BrightPath SMALL BUSINESS FORUM - July 16
+Venue: Portland Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Mr. Brown
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-143","What begins at 11:00 A.M.?","Opening remarks","A finance session","Lunch","Networking","B","The finance session is scheduled for 11:00 A.M. | Phiên tài chính bắt đầu lúc 11 giờ.","7","reading","schedules","700","BrightPath SMALL BUSINESS FORUM - July 16
+Venue: Portland Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Mr. Brown
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-144","Where will lunch be served?","At the entrance","In Hall B","At headquarters","In the workshop room","B","The schedule places lunch in Hall B. | Lịch ghi bữa trưa ở Hội trường B.","7","reading","schedules","700","BrightPath SMALL BUSINESS FORUM - July 16
+Venue: Portland Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Mr. Brown
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-145","What must attendees present?","A passport","A supplier invoice","A registration code","A printed resume","C","A registration code is required at the entrance. | Người tham dự phải xuất trình mã đăng ký ở lối vào.","7","reading","schedules","700","BrightPath SMALL BUSINESS FORUM - July 16
+Venue: Portland Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Mr. Brown
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-146","Why was the message sent?","To explain an order delay","To advertise a new product","To request a product review","To confirm a job interview","A","The message explains why an order was delayed and gives a new date. | Email giải thích việc đơn hàng bị chậm và cung cấp ngày mới.","7","reading","customer-service","700","From: support@brightpath.example
+To: Mr. Brown
+Subject: Update on order #7315
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Portland distribution center yesterday. The package is now expected to arrive on July 16. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-147","What caused the delay?","A payment problem","Severe weather","An incorrect address","A product shortage","B","Severe weather stopped the carrier from reaching the center. | Thời tiết xấu khiến đơn vị vận chuyển không đến được trung tâm.","7","reading","customer-service","700","From: support@brightpath.example
+To: Mr. Brown
+Subject: Update on order #7315
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Portland distribution center yesterday. The package is now expected to arrive on July 16. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-148","What has the company refunded?","The full order price","The express-delivery charge","A membership fee","A warranty charge","B","The express-delivery charge was refunded. | Phí giao hàng nhanh đã được hoàn lại.","7","reading","customer-service","700","From: support@brightpath.example
+To: Mr. Brown
+Subject: Update on order #7315
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Portland distribution center yesterday. The package is now expected to arrive on July 16. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-149","How will the refund be paid?","By store credit","By check","To the original payment method","In cash at the warehouse","C","The refund goes to the original payment method. | Khoản hoàn tiền được trả về phương thức thanh toán ban đầu.","7","reading","customer-service","700","From: support@brightpath.example
+To: Mr. Brown
+Subject: Update on order #7315
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Portland distribution center yesterday. The package is now expected to arrive on July 16. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-150","How long may the refund take to appear?","One hour","One day","Three to five business days","Two weeks exactly","C","The message states three to five business days. | Email nêu thời gian từ ba đến năm ngày làm việc.","7","reading","customer-service","700","From: support@brightpath.example
+To: Mr. Brown
+Subject: Update on order #7315
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Portland distribution center yesterday. The package is now expected to arrive on July 16. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-151","What is the purpose of the document?","To confirm a hotel booking","To advertise a restaurant","To request payment for a flight","To announce a meeting","A","The heading and booking details show that this is a hotel confirmation. | Tiêu đề và thông tin đặt phòng cho thấy đây là xác nhận khách sạn.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Ms. Garcia
+Location: Atlanta
+Check-in: August 6, after 3:00 P.M.
+Room: Business King
+Rate: $145 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-152","What is included in the room rate?","Dinner and parking","Breakfast and Internet","Airport tickets","Laundry service","B","Breakfast and wireless Internet are explicitly included. | Bữa sáng và Internet không dây được bao gồm.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Ms. Garcia
+Location: Atlanta
+Check-in: August 6, after 3:00 P.M.
+Room: Business King
+Rate: $145 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-153","When can the guest check in?","Before noon","After 3:00 P.M.","Only at midnight","Two days early","B","The confirmation lists check-in after 3:00 P.M. | Xác nhận ghi giờ nhận phòng sau 3 giờ chiều.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Ms. Garcia
+Location: Atlanta
+Check-in: August 6, after 3:00 P.M.
+Room: Business King
+Rate: $145 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-154","How can the guest avoid a cancellation fee?","Cancel at least 48 hours early","Call after check-in","Reserve the shuttle","Change the room type","A","Cancellations at least 48 hours before check-in are free. | Hủy trước ít nhất 48 giờ sẽ không mất phí.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Ms. Garcia
+Location: Atlanta
+Check-in: August 6, after 3:00 P.M.
+Room: Business King
+Rate: $145 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-155","What requires an advance reservation?","Breakfast","Wireless Internet","The airport shuttle","The business room","C","The airport shuttle must be reserved by noon before arrival. | Xe đưa đón sân bay phải được đặt trước.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Ms. Garcia
+Location: Atlanta
+Check-in: August 6, after 3:00 P.M.
+Room: Business King
+Rate: $145 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-156","What position is available?","Sales director","Operations coordinator","Software engineer","Hotel manager","B","The posting is for an operations coordinator. | Tin tuyển dụng dành cho vị trí điều phối vận hành.","7","reading","jobs","650","Harborview IS HIRING: OPERATIONS COORDINATOR
+Location: Atlanta
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@harborview.example by August 6. Interviews will take place the following week.",""
+"local-p7-157","Which task is part of the job?","Designing buildings","Organizing delivery schedules","Teaching language classes","Repairing vehicles","B","Organizing delivery schedules is listed as a responsibility. | Sắp xếp lịch giao hàng là một nhiệm vụ được nêu.","7","reading","jobs","650","Harborview IS HIRING: OPERATIONS COORDINATOR
+Location: Atlanta
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@harborview.example by August 6. Interviews will take place the following week.",""
+"local-p7-158","What experience is required?","Two years of office experience","Five years abroad","No previous experience","Restaurant experience only","A","Applicants need at least two years of office experience. | Ứng viên cần ít nhất hai năm kinh nghiệm văn phòng.","7","reading","jobs","650","Harborview IS HIRING: OPERATIONS COORDINATOR
+Location: Atlanta
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@harborview.example by August 6. Interviews will take place the following week.",""
+"local-p7-159","What must applicants send?","A portfolio only","A resume and cover letter","A training certificate only","A weekly report","B","The posting requests both a resume and a cover letter. | Tin tuyển dụng yêu cầu CV và thư xin việc.","7","reading","jobs","650","Harborview IS HIRING: OPERATIONS COORDINATOR
+Location: Atlanta
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@harborview.example by August 6. Interviews will take place the following week.",""
+"local-p7-160","When are interviews expected?","On the application deadline","The following week","Next year","Before applications open","B","Interviews will occur in the week after the deadline. | Phỏng vấn diễn ra vào tuần tiếp theo.","7","reading","jobs","650","Harborview IS HIRING: OPERATIONS COORDINATOR
+Location: Atlanta
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@harborview.example by August 6. Interviews will take place the following week.",""
+"local-p7-161","What product is being advertised?","A travel mug","A coffee machine","A delivery vehicle","A refrigerator","A","The advertisement introduces a travel mug. | Quảng cáo giới thiệu một chiếc cốc du lịch.","7","reading","advertisements","650","INTRODUCING THE HARBORVIEW TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before August 6 and use code EP30 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-162","How long can the mug keep drinks cold?","Two hours","Eight hours","Twelve hours","Twenty hours","C","It keeps cold drinks cold for twelve hours. | Cốc giữ lạnh trong mười hai giờ.","7","reading","advertisements","650","INTRODUCING THE HARBORVIEW TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before August 6 and use code EP30 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-163","What does every mug include?","Free coffee","A two-year warranty","A second lid","A gift card","B","Every mug comes with a two-year warranty. | Mỗi cốc đi kèm bảo hành hai năm.","7","reading","advertisements","650","INTRODUCING THE HARBORVIEW TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before August 6 and use code EP30 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-164","What is the purpose of code EP30?","To track delivery","To receive a discount","To extend the warranty","To select a color","B","The code provides a 20 percent discount. | Mã dùng để nhận giảm giá 20 phần trăm.","7","reading","advertisements","650","INTRODUCING THE HARBORVIEW TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before August 6 and use code EP30 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-165","When is delivery free?","For every order","For orders over $50","Only on August 6","With store pickup","B","Orders over $50 qualify for free delivery. | Đơn hàng trên 50 đô la được giao miễn phí.","7","reading","advertisements","650","INTRODUCING THE HARBORVIEW TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before August 6 and use code EP30 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-166","Where will the forum take place?","Atlanta Conference Center","Harborview headquarters","Hall A Restaurant","The city library","A","The venue is listed directly below the event date. | Địa điểm được ghi ngay dưới ngày tổ chức.","7","reading","schedules","700","Harborview SMALL BUSINESS FORUM - August 6
+Venue: Atlanta Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Ms. Garcia
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-167","Who will speak about digital branding?","Ms. Garcia","A finance officer","A supplier","The reception manager","A","Ms. Garcia is named beside the digital-brand session. | Ms. Garcia được ghi cạnh phiên về thương hiệu số.","7","reading","schedules","700","Harborview SMALL BUSINESS FORUM - August 6
+Venue: Atlanta Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Ms. Garcia
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-168","What begins at 11:00 A.M.?","Opening remarks","A finance session","Lunch","Networking","B","The finance session is scheduled for 11:00 A.M. | Phiên tài chính bắt đầu lúc 11 giờ.","7","reading","schedules","700","Harborview SMALL BUSINESS FORUM - August 6
+Venue: Atlanta Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Ms. Garcia
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-169","Where will lunch be served?","At the entrance","In Hall B","At headquarters","In the workshop room","B","The schedule places lunch in Hall B. | Lịch ghi bữa trưa ở Hội trường B.","7","reading","schedules","700","Harborview SMALL BUSINESS FORUM - August 6
+Venue: Atlanta Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Ms. Garcia
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-170","What must attendees present?","A passport","A supplier invoice","A registration code","A printed resume","C","A registration code is required at the entrance. | Người tham dự phải xuất trình mã đăng ký ở lối vào.","7","reading","schedules","700","Harborview SMALL BUSINESS FORUM - August 6
+Venue: Atlanta Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Ms. Garcia
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-171","Why was the message sent?","To explain an order delay","To advertise a new product","To request a product review","To confirm a job interview","A","The message explains why an order was delayed and gives a new date. | Email giải thích việc đơn hàng bị chậm và cung cấp ngày mới.","7","reading","customer-service","700","From: support@harborview.example
+To: Ms. Garcia
+Subject: Update on order #7338
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Atlanta distribution center yesterday. The package is now expected to arrive on August 6. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-172","What caused the delay?","A payment problem","Severe weather","An incorrect address","A product shortage","B","Severe weather stopped the carrier from reaching the center. | Thời tiết xấu khiến đơn vị vận chuyển không đến được trung tâm.","7","reading","customer-service","700","From: support@harborview.example
+To: Ms. Garcia
+Subject: Update on order #7338
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Atlanta distribution center yesterday. The package is now expected to arrive on August 6. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-173","What has the company refunded?","The full order price","The express-delivery charge","A membership fee","A warranty charge","B","The express-delivery charge was refunded. | Phí giao hàng nhanh đã được hoàn lại.","7","reading","customer-service","700","From: support@harborview.example
+To: Ms. Garcia
+Subject: Update on order #7338
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Atlanta distribution center yesterday. The package is now expected to arrive on August 6. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-174","How will the refund be paid?","By store credit","By check","To the original payment method","In cash at the warehouse","C","The refund goes to the original payment method. | Khoản hoàn tiền được trả về phương thức thanh toán ban đầu.","7","reading","customer-service","700","From: support@harborview.example
+To: Ms. Garcia
+Subject: Update on order #7338
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Atlanta distribution center yesterday. The package is now expected to arrive on August 6. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-175","How long may the refund take to appear?","One hour","One day","Three to five business days","Two weeks exactly","C","The message states three to five business days. | Email nêu thời gian từ ba đến năm ngày làm việc.","7","reading","customer-service","700","From: support@harborview.example
+To: Ms. Garcia
+Subject: Update on order #7338
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Atlanta distribution center yesterday. The package is now expected to arrive on August 6. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-176","What is the purpose of the document?","To confirm a hotel booking","To advertise a restaurant","To request payment for a flight","To announce a meeting","A","The heading and booking details show that this is a hotel confirmation. | Tiêu đề và thông tin đặt phòng cho thấy đây là xác nhận khách sạn.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Mr. Kim
+Location: Phoenix
+Check-in: August 13, after 3:00 P.M.
+Room: Business King
+Rate: $155 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-177","What is included in the room rate?","Dinner and parking","Breakfast and Internet","Airport tickets","Laundry service","B","Breakfast and wireless Internet are explicitly included. | Bữa sáng và Internet không dây được bao gồm.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Mr. Kim
+Location: Phoenix
+Check-in: August 13, after 3:00 P.M.
+Room: Business King
+Rate: $155 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-178","When can the guest check in?","Before noon","After 3:00 P.M.","Only at midnight","Two days early","B","The confirmation lists check-in after 3:00 P.M. | Xác nhận ghi giờ nhận phòng sau 3 giờ chiều.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Mr. Kim
+Location: Phoenix
+Check-in: August 13, after 3:00 P.M.
+Room: Business King
+Rate: $155 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-179","How can the guest avoid a cancellation fee?","Cancel at least 48 hours early","Call after check-in","Reserve the shuttle","Change the room type","A","Cancellations at least 48 hours before check-in are free. | Hủy trước ít nhất 48 giờ sẽ không mất phí.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Mr. Kim
+Location: Phoenix
+Check-in: August 13, after 3:00 P.M.
+Room: Business King
+Rate: $155 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-180","What requires an advance reservation?","Breakfast","Wireless Internet","The airport shuttle","The business room","C","The airport shuttle must be reserved by noon before arrival. | Xe đưa đón sân bay phải được đặt trước.","7","reading","reservations","600","RIVERSIDE HOTEL - BOOKING CONFIRMATION
+Guest: Mr. Kim
+Location: Phoenix
+Check-in: August 13, after 3:00 P.M.
+Room: Business King
+Rate: $155 per night
+
+Breakfast and wireless Internet are included. Cancellations made at least 48 hours before check-in are free. The airport shuttle must be reserved by noon on the day before arrival.",""
+"local-p7-181","What position is available?","Sales director","Operations coordinator","Software engineer","Hotel manager","B","The posting is for an operations coordinator. | Tin tuyển dụng dành cho vị trí điều phối vận hành.","7","reading","jobs","650","Silverline IS HIRING: OPERATIONS COORDINATOR
+Location: Phoenix
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@silverline.example by August 13. Interviews will take place the following week.",""
+"local-p7-182","Which task is part of the job?","Designing buildings","Organizing delivery schedules","Teaching language classes","Repairing vehicles","B","Organizing delivery schedules is listed as a responsibility. | Sắp xếp lịch giao hàng là một nhiệm vụ được nêu.","7","reading","jobs","650","Silverline IS HIRING: OPERATIONS COORDINATOR
+Location: Phoenix
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@silverline.example by August 13. Interviews will take place the following week.",""
+"local-p7-183","What experience is required?","Two years of office experience","Five years abroad","No previous experience","Restaurant experience only","A","Applicants need at least two years of office experience. | Ứng viên cần ít nhất hai năm kinh nghiệm văn phòng.","7","reading","jobs","650","Silverline IS HIRING: OPERATIONS COORDINATOR
+Location: Phoenix
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@silverline.example by August 13. Interviews will take place the following week.",""
+"local-p7-184","What must applicants send?","A portfolio only","A resume and cover letter","A training certificate only","A weekly report","B","The posting requests both a resume and a cover letter. | Tin tuyển dụng yêu cầu CV và thư xin việc.","7","reading","jobs","650","Silverline IS HIRING: OPERATIONS COORDINATOR
+Location: Phoenix
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@silverline.example by August 13. Interviews will take place the following week.",""
+"local-p7-185","When are interviews expected?","On the application deadline","The following week","Next year","Before applications open","B","Interviews will occur in the week after the deadline. | Phỏng vấn diễn ra vào tuần tiếp theo.","7","reading","jobs","650","Silverline IS HIRING: OPERATIONS COORDINATOR
+Location: Phoenix
+
+The successful candidate will organize delivery schedules, communicate with suppliers, and prepare weekly reports. Applicants need at least two years of office experience and strong spreadsheet skills. Send a resume and cover letter to careers@silverline.example by August 13. Interviews will take place the following week.",""
+"local-p7-186","What product is being advertised?","A travel mug","A coffee machine","A delivery vehicle","A refrigerator","A","The advertisement introduces a travel mug. | Quảng cáo giới thiệu một chiếc cốc du lịch.","7","reading","advertisements","650","INTRODUCING THE SILVERLINE TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before August 13 and use code EP31 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-187","How long can the mug keep drinks cold?","Two hours","Eight hours","Twelve hours","Twenty hours","C","It keeps cold drinks cold for twelve hours. | Cốc giữ lạnh trong mười hai giờ.","7","reading","advertisements","650","INTRODUCING THE SILVERLINE TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before August 13 and use code EP31 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-188","What does every mug include?","Free coffee","A two-year warranty","A second lid","A gift card","B","Every mug comes with a two-year warranty. | Mỗi cốc đi kèm bảo hành hai năm.","7","reading","advertisements","650","INTRODUCING THE SILVERLINE TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before August 13 and use code EP31 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-189","What is the purpose of code EP31?","To track delivery","To receive a discount","To extend the warranty","To select a color","B","The code provides a 20 percent discount. | Mã dùng để nhận giảm giá 20 phần trăm.","7","reading","advertisements","650","INTRODUCING THE SILVERLINE TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before August 13 and use code EP31 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-190","When is delivery free?","For every order","For orders over $50","Only on August 13","With store pickup","B","Orders over $50 qualify for free delivery. | Đơn hàng trên 50 đô la được giao miễn phí.","7","reading","advertisements","650","INTRODUCING THE SILVERLINE TRAVEL MUG
+Keep drinks hot for eight hours or cold for twelve. The leak-resistant lid fits most car cup holders, and every mug includes a two-year warranty. Order online before August 13 and use code EP31 to receive 20 percent off. Free delivery is available on orders over $50.",""
+"local-p7-191","Where will the forum take place?","Phoenix Conference Center","Silverline headquarters","Hall A Restaurant","The city library","A","The venue is listed directly below the event date. | Địa điểm được ghi ngay dưới ngày tổ chức.","7","reading","schedules","700","Silverline SMALL BUSINESS FORUM - August 13
+Venue: Phoenix Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Mr. Kim
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-192","Who will speak about digital branding?","Mr. Kim","A finance officer","A supplier","The reception manager","A","Mr. Kim is named beside the digital-brand session. | Mr. Kim được ghi cạnh phiên về thương hiệu số.","7","reading","schedules","700","Silverline SMALL BUSINESS FORUM - August 13
+Venue: Phoenix Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Mr. Kim
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-193","What begins at 11:00 A.M.?","Opening remarks","A finance session","Lunch","Networking","B","The finance session is scheduled for 11:00 A.M. | Phiên tài chính bắt đầu lúc 11 giờ.","7","reading","schedules","700","Silverline SMALL BUSINESS FORUM - August 13
+Venue: Phoenix Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Mr. Kim
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-194","Where will lunch be served?","At the entrance","In Hall B","At headquarters","In the workshop room","B","The schedule places lunch in Hall B. | Lịch ghi bữa trưa ở Hội trường B.","7","reading","schedules","700","Silverline SMALL BUSINESS FORUM - August 13
+Venue: Phoenix Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Mr. Kim
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-195","What must attendees present?","A passport","A supplier invoice","A registration code","A printed resume","C","A registration code is required at the entrance. | Người tham dự phải xuất trình mã đăng ký ở lối vào.","7","reading","schedules","700","Silverline SMALL BUSINESS FORUM - August 13
+Venue: Phoenix Conference Center
+9:00 A.M. Opening remarks
+9:30 A.M. Building a digital brand - Mr. Kim
+11:00 A.M. Finance for growing companies
+12:15 P.M. Lunch in Hall B
+1:30 P.M. Supplier negotiation workshop
+3:00 P.M. Networking reception
+
+Attendees must show their registration code at the entrance.",""
+"local-p7-196","Why was the message sent?","To explain an order delay","To advertise a new product","To request a product review","To confirm a job interview","A","The message explains why an order was delayed and gives a new date. | Email giải thích việc đơn hàng bị chậm và cung cấp ngày mới.","7","reading","customer-service","700","From: support@silverline.example
+To: Mr. Kim
+Subject: Update on order #7361
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Phoenix distribution center yesterday. The package is now expected to arrive on August 13. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-197","What caused the delay?","A payment problem","Severe weather","An incorrect address","A product shortage","B","Severe weather stopped the carrier from reaching the center. | Thời tiết xấu khiến đơn vị vận chuyển không đến được trung tâm.","7","reading","customer-service","700","From: support@silverline.example
+To: Mr. Kim
+Subject: Update on order #7361
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Phoenix distribution center yesterday. The package is now expected to arrive on August 13. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-198","What has the company refunded?","The full order price","The express-delivery charge","A membership fee","A warranty charge","B","The express-delivery charge was refunded. | Phí giao hàng nhanh đã được hoàn lại.","7","reading","customer-service","700","From: support@silverline.example
+To: Mr. Kim
+Subject: Update on order #7361
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Phoenix distribution center yesterday. The package is now expected to arrive on August 13. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-199","How will the refund be paid?","By store credit","By check","To the original payment method","In cash at the warehouse","C","The refund goes to the original payment method. | Khoản hoàn tiền được trả về phương thức thanh toán ban đầu.","7","reading","customer-service","700","From: support@silverline.example
+To: Mr. Kim
+Subject: Update on order #7361
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Phoenix distribution center yesterday. The package is now expected to arrive on August 13. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""
+"local-p7-200","How long may the refund take to appear?","One hour","One day","Three to five business days","Two weeks exactly","C","The message states three to five business days. | Email nêu thời gian từ ba đến năm ngày làm việc.","7","reading","customer-service","700","From: support@silverline.example
+To: Mr. Kim
+Subject: Update on order #7361
+
+Thank you for contacting us about your delayed order. Severe weather prevented the carrier from reaching the Phoenix distribution center yesterday. The package is now expected to arrive on August 13. We have refunded the express-delivery charge to your original payment method. The refund may take three to five business days to appear.",""

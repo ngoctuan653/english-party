@@ -5,6 +5,7 @@
  */
 
 import { ANTI_CHEAT } from '@/utils/constants';
+import type { SessionValidationIssue } from '@/types/study';
 
 export interface AntiCheatData {
   tabSwitches: number;
@@ -12,6 +13,8 @@ export interface AntiCheatData {
   interactionCount: number;
   activeSeconds: number;
   totalSeconds: number;
+  trackingAvailable: boolean;
+  validationIssues: SessionValidationIssue[];
   isValid: boolean;
 }
 
@@ -29,10 +32,36 @@ interface ActivityTracker {
   interactionHandler: (() => void) | null;
 }
 
-let tracker: ActivityTracker | null = null;
+const trackers = new Map<string, ActivityTracker>();
+const completedSnapshots = new Map<string, AntiCheatData>();
 
-export function startAntiCheatTracking(): void {
-  tracker = {
+function cleanupTracker(tracker: ActivityTracker): void {
+  if (tracker.visibilityHandler) {
+    document.removeEventListener('visibilitychange', tracker.visibilityHandler);
+  }
+  if (tracker.interactionHandler) {
+    document.removeEventListener('click', tracker.interactionHandler);
+    document.removeEventListener('keydown', tracker.interactionHandler);
+    document.removeEventListener('touchstart', tracker.interactionHandler);
+  }
+  if (tracker.idleTimer) clearTimeout(tracker.idleTimer);
+}
+
+function rememberSnapshot(sessionId: string, data: AntiCheatData): void {
+  completedSnapshots.set(sessionId, data);
+  if (completedSnapshots.size <= 50) return;
+  const oldestKey = completedSnapshots.keys().next().value;
+  if (oldestKey) completedSnapshots.delete(oldestKey);
+}
+
+export function startAntiCheatTracking(sessionId: string): void {
+  for (const [activeSessionId, activeTracker] of trackers) {
+    cleanupTracker(activeTracker);
+    trackers.delete(activeSessionId);
+  }
+
+  completedSnapshots.delete(sessionId);
+  const tracker: ActivityTracker = {
     startTime: Date.now(),
     lastActivityTime: Date.now(),
     activeStartedAt: Date.now(),
@@ -45,28 +74,27 @@ export function startAntiCheatTracking(): void {
     visibilityHandler: null,
     interactionHandler: null,
   };
+  trackers.set(sessionId, tracker);
 
   const addActiveSegment = (now: number) => {
-    if (!tracker || tracker.isIdle || tracker.activeStartedAt === null) return;
+    if (tracker.isIdle || tracker.activeStartedAt === null) return;
     tracker.activeTime += Math.max(0, now - tracker.activeStartedAt) / 1000;
     tracker.activeStartedAt = null;
   };
 
   const scheduleIdleTimer = () => {
-    if (!tracker) return;
     if (tracker.idleTimer) clearTimeout(tracker.idleTimer);
     tracker.idleTimer = setTimeout(() => {
-      if (tracker) {
-        addActiveSegment(Date.now());
-        tracker.isIdle = true;
-        tracker.idleIntervals++;
-      }
+      if (trackers.get(sessionId) !== tracker) return;
+      addActiveSegment(Date.now());
+      tracker.isIdle = true;
+      tracker.idleIntervals++;
     }, ANTI_CHEAT.idleTimeoutSeconds * 1000);
   };
 
   // Track tab visibility
   tracker.visibilityHandler = () => {
-    if (!tracker) return;
+    if (trackers.get(sessionId) !== tracker) return;
     const now = Date.now();
     if (document.visibilityState === 'hidden') {
       addActiveSegment(now);
@@ -84,7 +112,7 @@ export function startAntiCheatTracking(): void {
 
   // Track interactions (clicks, keys, touches)
   tracker.interactionHandler = () => {
-    if (!tracker || document.visibilityState === 'hidden') return;
+    if (trackers.get(sessionId) !== tracker || document.visibilityState === 'hidden') return;
     tracker.interactionCount++;
     const now = Date.now();
 
@@ -107,7 +135,11 @@ export function startAntiCheatTracking(): void {
   scheduleIdleTimer();
 }
 
-export function stopAntiCheatTracking(): AntiCheatData {
+export function stopAntiCheatTracking(sessionId: string): AntiCheatData {
+  const completed = completedSnapshots.get(sessionId);
+  if (completed) return completed;
+
+  const tracker = trackers.get(sessionId);
   if (!tracker) {
     return {
       tabSwitches: 0,
@@ -115,7 +147,9 @@ export function stopAntiCheatTracking(): AntiCheatData {
       interactionCount: 0,
       activeSeconds: 0,
       totalSeconds: 0,
-      isValid: false,
+      trackingAvailable: false,
+      validationIssues: [],
+      isValid: true,
     };
   }
 
@@ -128,47 +162,47 @@ export function stopAntiCheatTracking(): AntiCheatData {
     tracker.activeStartedAt = null;
   }
 
+  const validationIssues = validateSession(tracker, totalSeconds);
   const data: AntiCheatData = {
     tabSwitches: tracker.tabSwitches,
     idleIntervals: tracker.idleIntervals,
     interactionCount: tracker.interactionCount,
     activeSeconds: Math.round(tracker.activeTime),
     totalSeconds: Math.round(totalSeconds),
-    isValid: validateSession(tracker, totalSeconds),
+    trackingAvailable: true,
+    validationIssues,
+    isValid: validationIssues.length === 0,
   };
 
-  // Cleanup
-  if (tracker.visibilityHandler) {
-    document.removeEventListener('visibilitychange', tracker.visibilityHandler);
-  }
-  if (tracker.interactionHandler) {
-    document.removeEventListener('click', tracker.interactionHandler);
-    document.removeEventListener('keydown', tracker.interactionHandler);
-    document.removeEventListener('touchstart', tracker.interactionHandler);
-  }
-  if (tracker.idleTimer) {
-    clearTimeout(tracker.idleTimer);
-  }
-
-  tracker = null;
+  cleanupTracker(tracker);
+  trackers.delete(sessionId);
+  rememberSnapshot(sessionId, data);
   return data;
 }
 
-function validateSession(t: ActivityTracker, totalSeconds: number): boolean {
-  // Active time ratio check
+export function cancelAntiCheatTracking(sessionId: string): void {
+  const tracker = trackers.get(sessionId);
+  if (tracker) cleanupTracker(tracker);
+  trackers.delete(sessionId);
+  completedSnapshots.delete(sessionId);
+}
+
+function validateSession(t: ActivityTracker, totalSeconds: number): SessionValidationIssue[] {
+  const issues: SessionValidationIssue[] = [];
   const activeRatio = totalSeconds > 0 ? t.activeTime / totalSeconds : 0;
-  if (activeRatio < ANTI_CHEAT.minActiveRatio) return false;
+  const hasSustainedInactivity =
+    totalSeconds >= ANTI_CHEAT.idleTimeoutSeconds &&
+    activeRatio < ANTI_CHEAT.minActiveRatio &&
+    t.idleIntervals > ANTI_CHEAT.maxIdleIntervals;
 
-  // Tab switch check
-  if (t.tabSwitches > ANTI_CHEAT.maxTabSwitches) return false;
+  if (t.tabSwitches > ANTI_CHEAT.maxTabSwitches) {
+    issues.push('excessive-tab-switching');
+  }
+  if (hasSustainedInactivity || (totalSeconds >= 20 && t.interactionCount < ANTI_CHEAT.minInteractions)) {
+    issues.push('extended-inactivity');
+  }
 
-  // Idle intervals check
-  if (t.idleIntervals > ANTI_CHEAT.maxIdleIntervals) return false;
-
-  // Must have some interactions
-  if (t.interactionCount < ANTI_CHEAT.minInteractions) return false;
-
-  return true;
+  return issues;
 }
 
 export function validateAnswerTiming(
@@ -180,8 +214,9 @@ export function validateAnswerTiming(
   return avgSeconds >= ANTI_CHEAT.minSecondsPerQuestion;
 }
 
-export function getAntiCheatStatus(): AntiCheatData | null {
-  if (!tracker) return null;
+export function getAntiCheatStatus(sessionId: string): AntiCheatData | null {
+  const tracker = trackers.get(sessionId);
+  if (!tracker) return completedSnapshots.get(sessionId) ?? null;
   
   const now = Date.now();
   const totalSeconds = (now - tracker.startTime) / 1000;
@@ -191,12 +226,15 @@ export function getAntiCheatStatus(): AntiCheatData | null {
       ? Math.max(0, now - tracker.activeStartedAt) / 1000
       : 0);
   
+  const validationIssues = validateSession(tracker, totalSeconds);
   return {
     tabSwitches: tracker.tabSwitches,
     idleIntervals: tracker.idleIntervals,
     interactionCount: tracker.interactionCount,
     activeSeconds: Math.round(activeSeconds),
     totalSeconds: Math.round(totalSeconds),
-    isValid: validateSession(tracker, totalSeconds),
+    trackingAvailable: true,
+    validationIssues,
+    isValid: validationIssues.length === 0,
   };
 }
