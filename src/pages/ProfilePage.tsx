@@ -14,6 +14,7 @@ import type { StudySession } from '@/types/study';
 import * as Icons from 'lucide-react';
 import { motion } from 'framer-motion';
 import SessionReviewModal from '@/components/study/SessionReviewModal';
+import { getCurrentCefrLevel, getTargetCefrLevel } from '@/types/cefr';
 
 export default function ProfilePage() {
   const { profile, reset } = useAuthStore();
@@ -93,7 +94,7 @@ export default function ProfilePage() {
       unlocked: profile.totalStudyMinutes >= 120,
     },
     {
-      title: 'TOEIC Challenger',
+      title: 'CEFR Challenger',
       desc: 'Answered over 100 questions',
       icon: '🏆',
       unlocked: profile.totalQuestionsAnswered >= 100,
@@ -144,7 +145,7 @@ export default function ProfilePage() {
               </span>
               <span className="text-slate-300">•</span>
               <span className="flex items-center gap-1">
-                🎯 Target Score: <span className="text-[#0071E3] font-bold">{profile.targetScore} ({profile.targetExam.toUpperCase()})</span>
+                CEFR path: <span className="text-[#0071E3] font-bold">{getCurrentCefrLevel(profile)} → {getTargetCefrLevel(profile)}</span>
               </span>
             </div>
           </div>

@@ -1,11 +1,14 @@
 import { Timestamp } from 'firebase/firestore';
+import type { CefrLevel } from './cefr';
 
 export type QuestionType = 'mcq' | 'fill' | 'listening' | 'reading';
-export type DifficultyLevel = 500 | 600 | 700 | 800 | 900;
+export type DifficultyLevel = 500 | 600 | 650 | 700 | 800 | 900;
+export type AnswerConfidence = 'low' | 'medium' | 'high';
 
 export interface Question {
   id: string;
   exam: string;
+  cefrLevel?: CefrLevel;
   part: number;
   type: QuestionType;
   topic: string;
@@ -31,4 +34,5 @@ export interface QuestionAnswer {
   selectedAnswer: number;
   isCorrect: boolean;
   timeSpent: number;
+  confidence?: AnswerConfidence;
 }

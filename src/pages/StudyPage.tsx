@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/Button';
 import { Progress } from '@/components/ui/Progress';
 import { Skeleton } from '@/components/ui/Skeleton';
 import type { StudySession, SessionResults, SessionValidationIssue } from '@/types/study';
-import type { Question, QuestionAnswer } from '@/types/question';
+import type { AnswerConfidence, Question, QuestionAnswer } from '@/types/question';
 import { formatTimestamp, formatDuration, getAccuracyColor } from '@/utils/helpers';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-hot-toast';
@@ -24,6 +24,7 @@ import {
   buildMistakeReviewDeck,
   generateSmartQuizSession,
   getUserQuestionProgress,
+  isReviewDue,
 } from '@/services/progress';
 import SessionReviewModal from '@/components/study/SessionReviewModal';
 import {
@@ -33,24 +34,29 @@ import {
   WorkspaceSearch,
 } from '@/components/study/LearningWorkspace';
 import { getBundledQuestionCount, getBundledTopics } from '@/data/questionBank';
+import type { CefrLevel } from '@/types/cefr';
+import { CEFR_LEVELS, CEFR_LEVEL_META, getCefrDifficulty, getCurrentCefrLevel, isCefrLevel } from '@/types/cefr';
 
-type ToeicReadingPart = 5 | 6 | 7;
+type LearningSkillPart = 5 | 6 | 7;
 
-const partMeta: Record<ToeicReadingPart, { title: string; shortTitle: string; description: string }> = {
+const skillMeta: Record<LearningSkillPart, { id: string; title: string; shortTitle: string; description: string }> = {
   5: {
-    title: 'Incomplete Sentences',
+    id: 'grammar',
+    title: 'Grammar Foundations',
     shortTitle: 'Grammar',
-    description: 'Build accuracy with grammar, word forms, and business vocabulary in individual sentences.',
+    description: 'Build accurate sentences with level-appropriate grammar, word forms, and usage.',
   },
   6: {
-    title: 'Text Completion',
-    shortTitle: 'Text completion',
-    description: 'Choose language that completes emails, notices, memos, and other workplace texts.',
+    id: 'use-of-english',
+    title: 'Use of English',
+    shortTitle: 'Use of English',
+    description: 'Choose language that completes connected texts naturally and precisely.',
   },
   7: {
+    id: 'reading',
     title: 'Reading Comprehension',
     shortTitle: 'Reading',
-    description: 'Read practical workplace documents and answer detail, purpose, and inference questions.',
+    description: 'Read level-appropriate texts and answer detail, purpose, and inference questions.',
   },
 };
 
@@ -131,8 +137,11 @@ export default function StudyPage() {
   const [loading, setLoading] = useState(true);
   const [selectedReviewSession, setSelectedReviewSession] = useState<StudySession | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activePart, setActivePart] = useState<ToeicReadingPart>(5);
-  const [practiceTitle, setPracticeTitle] = useState('Part 5 mixed practice');
+  const [activePart, setActivePart] = useState<LearningSkillPart>(5);
+  const [activeLevel, setActiveLevel] = useState<CefrLevel>(() => getCurrentCefrLevel(profile));
+  const [practiceTitle, setPracticeTitle] = useState('CEFR smart practice');
+  const [sessionSize, setSessionSize] = useState<5 | 10 | 20>(10);
+  const [queueStats, setQueueStats] = useState({ due: 0, weak: 0, newCount: 0 });
 
   // Active quiz session states
   const [quizActive, setQuizActive] = useState(false);
@@ -140,6 +149,7 @@ export default function StudyPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false);
+  const [answerConfidence, setAnswerConfidence] = useState<AnswerConfidence | null>(null);
   const [answers, setAnswers] = useState<QuestionAnswer[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [results, setResults] = useState<SessionResults | null>(null);
@@ -235,9 +245,53 @@ export default function StudyPage() {
   }, [profile?.uid, quizActive]);
 
   useEffect(() => {
-    const part = Number(new URLSearchParams(location.search).get('part'));
-    if (part === 5 || part === 6 || part === 7) setActivePart(part);
+    const params = new URLSearchParams(location.search);
+    const level = params.get('level');
+    const skill = params.get('skill');
+    if (isCefrLevel(level)) setActiveLevel(level);
+    if (skill === 'grammar') setActivePart(5);
+    if (skill === 'use-of-english') setActivePart(6);
+    if (skill === 'reading') setActivePart(7);
   }, [location.search]);
+
+  useEffect(() => {
+    if (!profile?.uid || quizActive) return;
+    let cancelled = false;
+
+    async function loadQueueStats() {
+      try {
+        const [pool, progressMap] = await Promise.all([
+          fetchQuestions({ exam: 'cefr', cefrLevel: activeLevel, count: 1000 }),
+          getUserQuestionProgress(profile!.uid),
+        ]);
+        if (cancelled) return;
+        const readingPool = pool.filter((question) => question.part === 5 || question.part === 6 || question.part === 7);
+        const activePool = readingPool.filter((question) => question.part === activePart);
+        let due = 0;
+        let weak = 0;
+        let newCount = 0;
+        for (const question of activePool) {
+          const progress = progressMap.get(question.id);
+          if (!progress) newCount += 1;
+          else {
+            if (isReviewDue(progress)) due += 1;
+          }
+        }
+        weak = readingPool.filter((question) => {
+          const progress = progressMap.get(question.id);
+          return progress && progress.wrongCount > 0 && (progress.wrongCount > progress.correctCount || progress.mastery < 40);
+        }).length;
+        setQueueStats({ due, weak, newCount });
+      } catch (error) {
+        console.warn('Could not load practice queue summary.', error);
+      }
+    }
+
+    void loadQueueStats();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeLevel, activePart, profile?.uid, quizActive]);
 
   // Catch retake questions from router state (e.g. from Profile page)
   useEffect(() => {
@@ -269,7 +323,7 @@ export default function StudyPage() {
 
   const handleStartQuiz = async (
     customQuestions?: Question[],
-    filters: { part?: ToeicReadingPart; topic?: string; count?: number; title?: string } = {},
+    filters: { part?: LearningSkillPart; topic?: string; count?: number; title?: string } = {},
   ) => {
     if (!profile?.uid) return;
     try {
@@ -282,7 +336,8 @@ export default function StudyPage() {
       } else {
         const targetPart = filters.part ?? activePart;
         const allQuestions = await fetchQuestions({
-          exam: 'toeic',
+          exam: 'cefr',
+          cefrLevel: activeLevel,
           part: targetPart,
           topic: filters.topic,
           count: 250,
@@ -294,11 +349,13 @@ export default function StudyPage() {
           return;
         }
 
-        list = await generateSmartQuizSession(profile.uid, allQuestions, filters.count ?? 10);
+        list = await generateSmartQuizSession(profile.uid, allQuestions, filters.count ?? sessionSize, {
+          targetDifficulty: getCefrDifficulty(activeLevel),
+        });
         setPracticeTitle(
           filters.topic
-            ? `Part ${targetPart} · ${formatTopic(filters.topic)}`
-            : `Part ${targetPart} mixed practice`,
+            ? `${activeLevel} ${skillMeta[targetPart].shortTitle} · ${formatTopic(filters.topic)}`
+            : `${activeLevel} ${skillMeta[targetPart].shortTitle} practice`,
         );
 
         if (list.length === 0) {
@@ -311,13 +368,14 @@ export default function StudyPage() {
         }
       }
 
-      const activeSessionId = await startStudySession(profile.uid, 'toeic', 'quiz');
+      const activeSessionId = await startStudySession(profile.uid, 'cefr', 'quiz');
       setSessionId(activeSessionId);
       setQuestions(list);
       setCurrentIndex(0);
       setAnswers([]);
       setSelectedChoice(null);
       setIsAnswerSubmitted(false);
+      setAnswerConfidence(null);
       setResults(null);
       setSecondsElapsed(0);
       questionStartTimeRef.current = Date.now();
@@ -346,12 +404,21 @@ export default function StudyPage() {
 
     setAnswers((prev) => [...prev, answerRecord]);
     setIsAnswerSubmitted(true);
+    setAnswerConfidence(null);
+  };
+
+  const handleConfidence = (confidence: AnswerConfidence) => {
+    setAnswerConfidence(confidence);
+    setAnswers((previous) => previous.map((answer) =>
+      answer.questionId === questions[currentIndex]?.id ? { ...answer, confidence } : answer
+    ));
   };
 
   const handleNextQuestion = () => {
     if (currentIndex < questions.length - 1) {
       setSelectedChoice(null);
       setIsAnswerSubmitted(false);
+      setAnswerConfidence(null);
       setCurrentIndex((prev) => prev + 1);
       questionStartTimeRef.current = Date.now();
     } else {
@@ -386,10 +453,11 @@ export default function StudyPage() {
     try {
       setLoadingQuestions(true);
       const [allQuestions, progressMap] = await Promise.all([
-        fetchQuestions({ exam: 'toeic', count: 1000 }),
+        fetchQuestions({ exam: 'cefr', cefrLevel: activeLevel, count: 1000 }),
         getUserQuestionProgress(profile.uid),
       ]);
-      const reviewDeck = buildMistakeReviewDeck(allQuestions, progressMap, 10);
+      const readingQuestions = allQuestions.filter((question) => question.part === 5 || question.part === 6 || question.part === 7);
+      const reviewDeck = buildMistakeReviewDeck(readingQuestions, progressMap, sessionSize);
 
       if (reviewDeck.length === 0) {
         toast.success('No unresolved mistakes. Your review queue is clear!');
@@ -415,10 +483,42 @@ export default function StudyPage() {
     }
   };
 
+  useEffect(() => {
+    if (!quizActive || results) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A'].includes(target?.tagName ?? '')) return;
+
+      if (!isAnswerSubmitted && ['1', '2', '3', '4'].includes(event.key)) {
+        const choice = Number(event.key) - 1;
+        if (choice < (questions[currentIndex]?.choices.length ?? 0)) {
+          event.preventDefault();
+          setSelectedChoice(choice);
+        }
+      }
+
+      if (event.key === 'Enter') {
+        if (!isAnswerSubmitted && selectedChoice !== null) {
+          event.preventDefault();
+          handleSubmitAnswer();
+        } else if (isAnswerSubmitted && !loadingQuestions) {
+          event.preventDefault();
+          handleNextQuestion();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentIndex, isAnswerSubmitted, loadingQuestions, questions, quizActive, results, selectedChoice]);
+
   // Render Quiz flow
   if (quizActive) {
     const currentQuestion = questions[currentIndex];
     const progressPercent = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
+    const wrongQuestionIds = new Set(answers.filter((answer) => !answer.isCorrect).map((answer) => answer.questionId));
+    const wrongQuestions = questions.filter((question) => wrongQuestionIds.has(question.id));
 
     return (
       <div className="mx-auto w-full max-w-[1280px] space-y-4 pb-8 text-slate-800 animate-fade-in">
@@ -463,14 +563,10 @@ export default function StudyPage() {
               <Card className="h-full space-y-5 rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="purple">TOEIC Part {currentQuestion?.part || 5}</Badge>
+                    <Badge variant="purple">CEFR {currentQuestion?.cefrLevel ?? activeLevel}</Badge>
                     <Badge variant="info" className="capitalize">{currentQuestion?.topic || 'Business'}</Badge>
                   </div>
-                  {currentQuestion?.difficulty && (
-                    <Badge variant="warning" dot>
-                      Target: {currentQuestion.difficulty}
-                    </Badge>
-                  )}
+                  <Badge variant="warning" dot>{skillMeta[(currentQuestion?.part as LearningSkillPart) || 5].shortTitle}</Badge>
                 </div>
                 {currentQuestion?.context && (
                   <div className="max-h-[calc(100vh-280px)] overflow-y-auto whitespace-pre-line rounded-md border border-slate-200 bg-slate-50 p-5 text-sm leading-7 text-slate-700">
@@ -531,7 +627,7 @@ export default function StudyPage() {
                   const { sentenceTranslation, viExpl } = parseExplanation(currentQuestion?.explanation);
 
                   return (
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                    <motion.div className="space-y-3" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                       <Card className="space-y-3 rounded-lg border-sky-200 bg-sky-50 p-5 text-slate-700 shadow-none">
                         <p className="flex items-center gap-2 border-b border-sky-200 pb-2 text-xs font-black uppercase text-sky-700">
                           <Icons.Info className="h-4 w-4" /> Detailed explanation
@@ -555,6 +651,29 @@ export default function StudyPage() {
                           )}
                         </div>
                       </Card>
+                      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white p-3">
+                        <p className="text-xs font-black text-slate-700">How confident were you?</p>
+                        <div className="grid w-full grid-cols-3 gap-1 rounded-md bg-slate-100 p-1 sm:w-auto">
+                          {([
+                            ['low', 'Not sure'],
+                            ['medium', 'Fairly sure'],
+                            ['high', 'Very sure'],
+                          ] as Array<[AnswerConfidence, string]>).map(([value, label]) => (
+                            <button
+                              key={value}
+                              type="button"
+                              onClick={() => handleConfidence(value)}
+                              className={`rounded px-3 py-1.5 text-[10px] font-black transition-colors ${
+                                answerConfidence === value
+                                  ? 'bg-slate-950 text-white shadow-sm'
+                                  : 'text-slate-500 hover:bg-white hover:text-slate-900'
+                              }`}
+                            >
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </motion.div>
                   );
                 })()}
@@ -683,8 +802,17 @@ export default function StudyPage() {
                   >
                     <Icons.Map className="h-4 w-4" /> Back to Path
                   </Button>
-                  <Button onClick={() => handleStartQuiz()} className="px-6 font-bold">
-                    <Icons.RotateCcw className="h-4 w-4" /> Practice Again
+                  {wrongQuestions.length > 0 && (
+                    <Button
+                      variant="secondary"
+                      onClick={() => handleStartQuiz(wrongQuestions, { title: 'Mistake repair' })}
+                      className="border-rose-200 bg-rose-50 px-6 font-bold text-rose-700 hover:bg-rose-100"
+                    >
+                      <Icons.RefreshCw className="h-4 w-4" /> Repair {wrongQuestions.length} mistakes
+                    </Button>
+                  )}
+                  <Button onClick={() => handleStartQuiz(undefined, { count: sessionSize })} className="px-6 font-bold">
+                    <Icons.RotateCcw className="h-4 w-4" /> New smart session
                   </Button>
                 </div>
               </section>
@@ -695,7 +823,7 @@ export default function StudyPage() {
     );
   }
 
-  const filteredGrammarTopics = getBundledTopics(activePart).filter((topic) => {
+  const filteredGrammarTopics = getBundledTopics(activePart, activeLevel).filter((topic) => {
     const term = searchTerm.trim().toLowerCase();
     if (!term) return true;
     return formatTopic(topic.topic).toLowerCase().includes(term);
@@ -707,15 +835,15 @@ export default function StudyPage() {
       <LearningModuleNav active="grammar" />
 
       <LearningIntro
-        eyebrow="TOEIC Reading"
-        title={`Part ${activePart}: ${partMeta[activePart].title}`}
-        description={partMeta[activePart].description}
+        eyebrow={`CEFR ${activeLevel} · ${CEFR_LEVEL_META[activeLevel].band}`}
+        title={skillMeta[activePart].title}
+        description={`${skillMeta[activePart].description} ${CEFR_LEVEL_META[activeLevel].descriptor}`}
         icon={activePart === 7 ? Icons.Newspaper : activePart === 6 ? Icons.Files : Icons.BookOpen}
         accent="emerald"
         aside={(
           <div className="w-full">
             <p className="text-[10px] font-bold uppercase text-slate-400">Question bank</p>
-            <p className="mt-1 text-3xl font-black text-slate-950">{getBundledQuestionCount(activePart)}</p>
+            <p className="mt-1 text-3xl font-black text-slate-950">{getBundledQuestionCount(activePart, undefined, activeLevel)}</p>
             <p className="mt-1 text-xs text-slate-500">verified practice questions</p>
             <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-slate-200">
               <div className="h-full w-full bg-emerald-500" />
@@ -730,7 +858,24 @@ export default function StudyPage() {
             <p className="text-[10px] font-black uppercase text-sky-700">Personalized practice</p>
             <h2 className="mt-1 text-lg font-black text-slate-950">Practice Hub</h2>
           </div>
-          <p className="text-xs font-medium text-slate-500">Short sessions based on what needs attention now</p>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-black uppercase text-slate-400">Session</span>
+            <div className="flex rounded-md bg-slate-100 p-1" role="group" aria-label="Session size">
+              {([5, 10, 20] as const).map((size) => (
+                <button
+                  key={size}
+                  type="button"
+                  onClick={() => setSessionSize(size)}
+                  aria-pressed={sessionSize === size}
+                  className={`min-w-9 rounded px-2 py-1 text-[10px] font-black transition-colors ${
+                    sessionSize === size ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-900'
+                  }`}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
         <div className="grid sm:grid-cols-2 xl:grid-cols-4">
           <button
@@ -744,7 +889,7 @@ export default function StudyPage() {
             </span>
             <span>
               <span className="block text-sm font-black text-slate-900">Mistakes</span>
-              <span className="mt-1 block text-xs leading-5 text-slate-500">Retry unresolved answers</span>
+              <span className="mt-1 block text-xs leading-5 text-slate-500">{queueStats.weak} unresolved reading items</span>
               <span className="mt-2 inline-flex items-center gap-1 text-xs font-black text-rose-600">
                 Review <Icons.ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
               </span>
@@ -752,7 +897,7 @@ export default function StudyPage() {
           </button>
           <button
             type="button"
-            onClick={() => handleStartQuiz(undefined, { part: activePart, count: 10 })}
+            onClick={() => handleStartQuiz(undefined, { part: activePart, count: sessionSize })}
             disabled={loadingQuestions}
             className="group flex min-h-28 items-start gap-3 border-b border-slate-200 p-4 text-left transition-colors hover:bg-sky-50 disabled:cursor-wait disabled:opacity-60 xl:border-b-0 xl:border-r"
           >
@@ -761,7 +906,7 @@ export default function StudyPage() {
             </span>
             <span>
               <span className="block text-sm font-black text-slate-900">Smart mix</span>
-              <span className="mt-1 block text-xs leading-5 text-slate-500">New, weak, and review items</span>
+              <span className="mt-1 block text-xs leading-5 text-slate-500">{queueStats.due} due · {queueStats.newCount} new</span>
               <span className="mt-2 inline-flex items-center gap-1 text-xs font-black text-sky-700">
                 Practice <Icons.ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
               </span>
@@ -800,8 +945,32 @@ export default function StudyPage() {
         </div>
       </section>
 
+      <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="border-b border-slate-200 px-5 py-3">
+          <p className="text-[10px] font-black uppercase text-sky-700">Choose your CEFR level</p>
+        </div>
+        <div className="grid grid-cols-3 sm:grid-cols-6">
+          {CEFR_LEVELS.map((level) => (
+            <button
+              key={level}
+              type="button"
+              aria-pressed={activeLevel === level}
+              onClick={() => setActiveLevel(level)}
+              className={`min-h-16 border-b border-r border-slate-200 px-3 py-2 text-center transition-colors sm:border-b-0 ${
+                activeLevel === level ? 'bg-sky-600 text-white' : 'bg-white text-slate-600 hover:bg-sky-50'
+              }`}
+            >
+              <span className="block text-lg font-black">{level}</span>
+              <span className={`block text-[9px] font-bold ${activeLevel === level ? 'text-sky-100' : 'text-slate-400'}`}>
+                {CEFR_LEVEL_META[level].title}
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
+
       <div className="grid overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm md:grid-cols-3">
-        {([5, 6, 7] as ToeicReadingPart[]).map((part) => (
+        {([5, 6, 7] as LearningSkillPart[]).map((part) => (
           <button
             key={part}
             type="button"
@@ -813,18 +982,18 @@ export default function StudyPage() {
           >
             <span>
               <span className={`block text-[10px] font-bold uppercase ${activePart === part ? 'text-sky-300' : 'text-sky-700'}`}>
-                TOEIC Part {part}
+                {skillMeta[part].id.replaceAll('-', ' ')}
               </span>
-              <span className="mt-1 block text-sm font-black">{partMeta[part].shortTitle}</span>
+              <span className="mt-1 block text-sm font-black">{skillMeta[part].shortTitle}</span>
             </span>
-            <span className={`text-xs font-bold ${activePart === part ? 'text-slate-400' : 'text-slate-400'}`}>200 Q</span>
+            <span className={`text-xs font-bold ${activePart === part ? 'text-slate-400' : 'text-slate-400'}`}>{getBundledQuestionCount(part, undefined, activeLevel)} Q</span>
           </button>
         ))}
       </div>
 
       <button
         type="button"
-        onClick={() => handleStartQuiz(undefined, { part: activePart, count: 10 })}
+        onClick={() => handleStartQuiz(undefined, { part: activePart, count: sessionSize })}
         disabled={loadingQuestions}
         className="flex w-full items-center justify-between rounded-lg border border-sky-200 bg-sky-50 px-5 py-5 text-left shadow-sm transition-colors hover:border-sky-300 hover:bg-sky-100/70 disabled:cursor-not-allowed disabled:opacity-70"
       >
@@ -834,7 +1003,7 @@ export default function StudyPage() {
           </span>
           <span className="min-w-0">
             <span className="block text-base font-black text-slate-900">Smart mixed practice</span>
-            <span className="block text-sm font-medium text-slate-500">10 questions from Part {activePart}, balanced from new, weak, and review items</span>
+            <span className="block text-sm font-medium text-slate-500">{sessionSize} {activeLevel} {skillMeta[activePart].shortTitle.toLowerCase()} questions, balanced from due, new, and weak items</span>
           </span>
         </span>
         <span className="ml-4 hidden rounded-md bg-slate-950 px-5 py-3 text-sm font-bold text-white shadow-sm sm:inline-flex">
@@ -845,11 +1014,11 @@ export default function StudyPage() {
       <WorkspaceSearch
         value={searchTerm}
         onChange={setSearchTerm}
-        placeholder={`Search Part ${activePart} topics...`}
+        placeholder={`Search ${activeLevel} ${skillMeta[activePart].shortTitle.toLowerCase()} topics...`}
       />
 
       <LearningSectionHeading
-        title={`Part ${activePart} topics`}
+        title={`${activeLevel} ${skillMeta[activePart].shortTitle} topics`}
         count={`${filteredGrammarTopics.length} topics`}
         icon={Icons.LibraryBig}
       />
@@ -865,13 +1034,13 @@ export default function StudyPage() {
             key={topic.topic}
             variants={cardVariants}
             type="button"
-            onClick={() => handleStartQuiz(undefined, { part: activePart, topic: topic.topic, count: 10 })}
+            onClick={() => handleStartQuiz(undefined, { part: activePart, topic: topic.topic, count: sessionSize })}
             className="group min-h-36 rounded-lg border border-slate-200 bg-white p-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md"
           >
             <div className="mb-4 flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <h3 className="text-base font-black text-slate-900">{formatTopic(topic.topic)}</h3>
-                <p className="mt-1 text-xs font-medium text-slate-500">Focused Part {activePart} practice</p>
+                <p className="mt-1 text-xs font-medium text-slate-500">Focused CEFR {activeLevel} practice</p>
               </div>
               <div className="flex shrink-0 gap-2 text-slate-300">
                 <Icons.Star className="h-4 w-4" />
@@ -884,7 +1053,7 @@ export default function StudyPage() {
                   <Icons.Target className="h-4 w-4" />
                   {topic.count} questions
                 </p>
-                <p className="mt-5 text-xs font-bold text-slate-500">10 per smart session</p>
+                <p className="mt-5 text-xs font-bold text-slate-500">{sessionSize} per smart session</p>
               </div>
               <span className="inline-flex items-center gap-1 text-xs font-black text-sky-500">
                 Practice

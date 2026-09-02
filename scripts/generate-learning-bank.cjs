@@ -10,24 +10,44 @@ const people = ['Ms. Carter', 'Mr. Lee', 'Ms. Nguyen', 'Mr. Wilson', 'Ms. Patel'
 const dates = ['June 4', 'June 11', 'June 18', 'July 2', 'July 9', 'July 16', 'August 6', 'August 13', 'September 3', 'September 10'];
 const locations = ['Boston', 'Seattle', 'Denver', 'Austin', 'Chicago', 'Portland', 'Atlanta', 'Phoenix', 'Miami', 'Dallas'];
 
+function cefrLevelFor(difficulty, id) {
+  const sequence = Number(id.match(/(\d+)$/)?.[1] ?? 0);
+  if (difficulty >= 900) return 'C2';
+  if (difficulty >= 800) return sequence % 2 === 0 ? 'C2' : 'C1';
+  if (difficulty >= 700) return ['B2', 'C1', 'C2'][sequence % 3];
+  if (difficulty >= 650) return sequence % 2 === 0 ? 'B2' : 'B1';
+  if (difficulty >= 600) return ['A1', 'A2', 'B1'][sequence % 3];
+  return 'A1';
+}
+
+function skillForPart(part) {
+  if (part === 5) return 'grammar';
+  if (part === 6) return 'use-of-english';
+  if (part === 7) return 'reading';
+  return 'listening';
+}
+
 function question(id, part, topic, difficulty, prompt, choices, correctAnswer, explanation, extra = {}) {
+  const cefrLevel = cefrLevelFor(difficulty, id);
+  const cefrDifficulty = { A1: 500, A2: 600, B1: 650, B2: 700, C1: 800, C2: 900 }[cefrLevel];
   return {
     id,
-    exam: 'toeic',
+    exam: 'cefr',
+    cefrLevel,
     part,
     type: part === 5 ? 'mcq' : 'reading',
     topic,
-    difficulty,
+    difficulty: cefrDifficulty,
     question: prompt,
     choices,
     correctAnswer,
     explanation,
-    tags: [`part-${part}`, topic],
     isActive: true,
     timesAnswered: 0,
     timesCorrect: 0,
     createdBy: 'bundled_bank',
     ...extra,
+    tags: Array.from(new Set([skillForPart(part), `cefr-${cefrLevel.toLowerCase()}`, topic, ...(extra.tags ?? [])])),
   };
 }
 
@@ -424,8 +444,8 @@ function csvEscape(value) {
   return `"${text.replaceAll('"', '""')}"`;
 }
 
-function writeCsv(part, rows) {
-  const headers = ['id', 'question', 'choiceA', 'choiceB', 'choiceC', 'choiceD', 'correctAnswer', 'explanation', 'part', 'type', 'topic', 'difficulty', 'context', 'transcript'];
+function writeCsv(skill, rows) {
+  const headers = ['id', 'question', 'choiceA', 'choiceB', 'choiceC', 'choiceD', 'correctAnswer', 'explanation', 'cefrLevel', 'skill', 'mode', 'type', 'topic', 'difficulty', 'context', 'transcript'];
   const lines = [headers.join(',')];
   rows.forEach((row) => {
     lines.push([
@@ -434,7 +454,9 @@ function writeCsv(part, rows) {
       ...row.choices,
       ['A', 'B', 'C', 'D'][row.correctAnswer],
       row.explanation,
-      row.part,
+      row.cefrLevel,
+      skill,
+      row.part === 3 ? 'conversations' : row.part === 4 ? 'short-talks' : skill,
       row.type,
       row.topic,
       row.difficulty,
@@ -442,15 +464,19 @@ function writeCsv(part, rows) {
       row.transcript ?? '',
     ].map(csvEscape).join(','));
   });
-  const fileName = part === 'listening' ? 'toeic_listening_200.csv' : `toeic_part${part}_200.csv`;
+  const fileName = `cefr_${skill.replaceAll('-', '_')}_200.csv`;
   fs.writeFileSync(path.join(root, fileName), `${lines.join('\n')}\n`, 'utf8');
 }
 
 fs.mkdirSync(generatedDir, { recursive: true });
-fs.writeFileSync(path.join(generatedDir, 'toeic-questions.json'), `${JSON.stringify(allQuestions, null, 2)}\n`, 'utf8');
-writeCsv(5, part5);
-writeCsv(6, part6);
-writeCsv(7, part7);
+fs.writeFileSync(path.join(generatedDir, 'cefr-questions.json'), `${JSON.stringify(allQuestions, null, 2)}\n`, 'utf8');
+writeCsv('grammar', part5);
+writeCsv('use-of-english', part6);
+writeCsv('reading', part7);
 writeCsv('listening', listening);
 
-console.log(`Generated ${part5.length} Part 5, ${part6.length} Part 6, ${part7.length} Part 7, and ${listening.length} listening questions.`);
+const levelSummary = Object.fromEntries(['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].map((level) => [
+  level,
+  allQuestions.filter((item) => item.cefrLevel === level).length,
+]));
+console.log(`Generated ${allQuestions.length} CEFR questions across grammar, use of English, reading, and listening.`, levelSummary);

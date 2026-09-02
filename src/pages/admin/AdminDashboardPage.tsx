@@ -70,7 +70,7 @@ export default function AdminDashboardPage() {
     },
     {
       title: 'Manage Questions',
-      desc: 'Create, edit, toggle, or view TOEIC mock exam questions',
+      desc: 'Create, edit, and organize CEFR A1-C2 practice questions',
       icon: Icons.HelpCircle,
       path: '/admin/questions',
       color: 'text-[#0071E3] bg-blue-50/50 border-blue-200/60 hover:bg-blue-50',

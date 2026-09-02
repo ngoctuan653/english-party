@@ -14,16 +14,16 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 import { db } from '@/services/firebase/config';
-import type { Question } from '@/types/question';
+import type { Question, QuestionAnswer } from '@/types/question';
 import type { VocabWord } from '@/types/vocabulary';
 import type {
   QuestionProgress,
+  ReviewRating,
   VocabProgressRecord,
   ProgressState,
 } from '@/types/progress';
 import {
   MASTERY_THRESHOLDS,
-  SESSION_RATIO,
   COOLDOWN_HIGH_MASTERY_MS,
   COOLDOWN_LOW_MASTERY_MS,
   RECENTLY_SEEN_CACHE_SIZE,
@@ -36,6 +36,9 @@ import {
 
 let recentlySeenQuestionIds: string[] = [];
 let recentlySeenVocabIds: string[] = [];
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const AGAIN_RETRY_MS = 10 * 60 * 1000;
 
 function pushToRecentCache(cache: string[], ids: string[]): string[] {
   const updated = [...cache, ...ids];
@@ -62,6 +65,92 @@ export function calculateNewMastery(
   return Math.max(0, currentMastery - 25);
 }
 
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
+function timestampMs(value: Timestamp | undefined): number {
+  return value?.toMillis?.() ?? 0;
+}
+
+export function isReviewDue(
+  progress: QuestionProgress | VocabProgressRecord,
+  nowMs = Date.now(),
+): boolean {
+  if (progress.nextReviewAt) return timestampMs(progress.nextReviewAt) <= nowMs;
+  return !isOnCooldown(progress, nowMs);
+}
+
+export function ratingFromAnswer(answer: Pick<QuestionAnswer, 'isCorrect' | 'confidence'>): ReviewRating {
+  if (!answer.isCorrect) return 'again';
+  if (answer.confidence === 'low') return 'hard';
+  if (answer.confidence === 'high') return 'easy';
+  return 'good';
+}
+
+/**
+ * Lightweight adaptive scheduler inspired by modern spaced-repetition systems.
+ * It keeps the existing mastery model while adding an item-specific next review.
+ */
+export function calculateReviewSchedule(
+  current: Partial<QuestionProgress | VocabProgressRecord> | undefined,
+  rating: ReviewRating,
+  nowMs = Date.now(),
+) {
+  const currentMastery = clamp(current?.mastery ?? 0, 0, 100);
+  const previousInterval = Math.max(0, current?.intervalDays ?? 0);
+  const previousCorrect = Math.max(0, current?.consecutiveCorrect ?? 0);
+  let easeFactor = clamp(current?.easeFactor ?? 2.3, 1.3, 3);
+  let intervalDays = previousInterval;
+  let consecutiveCorrect = previousCorrect;
+  let lapseCount = Math.max(0, current?.lapseCount ?? 0);
+  let nextReviewMs = nowMs + DAY_MS;
+  let mastery = currentMastery;
+
+  if (rating === 'again') {
+    mastery = calculateNewMastery(currentMastery, false);
+    intervalDays = 0;
+    consecutiveCorrect = 0;
+    lapseCount += 1;
+    easeFactor = clamp(easeFactor - 0.2, 1.3, 3);
+    nextReviewMs = nowMs + AGAIN_RETRY_MS;
+  } else if (rating === 'hard') {
+    mastery = Math.min(100, currentMastery + (100 - currentMastery) * 0.12);
+    consecutiveCorrect += 1;
+    intervalDays = previousInterval <= 0 ? 1 : Math.max(1, Math.round(previousInterval * 1.25));
+    easeFactor = clamp(easeFactor - 0.05, 1.3, 3);
+    nextReviewMs = nowMs + intervalDays * DAY_MS;
+  } else if (rating === 'good') {
+    mastery = calculateNewMastery(currentMastery, true);
+    consecutiveCorrect += 1;
+    intervalDays = previousInterval <= 0
+      ? (previousCorrect > 0 ? 3 : 1)
+      : Math.max(previousInterval + 1, Math.round(previousInterval * easeFactor));
+    nextReviewMs = nowMs + intervalDays * DAY_MS;
+  } else {
+    mastery = Math.min(100, currentMastery + (100 - currentMastery) * 0.4);
+    consecutiveCorrect += 1;
+    intervalDays = previousInterval <= 0
+      ? 4
+      : Math.max(previousInterval + 2, Math.round(previousInterval * easeFactor * 1.3));
+    easeFactor = clamp(easeFactor + 0.05, 1.3, 3);
+    nextReviewMs = nowMs + intervalDays * DAY_MS;
+  }
+
+  const roundedMastery = Math.round(mastery * 100) / 100;
+  return {
+    mastery: roundedMastery,
+    state: getMasteryState(roundedMastery),
+    reviewCount: Math.max(0, current?.reviewCount ?? 0) + 1,
+    lapseCount,
+    consecutiveCorrect,
+    intervalDays,
+    easeFactor: Math.round(easeFactor * 100) / 100,
+    nextReviewAt: Timestamp.fromMillis(nextReviewMs),
+    lastRating: rating,
+  };
+}
+
 /** Map a numeric mastery value to its state label. */
 export function getMasteryState(mastery: number): ProgressState {
   if (mastery >= MASTERY_THRESHOLDS.MASTERED) return 'mastered';
@@ -75,6 +164,7 @@ export function isOnCooldown(
   progress: QuestionProgress | VocabProgressRecord,
   nowMs: number
 ): boolean {
+  if (progress.nextReviewAt) return timestampMs(progress.nextReviewAt) > nowMs;
   if (!progress.lastSeenAt) return false;
 
   const lastSeenMs = progress.lastSeenAt.toMillis();
@@ -127,16 +217,14 @@ export async function updateQuestionProgress(
   const docSnap = await getDoc(progressRef);
   const existing = docSnap.exists() ? docSnap.data() as QuestionProgress : null;
 
-  const currentMastery = existing?.mastery ?? 0;
-  const newMastery = calculateNewMastery(currentMastery, isCorrect);
+  const schedule = calculateReviewSchedule(existing ?? undefined, isCorrect ? 'good' : 'again');
 
   const updated: QuestionProgress = {
     questionId,
     correctCount: (existing?.correctCount ?? 0) + (isCorrect ? 1 : 0),
     wrongCount: (existing?.wrongCount ?? 0) + (isCorrect ? 0 : 1),
     lastSeenAt: Timestamp.now(),
-    mastery: Math.round(newMastery * 100) / 100,
-    state: getMasteryState(newMastery),
+    ...schedule,
   };
 
   await setDoc(progressRef, updated);
@@ -148,15 +236,14 @@ export async function updateQuestionProgress(
  */
 export async function batchUpdateQuestionProgress(
   userId: string,
-  answers: { questionId: string; isCorrect: boolean }[]
+  answers: Array<Pick<QuestionAnswer, 'questionId' | 'isCorrect' | 'confidence'>>
 ): Promise<void> {
   // Fetch existing progress once
   const progressMap = await getUserQuestionProgress(userId);
 
   const writes = answers.map((ans) => {
     const existing = progressMap.get(ans.questionId);
-    const currentMastery = existing?.mastery ?? 0;
-    const newMastery = calculateNewMastery(currentMastery, ans.isCorrect);
+    const schedule = calculateReviewSchedule(existing, ratingFromAnswer(ans));
 
     const updated: QuestionProgress = {
       questionId: ans.questionId,
@@ -165,8 +252,7 @@ export async function batchUpdateQuestionProgress(
       wrongCount:
         (existing?.wrongCount ?? 0) + (ans.isCorrect ? 0 : 1),
       lastSeenAt: Timestamp.now(),
-      mastery: Math.round(newMastery * 100) / 100,
-      state: getMasteryState(newMastery),
+      ...schedule,
     };
 
     const ref = doc(
@@ -203,25 +289,14 @@ export async function getUserVocabProgress(
 /** Batch-update vocab progress after a session. */
 export async function batchUpdateVocabProgress(
   userId: string,
-  entries: { wordId: string; isCorrect: boolean; alreadyKnew?: boolean }[]
+  entries: { wordId: string; isCorrect: boolean; alreadyKnew?: boolean; rating?: ReviewRating }[]
 ): Promise<void> {
   const progressMap = await getUserVocabProgress(userId);
 
   const writes = entries.map((entry) => {
     const existing = progressMap.get(entry.wordId);
-    let newMastery = 0;
-
-    if (entry.alreadyKnew) {
-      newMastery = 100;
-    } else if (entry.isCorrect) {
-      newMastery = Math.max(
-        existing?.mastery ?? 0,
-        MASTERY_THRESHOLDS.MASTERED
-      );
-    } else {
-      const currentMastery = existing?.mastery ?? 0;
-      newMastery = calculateNewMastery(currentMastery, entry.isCorrect);
-    }
+    const rating = entry.rating ?? (entry.alreadyKnew ? 'easy' : entry.isCorrect ? 'good' : 'again');
+    const schedule = calculateReviewSchedule(existing, rating);
 
     const updated: VocabProgressRecord = {
       wordId: entry.wordId,
@@ -230,8 +305,7 @@ export async function batchUpdateVocabProgress(
       wrongCount:
         (existing?.wrongCount ?? 0) + (entry.isCorrect ? 0 : 1),
       lastSeenAt: Timestamp.now(),
-      mastery: Math.round(newMastery * 100) / 100,
-      state: getMasteryState(newMastery),
+      ...schedule,
     };
 
     const ref = doc(db, 'users', userId, 'vocabProgress', entry.wordId);
@@ -248,10 +322,11 @@ export function buildSmartVocabDeck(
 ): VocabWord[] {
   const maxCount = Math.max(1, options.maxCount ?? 12);
   const reviewSampleCount = Math.max(1, options.reviewSampleCount ?? 3);
-
+  const now = Date.now();
   const newWords: VocabWord[] = [];
-  const learningWords: { w: VocabWord; mastery: number; lastSeen: number }[] = [];
-  const masteredWords: { w: VocabWord; mastery: number; lastSeen: number }[] = [];
+  const dueWords: { w: VocabWord; mastery: number; dueAt: number }[] = [];
+  const futureLearning: { w: VocabWord; mastery: number; dueAt: number }[] = [];
+  const futureMastered: { w: VocabWord; mastery: number; dueAt: number }[] = [];
 
   for (const w of allWords) {
     const prog = progressMap.get(w.id);
@@ -260,45 +335,45 @@ export function buildSmartVocabDeck(
       continue;
     }
 
-    const lastSeen = prog.lastSeenAt?.toMillis?.() ?? 0;
-    if (prog.mastery < MASTERY_THRESHOLDS.MASTERED) {
-      learningWords.push({ w, mastery: prog.mastery, lastSeen });
+    const dueAt = timestampMs(prog.nextReviewAt) || timestampMs(prog.lastSeenAt);
+    if (isReviewDue(prog, now)) {
+      dueWords.push({ w, mastery: prog.mastery, dueAt });
+    } else if (prog.mastery < MASTERY_THRESHOLDS.MASTERED) {
+      futureLearning.push({ w, mastery: prog.mastery, dueAt });
     } else {
-      masteredWords.push({ w, mastery: prog.mastery, lastSeen });
+      futureMastered.push({ w, mastery: prog.mastery, dueAt });
     }
   }
 
-  learningWords.sort((a, b) => a.mastery - b.mastery || a.lastSeen - b.lastSeen);
-  masteredWords.sort((a, b) => a.lastSeen - b.lastSeen || a.mastery - b.mastery);
+  dueWords.sort((a, b) => a.dueAt - b.dueAt || a.mastery - b.mastery);
+  futureLearning.sort((a, b) => a.mastery - b.mastery || a.dueAt - b.dueAt);
+  futureMastered.sort((a, b) => a.dueAt - b.dueAt || a.mastery - b.mastery);
 
-  const activeWords = [
-    ...shuffle(newWords),
-    ...learningWords.map((entry) => entry.w),
-  ];
+  const picked: VocabWord[] = [];
+  const pickedIds = new Set<string>();
+  const add = (items: VocabWord[], limit: number) => {
+    for (const word of items) {
+      if (picked.length >= maxCount || limit <= 0 || pickedIds.has(word.id)) continue;
+      picked.push(word);
+      pickedIds.add(word.id);
+      limit -= 1;
+    }
+  };
+  const preferFresh = <T extends { w: VocabWord }>(items: T[]) => [
+    ...items.filter((entry) => !recentlySeenVocabIds.includes(entry.w.id)),
+    ...items.filter((entry) => recentlySeenVocabIds.includes(entry.w.id)),
+  ].map((entry) => entry.w);
 
-  const picked: VocabWord[] = activeWords.slice(0, maxCount);
-  const pickedIds = new Set(picked.map((w) => w.id));
+  const dueSlots = Math.min(maxCount, Math.max(reviewSampleCount, Math.ceil(maxCount * 0.5)));
+  const newSlots = Math.max(0, Math.ceil(maxCount * 0.35));
+  add(preferFresh(dueWords), dueSlots);
+  add(shuffle(newWords), newSlots);
+  add(preferFresh(futureLearning), maxCount - picked.length);
+  add(preferFresh(dueWords), maxCount - picked.length);
+  add(preferFresh(futureMastered), maxCount - picked.length);
+  add(shuffle(allWords), maxCount - picked.length);
 
-  const reviewSlots =
-    picked.length === 0
-      ? Math.min(reviewSampleCount, maxCount)
-      : Math.min(reviewSampleCount, maxCount - picked.length);
-
-  if (reviewSlots > 0) {
-    const notRecentlySeen = masteredWords.filter(
-      (entry) => !recentlySeenVocabIds.includes(entry.w.id)
-    );
-    const reviewCandidates = notRecentlySeen.length > 0 ? notRecentlySeen : masteredWords;
-    const reviewPicked = reviewCandidates
-      .filter((entry) => !pickedIds.has(entry.w.id))
-      .slice(0, reviewSlots)
-      .map((entry) => entry.w);
-    picked.push(...reviewPicked);
-  }
-
-  const deck = picked.length > 0
-    ? picked
-    : shuffle(allWords).slice(0, Math.min(reviewSampleCount, allWords.length));
+  const deck = picked.length > 0 ? picked : shuffle(allWords).slice(0, Math.min(maxCount, allWords.length));
 
   recentlySeenVocabIds = pushToRecentCache(
     recentlySeenVocabIds,
@@ -368,96 +443,104 @@ export function buildMistakeReviewDeck(
 }
 
 /**
- * Generate a smart quiz session.
- * Prioritises: new (60%) → weak (25%) → review (15%)
- * Applies cooldown + recently-seen filtering.
+ * Interleave topics and parts without destroying the scheduler's priority order.
+ */
+export function interleaveQuestions(items: Question[]): Question[] {
+  const remaining = [...items];
+  const result: Question[] = [];
+
+  while (remaining.length > 0) {
+    const previous = result.at(-1);
+    const nextIndex = previous
+      ? remaining.findIndex((question) => question.topic !== previous.topic && question.part !== previous.part)
+      : 0;
+    const fallbackIndex = previous
+      ? remaining.findIndex((question) => question.topic !== previous.topic)
+      : 0;
+    const index = nextIndex >= 0 ? nextIndex : fallbackIndex >= 0 ? fallbackIndex : 0;
+    result.push(remaining.splice(index, 1)[0]);
+  }
+
+  return result;
+}
+
+/**
+ * Generate a due-first adaptive quiz with new material and reinforcement.
  */
 export async function generateSmartQuizSession(
   userId: string,
   allQuestions: Question[],
-  count: number
+  count: number,
+  options: { targetDifficulty?: number } = {},
 ): Promise<Question[]> {
   const progressMap = await getUserQuestionProgress(userId);
   const now = Date.now();
-
-  // Categorise questions
+  const maxCount = Math.max(1, count);
   const newPool: Question[] = [];
-  const weakPool: { q: Question; mastery: number; lastSeen: number }[] = [];
-  const reviewPool: { q: Question; mastery: number; lastSeen: number }[] = [];
+  const dueWeak: { q: Question; mastery: number; dueAt: number }[] = [];
+  const dueReview: { q: Question; mastery: number; dueAt: number }[] = [];
+  const futureWeak: { q: Question; mastery: number; dueAt: number }[] = [];
+  const futureReview: { q: Question; mastery: number; dueAt: number }[] = [];
 
   for (const q of allQuestions) {
     const prog = progressMap.get(q.id);
-
-    // Skip recently seen (in-memory cache)
-    if (recentlySeenQuestionIds.includes(q.id)) continue;
-
     if (!prog) {
-      // Never seen → new pool
       newPool.push(q);
       continue;
     }
 
-    // Skip if on cooldown
-    if (isOnCooldown(prog, now)) continue;
-
-    const lastSeen = prog.lastSeenAt?.toMillis?.() ?? 0;
-
-    if (prog.mastery < MASTERY_THRESHOLDS.REVIEW) {
-      // mastery 0-39 → weak (learning)
-      weakPool.push({ q, mastery: prog.mastery, lastSeen });
+    const dueAt = timestampMs(prog.nextReviewAt) || timestampMs(prog.lastSeenAt);
+    if (isReviewDue(prog, now)) {
+      if (prog.mastery < MASTERY_THRESHOLDS.REVIEW) dueWeak.push({ q, mastery: prog.mastery, dueAt });
+      else dueReview.push({ q, mastery: prog.mastery, dueAt });
+    } else if (prog.mastery < MASTERY_THRESHOLDS.REVIEW) {
+      futureWeak.push({ q, mastery: prog.mastery, dueAt });
     } else {
-      // mastery 40+ → review
-      reviewPool.push({ q, mastery: prog.mastery, lastSeen });
+      futureReview.push({ q, mastery: prog.mastery, dueAt });
     }
   }
 
-  // Sort weak pool: lowest mastery first, then most wrong
-  weakPool.sort((a, b) => a.mastery - b.mastery || a.lastSeen - b.lastSeen);
+  const byNeed = (a: { mastery: number; dueAt: number }, b: { mastery: number; dueAt: number }) =>
+    a.dueAt - b.dueAt || a.mastery - b.mastery;
+  dueWeak.sort(byNeed);
+  dueReview.sort(byNeed);
+  futureWeak.sort((a, b) => a.mastery - b.mastery || a.dueAt - b.dueAt);
+  futureReview.sort(byNeed);
 
-  // Sort review pool: oldest lastSeen first (needs review)
-  reviewPool.sort((a, b) => a.lastSeen - b.lastSeen);
-
-  // Calculate slot counts
-  let newSlots = Math.ceil(count * SESSION_RATIO.NEW);
-  let weakSlots = Math.ceil(count * SESSION_RATIO.WEAK);
-  let reviewSlots = count - newSlots - weakSlots;
-
-  // Ensure we don't exceed count
-  if (reviewSlots < 0) {
-    reviewSlots = 0;
-    weakSlots = count - newSlots;
-  }
-
-  // Fill slots — overflow to next category if under-filled
+  const targetDifficulty = options.targetDifficulty;
+  const preparedNew = shuffle(newPool).sort((a, b) => {
+    if (!targetDifficulty) return 0;
+    return Math.abs(a.difficulty - targetDifficulty) - Math.abs(b.difficulty - targetDifficulty);
+  });
   const picked: Question[] = [];
+  const pickedIds = new Set<string>();
+  const add = (items: Question[], limit: number) => {
+    for (const question of items) {
+      if (picked.length >= maxCount || limit <= 0 || pickedIds.has(question.id)) continue;
+      if (recentlySeenQuestionIds.includes(question.id)) continue;
+      picked.push(question);
+      pickedIds.add(question.id);
+      limit -= 1;
+    }
+  };
 
-  // 1. New
-  const shuffledNew = shuffle(newPool);
-  const newPicked = shuffledNew.slice(0, newSlots);
-  picked.push(...newPicked);
-  let remaining = newSlots - newPicked.length;
+  const duePool = [...dueWeak, ...dueReview].map((entry) => entry.q);
+  const reinforcementPool = [...futureWeak, ...futureReview].map((entry) => entry.q);
+  add(duePool, Math.ceil(maxCount * 0.5));
+  add(preparedNew, Math.ceil(maxCount * 0.35));
+  add(reinforcementPool, maxCount - picked.length);
+  add(duePool, maxCount - picked.length);
+  add(preparedNew, maxCount - picked.length);
+  add(shuffle(allQuestions), maxCount - picked.length);
 
-  // 2. Weak (+ overflow from new)
-  const weakAvail = weakSlots + remaining;
-  const weakPicked = weakPool.slice(0, weakAvail).map((w) => w.q);
-  picked.push(...weakPicked);
-  remaining = weakAvail - weakPicked.length;
-
-  // 3. Review (+ overflow from weak)
-  const reviewAvail = reviewSlots + remaining;
-  const reviewPicked = reviewPool.slice(0, reviewAvail).map((r) => r.q);
-  picked.push(...reviewPicked);
-  remaining = reviewAvail - reviewPicked.length;
-
-  // 4. If still under-filled, grab anything remaining (including cooldown items)
-  if (picked.length < count) {
-    const pickedIds = new Set(picked.map((p) => p.id));
-    const extras = allQuestions.filter(
-      (q) =>
-        !pickedIds.has(q.id) && !recentlySeenQuestionIds.includes(q.id)
-    );
-    const shuffledExtras = shuffle(extras);
-    picked.push(...shuffledExtras.slice(0, count - picked.length));
+  if (picked.length < maxCount) {
+    for (const question of shuffle(allQuestions)) {
+      if (picked.length >= maxCount) break;
+      if (!pickedIds.has(question.id)) {
+        picked.push(question);
+        pickedIds.add(question.id);
+      }
+    }
   }
 
   // Update recently seen cache
@@ -466,7 +549,7 @@ export async function generateSmartQuizSession(
     picked.map((q) => q.id)
   );
 
-  return shuffle(picked);
+  return interleaveQuestions(picked);
 }
 
 /**

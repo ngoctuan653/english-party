@@ -2,7 +2,7 @@
 
 <div align="center">
 
-**A gamified TOEIC learning platform for competitive friend groups**
+**A gamified CEFR A1-C2 English learning platform for friend groups**
 
 [![React](https://img.shields.io/badge/React-19.2-61dafb?logo=react)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178c6?logo=typescript)](https://www.typescriptlang.org)
@@ -38,9 +38,9 @@
 - XP and streak management
 
 ### 📚 Study System
-- **TOEIC Vocabulary** - Flashcard learning with spaced repetition
-- **TOEIC Parts 5-7** - 200 bundled questions per reading part
-- **Listening Practice** - 200 Part 3/4 questions with device voice playback and transcripts
+- **CEFR Vocabulary** - A1-C2 flashcards with adaptive spaced repetition
+- **Grammar, Use of English & Reading** - 200 bundled questions per skill
+- **Listening Practice** - 200 conversation and short-talk questions with transcripts
 - **Daily Missions** - Bite-sized tasks for consistency
 - **Progress Analytics** - Detailed performance tracking
 
@@ -149,7 +149,7 @@ src/
 ```
 users               → User profiles, stats, settings
 vocabulary          → Word definitions and examples
-questions           → TOEIC questions (parts 1-7)
+questions           → CEFR A1-C2 questions organized by skill
 study_sessions      → Active study records
 daily_progress      → Daily mission tracking
 friendships         → Friend relationships
@@ -160,7 +160,8 @@ study_history       → Historical performance data
 ### Example Question Document
 ```json
 {
-  "exam": "toeic",
+  "exam": "cefr",
+  "cefrLevel": "B2",
   "part": 5,
   "type": "mcq",
   "topic": "business",
@@ -177,12 +178,14 @@ study_history       → Historical performance data
 
 ### Bundled Learning Bank
 
-The app includes a bundled TOEIC bank that is merged with active Firestore content at runtime:
+The app includes a bundled CEFR bank that is merged with active Firestore content at runtime:
 
-- `toeic_part5_200.csv` - 200 incomplete-sentence questions
-- `toeic_part6_200.csv` - 200 text-completion questions
-- `toeic_part7_200.csv` - 200 reading-comprehension questions
-- `toeic_listening_200.csv` - 200 listening questions with transcripts
+- `cefr_grammar_200.csv` - 200 grammar questions
+- `cefr_use_of_english_200.csv` - 200 connected-text questions
+- `cefr_reading_200.csv` - 200 reading-comprehension questions
+- `cefr_listening_200.csv` - 200 listening questions with transcripts
+
+Every skill covers all six CEFR levels: A1, A2, B1, B2, C1, and C2. Existing question IDs remain stable so regenerated imports retain learner progress.
 
 Regenerate and validate the files with `npm run generate:learning-bank` and `npm run validate:learning-bank`. Admins can import the CSV files without changing IDs, so repeated imports update the same documents instead of creating duplicates.
 
@@ -249,7 +252,7 @@ Fully responsive across all devices:
 2. Join a friend group
 3. Start daily missions
 4. Learn vocabulary with flashcards
-5. Practice TOEIC questions
+5. Practice at the right CEFR level
 6. Track progress on leaderboards
 
 ### For Admins
@@ -268,7 +271,7 @@ Fully responsive across all devices:
 - [ ] Group study rooms with video chat
 - [ ] Native mobile app (React Native)
 - [ ] Capacitor Android APK
-- [ ] IELTS / JLPT / SAT expansion
+- [ ] CEFR writing and speaking assessment
 - [ ] Offline sync improvements
 - [ ] Dark mode
 

@@ -3,11 +3,11 @@ import { doc, writeBatch, serverTimestamp, getDocs, collection } from 'firebase/
 import type { Question } from '@/types/question';
 import type { VocabWord } from '@/types/vocabulary';
 
-// High-quality TOEIC Part 5 Questions
+// Curated CEFR grammar questions
 const SEED_QUESTIONS: Omit<Question, 'createdAt' | 'updatedAt'>[] = [
   {
     id: 'q_seed_1',
-    exam: 'toeic',
+    exam: 'cefr',
     part: 5,
     type: 'mcq',
     topic: 'business',
@@ -24,7 +24,7 @@ const SEED_QUESTIONS: Omit<Question, 'createdAt' | 'updatedAt'>[] = [
   },
   {
     id: 'q_seed_2',
-    exam: 'toeic',
+    exam: 'cefr',
     part: 5,
     type: 'mcq',
     topic: 'office',
@@ -41,7 +41,7 @@ const SEED_QUESTIONS: Omit<Question, 'createdAt' | 'updatedAt'>[] = [
   },
   {
     id: 'q_seed_3',
-    exam: 'toeic',
+    exam: 'cefr',
     part: 5,
     type: 'mcq',
     topic: 'meetings',
@@ -58,7 +58,7 @@ const SEED_QUESTIONS: Omit<Question, 'createdAt' | 'updatedAt'>[] = [
   },
   {
     id: 'q_seed_4',
-    exam: 'toeic',
+    exam: 'cefr',
     part: 5,
     type: 'mcq',
     topic: 'shipping',
@@ -75,7 +75,7 @@ const SEED_QUESTIONS: Omit<Question, 'createdAt' | 'updatedAt'>[] = [
   },
   {
     id: 'q_seed_5',
-    exam: 'toeic',
+    exam: 'cefr',
     part: 5,
     type: 'mcq',
     topic: 'technology',
@@ -92,7 +92,7 @@ const SEED_QUESTIONS: Omit<Question, 'createdAt' | 'updatedAt'>[] = [
   },
   {
     id: 'q_seed_6',
-    exam: 'toeic',
+    exam: 'cefr',
     part: 5,
     type: 'mcq',
     topic: 'finance',
@@ -109,7 +109,7 @@ const SEED_QUESTIONS: Omit<Question, 'createdAt' | 'updatedAt'>[] = [
   },
   {
     id: 'q_seed_7',
-    exam: 'toeic',
+    exam: 'cefr',
     part: 5,
     type: 'mcq',
     topic: 'marketing',
@@ -126,7 +126,7 @@ const SEED_QUESTIONS: Omit<Question, 'createdAt' | 'updatedAt'>[] = [
   },
   {
     id: 'q_seed_8',
-    exam: 'toeic',
+    exam: 'cefr',
     part: 5,
     type: 'mcq',
     topic: 'healthcare',
@@ -143,7 +143,7 @@ const SEED_QUESTIONS: Omit<Question, 'createdAt' | 'updatedAt'>[] = [
   },
   {
     id: 'q_seed_9',
-    exam: 'toeic',
+    exam: 'cefr',
     part: 5,
     type: 'mcq',
     topic: 'education',
@@ -160,7 +160,7 @@ const SEED_QUESTIONS: Omit<Question, 'createdAt' | 'updatedAt'>[] = [
   },
   {
     id: 'q_seed_10',
-    exam: 'toeic',
+    exam: 'cefr',
     part: 5,
     type: 'mcq',
     topic: 'travel',
@@ -177,11 +177,11 @@ const SEED_QUESTIONS: Omit<Question, 'createdAt' | 'updatedAt'>[] = [
   },
 ];
 
-// High-quality TOEIC Vocabulary words with English definitions & Vietnamese translations
+// Curated CEFR vocabulary with English definitions and Vietnamese translations
 const SEED_VOCABULARY: Omit<VocabWord, 'createdAt'>[] = [
   {
     id: 'v_seed_1',
-    exam: 'toeic',
+    exam: 'cefr',
     word: 'Collaborate',
     pronunciation: 'kəˈlæbəreɪt',
     partOfSpeech: 'verb',
@@ -197,7 +197,7 @@ const SEED_VOCABULARY: Omit<VocabWord, 'createdAt'>[] = [
   },
   {
     id: 'v_seed_2',
-    exam: 'toeic',
+    exam: 'cefr',
     word: 'Implement',
     pronunciation: 'ˈɪmplɪment',
     partOfSpeech: 'verb',
@@ -213,7 +213,7 @@ const SEED_VOCABULARY: Omit<VocabWord, 'createdAt'>[] = [
   },
   {
     id: 'v_seed_3',
-    exam: 'toeic',
+    exam: 'cefr',
     word: 'Innovative',
     pronunciation: 'ˈɪnəveɪtɪv',
     partOfSpeech: 'adjective',
@@ -229,7 +229,7 @@ const SEED_VOCABULARY: Omit<VocabWord, 'createdAt'>[] = [
   },
   {
     id: 'v_seed_4',
-    exam: 'toeic',
+    exam: 'cefr',
     word: 'Comply',
     pronunciation: 'kəmˈplaɪ',
     partOfSpeech: 'verb',
@@ -245,7 +245,7 @@ const SEED_VOCABULARY: Omit<VocabWord, 'createdAt'>[] = [
   },
   {
     id: 'v_seed_5',
-    exam: 'toeic',
+    exam: 'cefr',
     word: 'Negotiate',
     pronunciation: 'nɪˈɡəʊʃɪeɪt',
     partOfSpeech: 'verb',
@@ -261,7 +261,7 @@ const SEED_VOCABULARY: Omit<VocabWord, 'createdAt'>[] = [
   },
   {
     id: 'v_seed_6',
-    exam: 'toeic',
+    exam: 'cefr',
     word: 'Acquire',
     pronunciation: 'əˈkwaɪə(r)',
     partOfSpeech: 'verb',
@@ -277,7 +277,7 @@ const SEED_VOCABULARY: Omit<VocabWord, 'createdAt'>[] = [
   },
   {
     id: 'v_seed_7',
-    exam: 'toeic',
+    exam: 'cefr',
     word: 'Annual',
     pronunciation: 'ˈænjuəl',
     partOfSpeech: 'adjective',
@@ -293,7 +293,7 @@ const SEED_VOCABULARY: Omit<VocabWord, 'createdAt'>[] = [
   },
   {
     id: 'v_seed_8',
-    exam: 'toeic',
+    exam: 'cefr',
     word: 'Agenda',
     pronunciation: 'əˈdʒendə',
     partOfSpeech: 'noun',
@@ -309,7 +309,7 @@ const SEED_VOCABULARY: Omit<VocabWord, 'createdAt'>[] = [
   },
   {
     id: 'v_seed_9',
-    exam: 'toeic',
+    exam: 'cefr',
     word: 'Terminate',
     pronunciation: 'ˈtɜːmɪneɪt',
     partOfSpeech: 'verb',
@@ -325,7 +325,7 @@ const SEED_VOCABULARY: Omit<VocabWord, 'createdAt'>[] = [
   },
   {
     id: 'v_seed_10',
-    exam: 'toeic',
+    exam: 'cefr',
     word: 'Subsidiary',
     pronunciation: 'səbˈsɪdiəri',
     partOfSpeech: 'noun',
@@ -341,7 +341,7 @@ const SEED_VOCABULARY: Omit<VocabWord, 'createdAt'>[] = [
   },
   {
     id: 'v_seed_11',
-    exam: 'toeic',
+    exam: 'cefr',
     word: 'Delegate',
     pronunciation: 'ˈdelɪɡət',
     partOfSpeech: 'verb',
@@ -357,7 +357,7 @@ const SEED_VOCABULARY: Omit<VocabWord, 'createdAt'>[] = [
   },
   {
     id: 'v_seed_12',
-    exam: 'toeic',
+    exam: 'cefr',
     word: 'Lucrative',
     pronunciation: 'ˈluːkrətɪv',
     partOfSpeech: 'adjective',
@@ -373,7 +373,7 @@ const SEED_VOCABULARY: Omit<VocabWord, 'createdAt'>[] = [
   },
   {
     id: 'v_seed_13',
-    exam: 'toeic',
+    exam: 'cefr',
     word: 'Provisional',
     pronunciation: 'prəˈvɪʒənl',
     partOfSpeech: 'adjective',
@@ -389,7 +389,7 @@ const SEED_VOCABULARY: Omit<VocabWord, 'createdAt'>[] = [
   },
   {
     id: 'v_seed_14',
-    exam: 'toeic',
+    exam: 'cefr',
     word: 'Strategic',
     pronunciation: 'strəˈtiːdʒɪk',
     partOfSpeech: 'adjective',
@@ -405,7 +405,7 @@ const SEED_VOCABULARY: Omit<VocabWord, 'createdAt'>[] = [
   },
   {
     id: 'v_seed_15',
-    exam: 'toeic',
+    exam: 'cefr',
     word: 'Surplus',
     pronunciation: 'ˈsɜːpləs',
     partOfSpeech: 'noun',

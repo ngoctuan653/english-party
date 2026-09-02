@@ -12,9 +12,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'icons/*.png'],
       manifest: {
-        name: 'EnglishParty - TOEIC Study Platform',
+        name: 'EnglishParty - CEFR English Learning',
         short_name: 'EnglishParty',
-        description: 'Gamified TOEIC learning platform for friend groups',
+        description: 'Gamified CEFR A1-C2 English learning for friend groups',
         theme_color: '#0071E3',
         background_color: '#FFFFFF',
         display: 'standalone',

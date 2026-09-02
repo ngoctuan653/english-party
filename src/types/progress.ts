@@ -5,13 +5,24 @@ import { Timestamp } from 'firebase/firestore';
 // ============================================
 
 export type ProgressState = 'new' | 'learning' | 'review' | 'mastered';
+export type ReviewRating = 'again' | 'hard' | 'good' | 'easy';
+
+export interface ReviewScheduleFields {
+  reviewCount?: number;
+  lapseCount?: number;
+  consecutiveCorrect?: number;
+  intervalDays?: number;
+  easeFactor?: number;
+  nextReviewAt?: Timestamp;
+  lastRating?: ReviewRating;
+}
 
 // ============================================
 // Question Progress (per-user, per-question)
 // Stored at: users/{uid}/questionProgress/{questionId}
 // ============================================
 
-export interface QuestionProgress {
+export interface QuestionProgress extends ReviewScheduleFields {
   questionId: string;
   correctCount: number;
   wrongCount: number;
@@ -25,7 +36,7 @@ export interface QuestionProgress {
 // Stored at: users/{uid}/vocabProgress/{wordId}
 // ============================================
 
-export interface VocabProgressRecord {
+export interface VocabProgressRecord extends ReviewScheduleFields {
   wordId: string;
   correctCount: number;
   wrongCount: number;

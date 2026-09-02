@@ -7,7 +7,7 @@ import { useUIStore } from '@/stores/uiStore';
 import { cancelStudySession, endStudySession, fetchQuestions, startStudySession } from '@/services/study';
 import { generateSmartQuizSession } from '@/services/progress';
 import { formatDuration } from '@/utils/helpers';
-import type { Question, QuestionAnswer } from '@/types/question';
+import type { AnswerConfidence, Question, QuestionAnswer } from '@/types/question';
 import type { SessionResults } from '@/types/study';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -18,6 +18,8 @@ import {
   LearningStats,
 } from '@/components/study/LearningWorkspace';
 import { getBundledQuestionCount } from '@/data/questionBank';
+import type { CefrLevel } from '@/types/cefr';
+import { CEFR_LEVELS, CEFR_LEVEL_META, getCefrDifficulty, getCurrentCefrLevel } from '@/types/cefr';
 
 type ListeningPart = 3 | 4;
 
@@ -53,10 +55,13 @@ export default function ListeningPage() {
   const { setStudySessionActive } = useUIStore();
   const [active, setActive] = useState(false);
   const [selectedPart, setSelectedPart] = useState<ListeningPart>(3);
+  const [activeLevel, setActiveLevel] = useState<CefrLevel>(() => getCurrentCefrLevel(profile));
+  const [sessionSize, setSessionSize] = useState<5 | 10 | 20>(10);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false);
+  const [answerConfidence, setAnswerConfidence] = useState<AnswerConfidence | null>(null);
   const [showTranscript, setShowTranscript] = useState(false);
   const [answers, setAnswers] = useState<QuestionAnswer[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -70,6 +75,8 @@ export default function ListeningPage() {
   const activeSessionIdRef = useRef<string | null>(null);
 
   const currentQuestion = questions[currentIndex];
+  const wrongQuestionIds = new Set(answers.filter((answer) => !answer.isCorrect).map((answer) => answer.questionId));
+  const wrongQuestions = questions.filter((question) => wrongQuestionIds.has(question.id));
 
   useEffect(() => {
     activeSessionIdRef.current = sessionId;
@@ -118,23 +125,26 @@ export default function ListeningPage() {
   const resetQuestionState = () => {
     setSelectedAnswer(null);
     setIsAnswerSubmitted(false);
+    setAnswerConfidence(null);
     setShowTranscript(false);
     questionStartRef.current = Date.now();
     stopSpeech();
   };
 
-  const startPractice = async (part: ListeningPart) => {
+  const startPractice = async (part: ListeningPart, customQuestions?: Question[]) => {
     if (!profile?.uid) return;
     try {
       setLoading(true);
-      const pool = await fetchQuestions({ exam: 'toeic', type: 'listening', part, count: 250 });
-      const deck = await generateSmartQuizSession(profile.uid, pool, 10);
+      const pool = customQuestions ?? await fetchQuestions({ exam: 'cefr', cefrLevel: activeLevel, type: 'listening', part, count: 250 });
+      const deck = customQuestions ?? await generateSmartQuizSession(profile.uid, pool, sessionSize, {
+        targetDifficulty: getCefrDifficulty(activeLevel),
+      });
       if (deck.length === 0) {
-        toast.error('No listening questions are available for this part.');
+        toast.error(`No CEFR ${activeLevel} listening questions are available for this mode.`);
         return;
       }
 
-      const id = await startStudySession(profile.uid, 'toeic', 'listening');
+      const id = await startStudySession(profile.uid, 'cefr', 'listening');
       setSelectedPart(part);
       setQuestions(deck);
       setSessionId(id);
@@ -162,7 +172,15 @@ export default function ListeningPage() {
     };
     setAnswers((items) => [...items, answer]);
     setIsAnswerSubmitted(true);
+    setAnswerConfidence(null);
     stopSpeech();
+  };
+
+  const handleConfidence = (confidence: AnswerConfidence) => {
+    setAnswerConfidence(confidence);
+    setAnswers((previous) => previous.map((answer) =>
+      answer.questionId === currentQuestion?.id ? { ...answer, confidence } : answer
+    ));
   };
 
   const finishPractice = async () => {
@@ -201,12 +219,42 @@ export default function ListeningPage() {
     setAnswers([]);
   };
 
+  useEffect(() => {
+    if (!active || results) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A'].includes(target?.tagName ?? '')) return;
+
+      if (!isAnswerSubmitted && ['1', '2', '3', '4'].includes(event.key)) {
+        const choice = Number(event.key) - 1;
+        if (choice < (currentQuestion?.choices.length ?? 0)) {
+          event.preventDefault();
+          setSelectedAnswer(choice);
+        }
+      }
+
+      if (event.key === 'Enter') {
+        if (!isAnswerSubmitted && selectedAnswer !== null) {
+          event.preventDefault();
+          submitAnswer();
+        } else if (isAnswerSubmitted && !loading) {
+          event.preventDefault();
+          nextQuestion();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [active, currentQuestion, isAnswerSubmitted, loading, results, selectedAnswer]);
+
   if (!active) {
     return (
       <div className="mx-auto w-full max-w-[1440px] space-y-4 pb-8 text-slate-800">
         <LearningModuleNav active="listening" />
         <LearningIntro
-          eyebrow="TOEIC Listening"
+          eyebrow={`CEFR ${activeLevel} Listening`}
           title="Listening Studio"
           description="Train with short, focused audio sessions. Listen first, answer from memory, then open the transcript to review unfamiliar phrases."
           icon={Icons.Headphones}
@@ -225,12 +273,58 @@ export default function ListeningPage() {
 
         <LearningStats
           items={[
-            { label: 'Part 3', value: getBundledQuestionCount(3), detail: 'Conversation questions', icon: Icons.MessagesSquare, tone: 'blue' },
-            { label: 'Part 4', value: getBundledQuestionCount(4), detail: 'Short-talk questions', icon: Icons.Radio, tone: 'violet' },
-            { label: 'Session size', value: 10, detail: 'Questions per practice', icon: Icons.ListChecks, tone: 'emerald' },
-            { label: 'Review mode', value: 'Smart', detail: 'New + weak + review', icon: Icons.Brain, tone: 'amber' },
+            { label: 'Conversations', value: getBundledQuestionCount(3, undefined, activeLevel), detail: `${activeLevel} dialogue questions`, icon: Icons.MessagesSquare, tone: 'blue' },
+            { label: 'Short talks', value: getBundledQuestionCount(4, undefined, activeLevel), detail: `${activeLevel} monologue questions`, icon: Icons.Radio, tone: 'violet' },
+            { label: 'Session size', value: sessionSize, detail: 'Questions per practice', icon: Icons.ListChecks, tone: 'emerald' },
+            { label: 'Review mode', value: 'Adaptive', detail: 'Due + new + weak', icon: Icons.Brain, tone: 'amber' },
           ]}
         />
+
+        <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-200 px-5 py-3">
+            <p className="text-[10px] font-black uppercase text-violet-700">Listening level</p>
+          </div>
+          <div className="grid grid-cols-3 sm:grid-cols-6">
+            {CEFR_LEVELS.map((level) => (
+              <button
+                key={level}
+                type="button"
+                aria-pressed={activeLevel === level}
+                onClick={() => setActiveLevel(level)}
+                className={`min-h-16 border-b border-r border-slate-200 px-3 py-2 transition-colors sm:border-b-0 ${
+                  activeLevel === level ? 'bg-violet-600 text-white' : 'text-slate-600 hover:bg-violet-50'
+                }`}
+              >
+                <span className="block text-lg font-black">{level}</span>
+                <span className={`block text-[9px] font-bold ${activeLevel === level ? 'text-violet-100' : 'text-slate-400'}`}>
+                  {CEFR_LEVEL_META[level].title}
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-5 py-3 shadow-sm">
+          <div>
+            <p className="text-[10px] font-black uppercase text-violet-700">Session length</p>
+            <p className="mt-0.5 text-xs font-medium text-slate-500">{sessionSize} questions · adaptive queue</p>
+          </div>
+          <div className="flex rounded-md bg-slate-100 p-1" role="group" aria-label="Listening session size">
+            {([5, 10, 20] as const).map((size) => (
+              <button
+                key={size}
+                type="button"
+                onClick={() => setSessionSize(size)}
+                aria-pressed={sessionSize === size}
+                className={`min-w-12 rounded px-3 py-1.5 text-xs font-black transition-colors ${
+                  sessionSize === size ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-900'
+                }`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+        </section>
 
         <section className="grid gap-3 md:grid-cols-2">
           {listeningParts.map((item) => {
@@ -247,10 +341,10 @@ export default function ListeningPage() {
                   <span className={`flex h-11 w-11 items-center justify-center rounded-md border ${item.tone}`}>
                     <Icon className="h-5 w-5" />
                   </span>
-                  <span className="text-xs font-bold text-slate-400">100 questions</span>
+                  <span className="text-xs font-bold text-slate-400">{getBundledQuestionCount(item.part, undefined, activeLevel)} questions</span>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold uppercase text-sky-700">TOEIC Part {item.part}</p>
+                  <p className="text-[10px] font-bold uppercase text-sky-700">CEFR {activeLevel} · Listening</p>
                   <h2 className="mt-1 text-xl font-black text-slate-950">{item.title}</h2>
                   <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">{item.description}</p>
                   <span className="mt-4 inline-flex items-center gap-1 text-xs font-black text-sky-700">
@@ -270,7 +364,7 @@ export default function ListeningPage() {
       <div className="mx-auto w-full max-w-3xl pb-8 text-slate-800">
         <Card className="space-y-6 rounded-lg border border-slate-200 bg-white p-7 text-center shadow-md">
           <div>
-            <p className="text-[10px] font-bold uppercase text-violet-700">TOEIC Part {selectedPart}</p>
+            <p className="text-[10px] font-bold uppercase text-violet-700">CEFR {activeLevel} · {listeningParts.find((item) => item.part === selectedPart)?.title}</p>
             <h1 className="mt-2 text-2xl font-black text-slate-950">Listening results</h1>
           </div>
           <div className="mx-auto flex h-28 w-28 flex-col items-center justify-center rounded-full border-4 border-violet-500 bg-violet-50">
@@ -298,6 +392,15 @@ export default function ListeningPage() {
           )}
           <div className="flex flex-col justify-center gap-3 sm:flex-row">
             <Button variant="secondary" onClick={exitPractice}>Back to listening</Button>
+            {wrongQuestions.length > 0 && (
+              <Button
+                variant="secondary"
+                onClick={() => startPractice(selectedPart, wrongQuestions)}
+                className="border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100"
+              >
+                Repair {wrongQuestions.length} mistakes
+              </Button>
+            )}
             <Button onClick={() => startPractice(selectedPart)} isLoading={loading}>Practice again</Button>
           </div>
         </Card>
@@ -314,7 +417,7 @@ export default function ListeningPage() {
           <Icons.X className="h-4 w-4" /> Exit
         </button>
         <div className="flex items-center gap-3 text-xs font-bold text-slate-500">
-          <span>Part {selectedPart}</span>
+          <span>CEFR {currentQuestion?.cefrLevel ?? activeLevel}</span>
           <span className="text-slate-300">|</span>
           <span className="flex items-center gap-1"><Icons.Timer className="h-4 w-4 text-violet-600" /> {formatClock(secondsElapsed)}</span>
           <span className="text-slate-300">|</span>
@@ -394,21 +497,46 @@ export default function ListeningPage() {
           </div>
 
           {isAnswerSubmitted && (
-            <div className="space-y-3 rounded-lg border border-sky-100 bg-sky-50 p-4 text-sm leading-6 text-slate-700">
-              <p className="font-bold text-sky-800">Explanation</p>
-              <p>{currentQuestion?.explanation}</p>
-              <button
-                type="button"
-                onClick={() => setShowTranscript((value) => !value)}
-                className="inline-flex items-center gap-1 text-xs font-black text-sky-700"
-              >
-                <Icons.FileText className="h-4 w-4" /> {showTranscript ? 'Hide transcript' : 'Review transcript'}
-              </button>
-              {showTranscript && (
-                <div className="whitespace-pre-line border-t border-sky-200 pt-3 text-slate-600">
-                  {currentQuestion?.transcript}
+            <div className="space-y-3">
+              <div className="space-y-3 rounded-lg border border-sky-100 bg-sky-50 p-4 text-sm leading-6 text-slate-700">
+                <p className="font-bold text-sky-800">Explanation</p>
+                <p>{currentQuestion?.explanation}</p>
+                <button
+                  type="button"
+                  onClick={() => setShowTranscript((value) => !value)}
+                  className="inline-flex items-center gap-1 text-xs font-black text-sky-700"
+                >
+                  <Icons.FileText className="h-4 w-4" /> {showTranscript ? 'Hide transcript' : 'Review transcript'}
+                </button>
+                {showTranscript && (
+                  <div className="whitespace-pre-line border-t border-sky-200 pt-3 text-slate-600">
+                    {currentQuestion?.transcript}
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white p-3">
+                <p className="text-xs font-black text-slate-700">How confident were you?</p>
+                <div className="grid w-full grid-cols-3 gap-1 rounded-md bg-slate-100 p-1 sm:w-auto">
+                  {([
+                    ['low', 'Not sure'],
+                    ['medium', 'Fairly sure'],
+                    ['high', 'Very sure'],
+                  ] as Array<[AnswerConfidence, string]>).map(([value, label]) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => handleConfidence(value)}
+                      className={`rounded px-3 py-1.5 text-[10px] font-black transition-colors ${
+                        answerConfidence === value
+                          ? 'bg-slate-950 text-white shadow-sm'
+                          : 'text-slate-500 hover:bg-white hover:text-slate-900'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
                 </div>
-              )}
+              </div>
             </div>
           )}
 

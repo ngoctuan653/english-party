@@ -10,6 +10,7 @@ import { toast } from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import * as Icons from 'lucide-react';
 import { seedDatabase } from '@/data/seedData';
+import { cefrLevelFromDifficulty, getCefrDifficulty, isCefrLevel } from '@/types/cefr';
 
 type ImportType = 'questions' | 'vocabulary';
 
@@ -146,10 +147,15 @@ export default function AdminImportPage() {
     const explanation = explanationVi
       ? `${explanationEn} | ${explanationVi}`
       : explanationEn;
-    const part = Number(row.part || 5);
+    const skill = String(row.skill || 'grammar').toLowerCase().replaceAll('_', '-');
+    const mode = String(row.mode || '').toLowerCase().replaceAll('_', '-');
+    const part = Number(row.part || (mode === 'short-talks' ? 4 : mode === 'conversations' || skill === 'listening' ? 3 : skill === 'use-of-english' ? 6 : skill === 'reading' ? 7 : 5));
     const type = row.type || (part === 5 ? 'mcq' : 'reading');
     const topic = row.topic || 'general';
-    const difficulty = Number(row.difficulty || 700);
+    const requestedLevel = String(row.cefrLevel || row.cefrlevel || '').toUpperCase();
+    const fallbackDifficulty = Number(row.difficulty || 700);
+    const cefrLevel = isCefrLevel(requestedLevel) ? requestedLevel : cefrLevelFromDifficulty(fallbackDifficulty);
+    const difficulty = getCefrDifficulty(cefrLevel);
     const context = row.context || '';
     const transcript = row.transcript || '';
     const audioUrl = row.audioUrl || row.audiourl || '';
@@ -178,7 +184,8 @@ export default function AdminImportPage() {
 
     batch.set(docRef, {
       id,
-      exam: 'toeic',
+      exam: 'cefr',
+      cefrLevel,
       part,
       type,
       topic,
@@ -190,7 +197,7 @@ export default function AdminImportPage() {
       ...(context ? { context } : {}),
       ...(transcript ? { transcript } : {}),
       ...(audioUrl ? { audioUrl } : {}),
-      tags: [`part-${part}`, topic],
+      tags: [skill, `cefr-${cefrLevel.toLowerCase()}`, topic],
       isActive: true,
       timesAnswered: 0,
       timesCorrect: 0,
@@ -209,7 +216,10 @@ export default function AdminImportPage() {
     const example = row.example || '';
     const exampleTranslation = row.exampleTranslation || row.exampletranslation || '';
     const topic = row.topic || 'general';
-    const difficulty = Number(row.difficulty || 700);
+    const requestedLevel = String(row.cefrLevel || row.cefrlevel || '').toUpperCase();
+    const fallbackDifficulty = Number(row.difficulty || 700);
+    const cefrLevel = isCefrLevel(requestedLevel) ? requestedLevel : cefrLevelFromDifficulty(fallbackDifficulty);
+    const difficulty = getCefrDifficulty(cefrLevel);
     const synonymsStr = row.synonyms || row.synonym || '';
 
     if (!word) throw new Error('Missing word field.');
@@ -224,7 +234,8 @@ export default function AdminImportPage() {
 
     batch.set(docRef, {
       id,
-      exam: 'toeic',
+      exam: 'cefr',
+      cefrLevel,
       word,
       pronunciation,
       partOfSpeech,
@@ -259,7 +270,7 @@ export default function AdminImportPage() {
               <label className="block text-xs font-semibold text-slate-500">Import Category</label>
               <div className="grid grid-cols-1 gap-2">
                 {[
-                  { value: 'questions', label: 'Questions', desc: 'TOEIC Part 5/6/7 items' },
+                  { value: 'questions', label: 'Questions', desc: 'CEFR grammar, reading & listening' },
                   { value: 'vocabulary', label: 'Vocabulary', desc: 'Flashcard words & translations' },
                 ].map((opt) => (
                   <button
@@ -289,11 +300,11 @@ export default function AdminImportPage() {
               </p>
               {importType === 'questions' ? (
                 <code className="block bg-white p-2 rounded border border-slate-200 font-mono text-[9px] break-all text-slate-700">
-                  id,question,choiceA,choiceB,choiceC,choiceD,correctAnswer,explanation,explanationVi,part,type,topic,difficulty,context,transcript,audioUrl
+                  id,question,choiceA,choiceB,choiceC,choiceD,correctAnswer,explanation,cefrLevel,skill,mode,type,topic,context,transcript,audioUrl
                 </code>
               ) : (
                 <code className="block bg-white p-2 rounded border border-slate-200 font-mono text-[9px] break-all text-slate-700">
-                  word,pronunciation,partOfSpeech,definition,definitionNative,example,exampleTranslation,topic,difficulty,synonyms
+                  word,pronunciation,partOfSpeech,definition,definitionNative,example,exampleTranslation,topic,cefrLevel,synonyms
                 </code>
               )}
             </div>
@@ -302,7 +313,7 @@ export default function AdminImportPage() {
           <Card className="p-5 bg-white border border-slate-200/60 shadow-sm space-y-4">
             <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500">Database Seeding</h2>
             <p className="text-xs text-slate-500 leading-relaxed">
-              Don't have a CSV file? Seed the database with high-quality sample TOEIC Part 5 questions and vocabulary words.
+              Don't have a CSV file? Seed the database with CEFR-tagged sample questions and vocabulary words.
             </p>
             <Button
               onClick={handleSeedData}

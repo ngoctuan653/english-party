@@ -1,8 +1,10 @@
 import { Timestamp } from 'firebase/firestore';
+import type { CefrLevel } from './cefr';
 
 export interface VocabWord {
   id: string;
   exam: string;
+  cefrLevel?: CefrLevel;
   word: string;
   pronunciation: string;
   partOfSpeech: string;

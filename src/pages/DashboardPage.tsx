@@ -14,23 +14,24 @@ import { Progress } from '@/components/ui/Progress';
 import { Skeleton } from '@/components/ui/Skeleton';
 import SessionReviewModal from '@/components/study/SessionReviewModal';
 import { LearningPath, type LearningPathNode } from '@/components/study/LearningPath';
+import { getCurrentCefrLevel, getTargetCefrLevel } from '@/types/cefr';
 
 const pathNodes: LearningPathNode[] = [
   {
-    id: 'part-5-foundations',
+    id: 'a1-grammar-foundations',
     unit: 1,
-    unitTitle: 'Build the foundation',
-    title: 'Grammar foundations',
-    description: 'Sentence structure, word forms, and core TOEIC patterns.',
-    detail: 'Part 5 · 10 questions',
-    href: '/study?part=5',
+    unitTitle: 'Basic user · A1-A2',
+    title: 'A1 grammar foundations',
+    description: 'Build familiar phrases, basic sentence patterns, and everyday accuracy.',
+    detail: 'CEFR A1 · Grammar',
+    href: '/study?level=A1&skill=grammar',
     icon: Icons.BookOpenCheck,
     tone: 'sky',
   },
   {
     id: 'vocabulary-core',
     unit: 1,
-    unitTitle: 'Build the foundation',
+    unitTitle: 'Basic user · A1-A2',
     title: 'Core vocabulary',
     description: 'Learn high-frequency words with active recall.',
     detail: 'Smart flashcards · 12 words',
@@ -41,10 +42,10 @@ const pathNodes: LearningPathNode[] = [
   {
     id: 'listening-conversations',
     unit: 1,
-    unitTitle: 'Build the foundation',
-    title: 'Workplace conversations',
-    description: 'Listen for purpose, detail, and the next action.',
-    detail: 'Part 3 · 10 questions',
+    unitTitle: 'Basic user · A1-A2',
+    title: 'A2 everyday listening',
+    description: 'Listen for familiar information, purpose, and simple next actions.',
+    detail: 'CEFR A2 · Listening',
     href: '/study/listening',
     icon: Icons.Headphones,
     tone: 'emerald',
@@ -52,8 +53,8 @@ const pathNodes: LearningPathNode[] = [
   {
     id: 'checkpoint-one',
     unit: 1,
-    unitTitle: 'Build the foundation',
-    title: 'Foundation checkpoint',
+    unitTitle: 'Basic user · A1-A2',
+    title: 'A1-A2 checkpoint',
     description: 'Repair unresolved mistakes before moving forward.',
     detail: 'Personalized review',
     href: '/study',
@@ -62,20 +63,20 @@ const pathNodes: LearningPathNode[] = [
     tone: 'amber',
   },
   {
-    id: 'part-6-context',
+    id: 'b1-use-of-english',
     unit: 2,
-    unitTitle: 'Understand context',
-    title: 'Text completion',
-    description: 'Complete emails, notices, and workplace messages.',
-    detail: 'Part 6 · 10 questions',
-    href: '/study?part=6',
+    unitTitle: 'Independent user · B1-B2',
+    title: 'B1 Use of English',
+    description: 'Complete connected texts and follow the main points of clear language.',
+    detail: 'CEFR B1 · Use of English',
+    href: '/study?level=B1&skill=use-of-english',
     icon: Icons.Files,
     tone: 'sky',
   },
   {
     id: 'vocabulary-business',
     unit: 2,
-    unitTitle: 'Understand context',
+    unitTitle: 'Independent user · B1-B2',
     title: 'Business word recall',
     description: 'Strengthen weak and due vocabulary with spaced review.',
     detail: 'Personalized recall',
@@ -84,21 +85,21 @@ const pathNodes: LearningPathNode[] = [
     tone: 'violet',
   },
   {
-    id: 'part-7-reading',
+    id: 'b2-reading',
     unit: 2,
-    unitTitle: 'Understand context',
-    title: 'Reading for detail',
-    description: 'Find evidence, purpose, and inference in real documents.',
-    detail: 'Part 7 · 10 questions',
-    href: '/study?part=7',
+    unitTitle: 'Independent user · B1-B2',
+    title: 'B2 reading for meaning',
+    description: 'Find evidence, purpose, and inference in increasingly complex texts.',
+    detail: 'CEFR B2 · Reading',
+    href: '/study?level=B2&skill=reading',
     icon: Icons.Newspaper,
     tone: 'emerald',
   },
   {
     id: 'checkpoint-two',
     unit: 2,
-    unitTitle: 'Understand context',
-    title: 'Context checkpoint',
+    unitTitle: 'Independent user · B1-B2',
+    title: 'B1-B2 checkpoint',
     description: 'Revisit weak answers across grammar and reading.',
     detail: 'Personalized review',
     href: '/study',
@@ -107,24 +108,24 @@ const pathNodes: LearningPathNode[] = [
     tone: 'amber',
   },
   {
-    id: 'mixed-mastery',
+    id: 'c1-mixed-mastery',
     unit: 3,
-    unitTitle: 'Reach test readiness',
-    title: 'Mixed TOEIC practice',
-    description: 'Balance new, weak, and review questions under one session.',
-    detail: 'Adaptive mix · 10 questions',
-    href: '/study?part=5',
+    unitTitle: 'Proficient user · C1-C2',
+    title: 'C1 effective proficiency',
+    description: 'Use precise language flexibly across academic and professional contexts.',
+    detail: 'CEFR C1 · Adaptive practice',
+    href: '/study?level=C1&skill=grammar',
     icon: Icons.Sparkles,
     tone: 'sky',
   },
   {
-    id: 'final-mastery',
+    id: 'c2-mastery',
     unit: 3,
-    unitTitle: 'Reach test readiness',
-    title: 'Reading mastery',
-    description: 'Finish with longer documents and evidence-based answers.',
-    detail: 'Part 7 challenge',
-    href: '/study?part=7',
+    unitTitle: 'Proficient user · C1-C2',
+    title: 'C2 mastery',
+    description: 'Work with nuanced meaning, complex texts, and precise expression.',
+    detail: 'CEFR C2 · Reading challenge',
+    href: '/study?level=C2&skill=reading',
     icon: Icons.Trophy,
     tone: 'amber',
   },
@@ -227,13 +228,15 @@ export default function DashboardPage() {
   }));
   const completedMissionCount = missions.filter((mission) => mission.completed).length;
   const currentRank = leaderboard.findIndex((user) => user.uid === profile?.uid) + 1;
+  const currentCefrLevel = getCurrentCefrLevel(profile);
+  const targetCefrLevel = getTargetCefrLevel(profile);
 
   return (
     <div className="mx-auto grid w-full max-w-[1280px] gap-5 pb-10 text-slate-800 xl:grid-cols-[minmax(0,1fr)_340px]">
       <main className="min-w-0 space-y-5">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-black uppercase text-sky-700">TOEIC learning path</p>
+            <p className="text-xs font-black uppercase text-sky-700">CEFR learning path</p>
             <h1 className="mt-1 text-2xl font-black text-slate-950 sm:text-3xl">
               Keep moving, {profile?.displayName?.split(' ')[0] ?? 'learner'}
             </h1>
@@ -242,7 +245,7 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700 shadow-sm">
               <Icons.Gauge className="h-4 w-4 text-sky-600" />
-              TOEIC {profile?.currentEstimatedScore ?? 0} / {profile?.targetScore ?? 700}
+              CEFR {currentCefrLevel} → {targetCefrLevel}
             </span>
           </div>
         </header>
@@ -295,7 +298,7 @@ export default function DashboardPage() {
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4 sm:px-6">
             <div>
               <p className="text-[10px] font-black uppercase text-sky-700">Course map</p>
-              <h2 className="mt-1 text-lg font-black text-slate-950">TOEIC 700-800 journey</h2>
+              <h2 className="mt-1 text-lg font-black text-slate-950">English A1-C2 journey</h2>
             </div>
             <span className="text-xs font-bold text-slate-500">{completedPathSteps} / {pathNodes.length} steps mastered</span>
           </div>

@@ -14,7 +14,7 @@ const modules: Array<{
   {
     id: 'grammar',
     label: 'Grammar & Reading',
-    description: 'TOEIC Parts 5-7',
+    description: 'CEFR A1-C2 practice',
     path: '/study',
     icon: Icons.BookOpen,
   },

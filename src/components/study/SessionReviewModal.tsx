@@ -80,6 +80,7 @@ export default function SessionReviewModal({
   const totalAnswers = session.answers.length;
   const correctCount = session.answers.filter((a) => a.isCorrect).length;
   const wrongCount = totalAnswers - correctCount;
+  const vocabRatingLabels = ['Again', 'Hard', 'Good', 'Easy'] as const;
 
   // Filtered items mapped with answers
   const itemWithAnswers = items.map((item) => {
@@ -276,7 +277,16 @@ export default function SessionReviewModal({
                                 </h3>
                                 <Badge variant="purple" className="mt-1 font-bold text-[9px] capitalize">{vocab.partOfSpeech}</Badge>
                               </div>
-                              <Badge variant="default" className="capitalize text-[9px]">{vocab.topic}</Badge>
+                              <div className="flex flex-wrap items-center justify-end gap-2">
+                                <Badge
+                                  variant={userAnswer === 0 ? 'danger' : userAnswer === 1 ? 'warning' : userAnswer === 2 ? 'info' : 'success'}
+                                  className="text-[9px] font-bold"
+                                >
+                                  {vocabRatingLabels[userAnswer ?? 0] ?? 'Again'}
+                                </Badge>
+                                <Badge variant="default" className="capitalize text-[9px]">{vocab.topic}</Badge>
+                                <span className="text-[9px] font-bold text-slate-400">{Math.round(timeSpent)}s</span>
+                              </div>
                             </div>
 
                             <div className="text-xs space-y-1.5 text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-150">

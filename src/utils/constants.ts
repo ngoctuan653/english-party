@@ -7,18 +7,16 @@ export const TOPICS = [
 ] as const;
 
 export const EXAM_TYPES = [
-  { id: 'toeic', name: 'TOEIC', icon: '📝' },
-  { id: 'ielts', name: 'IELTS', icon: '🎓' },
-  { id: 'jlpt', name: 'JLPT', icon: '🇯🇵' },
-  { id: 'sat', name: 'SAT', icon: '📚' },
+  { id: 'cefr', name: 'CEFR A1-C2', icon: '🌍' },
 ] as const;
 
 export const DIFFICULTY_LEVELS = [
-  { value: 500, label: 'Beginner', color: '#22C55E' },
-  { value: 600, label: 'Elementary', color: '#3B82F6' },
-  { value: 700, label: 'Intermediate', color: '#A855F7' },
-  { value: 800, label: 'Advanced', color: '#F59E0B' },
-  { value: 900, label: 'Expert', color: '#EF4444' },
+  { value: 500, label: 'A1', color: '#22C55E' },
+  { value: 600, label: 'A2', color: '#14B8A6' },
+  { value: 650, label: 'B1', color: '#3B82F6' },
+  { value: 700, label: 'B2', color: '#6366F1' },
+  { value: 800, label: 'C1', color: '#A855F7' },
+  { value: 900, label: 'C2', color: '#F59E0B' },
 ] as const;
 
 export const NAV_ITEMS = [

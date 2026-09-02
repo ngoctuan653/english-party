@@ -18,6 +18,10 @@ import { toast } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as Icons from 'lucide-react';
 import type { Question } from '@/types/question';
+import type { CefrLevel } from '@/types/cefr';
+import { CEFR_LEVELS, CEFR_LEVEL_META, cefrLevelFromDifficulty, getCefrDifficulty, isCefrLevel } from '@/types/cefr';
+
+const skillLabels: Record<number, string> = { 3: 'Conversations', 4: 'Short talks', 5: 'Grammar', 6: 'Use of English', 7: 'Reading' };
 
 export default function AdminQuestionsPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -37,6 +41,7 @@ export default function AdminQuestionsPage() {
   const [part, setPart] = useState(5);
   const [topic, setTopic] = useState('business');
   const [difficulty, setDifficulty] = useState(700);
+  const [cefrLevel, setCefrLevel] = useState<CefrLevel>('B2');
 
   async function loadQuestions() {
     try {
@@ -68,6 +73,7 @@ export default function AdminQuestionsPage() {
     setPart(5);
     setTopic('business');
     setDifficulty(700);
+    setCefrLevel('B2');
     setIsModalOpen(true);
   };
 
@@ -79,7 +85,9 @@ export default function AdminQuestionsPage() {
     setExplanation(q.explanation);
     setPart(q.part);
     setTopic(q.topic);
-    setDifficulty(q.difficulty);
+    const level = isCefrLevel(q.cefrLevel) ? q.cefrLevel : cefrLevelFromDifficulty(q.difficulty);
+    setDifficulty(getCefrDifficulty(level));
+    setCefrLevel(level);
     setIsModalOpen(true);
   };
 
@@ -99,7 +107,8 @@ export default function AdminQuestionsPage() {
         part: Number(part),
         topic,
         difficulty: Number(difficulty),
-        exam: 'toeic',
+        cefrLevel,
+        exam: 'cefr',
         type: 'mcq',
         isActive: editingQuestion ? editingQuestion.isActive : true,
         updatedAt: serverTimestamp(),
@@ -167,8 +176,8 @@ export default function AdminQuestionsPage() {
     <div className="space-y-6 pb-8 text-slate-800 animate-fade-in">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold sm:text-3xl text-slate-900">Manage TOEIC Questions</h1>
-          <p className="text-sm text-slate-505 mt-1">Add, edit, or delete practice questions</p>
+          <h1 className="text-2xl font-bold sm:text-3xl text-slate-900">Manage CEFR Questions</h1>
+          <p className="text-sm text-slate-505 mt-1">Manage A1-C2 questions by skill and level</p>
         </div>
         <Button
           onClick={openAddModal}
@@ -198,7 +207,7 @@ export default function AdminQuestionsPage() {
                   : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
               }`}
             >
-              {p === 'all' ? 'All Parts' : `Part ${p}`}
+              {p === 'all' ? 'All Skills' : skillLabels[Number(p)]}
             </button>
           ))}
         </div>
@@ -223,13 +232,13 @@ export default function AdminQuestionsPage() {
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center gap-2">
                     <Badge variant="purple" className="text-[10px] font-bold">
-                      Part {q.part}
+                      {skillLabels[q.part] ?? 'Practice'}
                     </Badge>
                     <Badge variant="info" className="text-[10px] font-bold capitalize">
                       {q.topic}
                     </Badge>
                     <Badge variant="default" className="text-[10px] font-bold">
-                      {q.difficulty} Level
+                      CEFR {isCefrLevel(q.cefrLevel) ? q.cefrLevel : cefrLevelFromDifficulty(q.difficulty)}
                     </Badge>
                     <span className="text-[10px] text-slate-500 font-semibold">
                       Success rate:{' '}
@@ -305,15 +314,15 @@ export default function AdminQuestionsPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="block text-xs font-semibold text-slate-500">Exam Part</label>
+              <label className="block text-xs font-semibold text-slate-500">Learning Skill</label>
               <select
                 value={part}
                 onChange={(e) => setPart(Number(e.target.value))}
                 className="w-full h-11 px-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
               >
-                <option value="5" className="bg-white text-slate-800">Part 5 (Incomplete Sentences)</option>
-                <option value="6" className="bg-white text-slate-800">Part 6 (Text Completion)</option>
-                <option value="7" className="bg-white text-slate-800">Part 7 (Reading Comprehension)</option>
+                <option value="5" className="bg-white text-slate-800">Grammar</option>
+                <option value="6" className="bg-white text-slate-800">Use of English</option>
+                <option value="7" className="bg-white text-slate-800">Reading Comprehension</option>
               </select>
             </div>
 
@@ -334,13 +343,20 @@ export default function AdminQuestionsPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Input
-              label="Difficulty Score"
-              type="number"
-              value={difficulty}
-              onChange={(e) => setDifficulty(Number(e.target.value))}
-              placeholder="700"
-            />
+            <div className="space-y-1">
+              <label className="block text-xs font-semibold text-slate-500">CEFR Level</label>
+              <select
+                value={cefrLevel}
+                onChange={(event) => {
+                  const level = event.target.value as CefrLevel;
+                  setCefrLevel(level);
+                  setDifficulty(getCefrDifficulty(level));
+                }}
+                className="w-full h-11 px-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              >
+                {CEFR_LEVELS.map((level) => <option key={level} value={level}>{level} · {CEFR_LEVEL_META[level].title}</option>)}
+              </select>
+            </div>
             <div className="space-y-1">
               <label className="block text-xs font-semibold text-slate-500">Correct Answer</label>
               <select

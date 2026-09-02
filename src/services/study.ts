@@ -20,6 +20,7 @@ import type { Question, QuestionAnswer } from '@/types/question';
 import type { StudySession, SessionResults, SessionType, SessionValidationIssue } from '@/types/study';
 import type { DailyProgress, MissionProgress, MissionType } from '@/types/gamification';
 import type { UserProfile } from '@/types/user';
+import type { ReviewRating } from '@/types/progress';
 import {
   cancelAntiCheatTracking,
   startAntiCheatTracking,
@@ -35,8 +36,14 @@ import {
 } from '@/services/gamification';
 import { calculateLevel } from '@/types/gamification';
 import { getTodayDateString } from '@/utils/helpers';
-import { batchUpdateQuestionProgress, batchUpdateVocabProgress } from '@/services/progress';
+import {
+  batchUpdateQuestionProgress,
+  batchUpdateVocabProgress,
+  getUserVocabProgress,
+} from '@/services/progress';
 import { getBundledQuestions } from '@/data/questionBank';
+import type { CefrLevel } from '@/types/cefr';
+import { cefrLevelFromDifficulty, isCefrLevel } from '@/types/cefr';
 
 // ============================================
 // Fetch Questions
@@ -48,6 +55,7 @@ export async function fetchQuestions(options: {
   topic?: string;
   difficulty?: number;
   type?: string;
+  cefrLevel?: CefrLevel;
   count?: number;
 }): Promise<Question[]> {
   const bundled = getBundledQuestions(options);
@@ -56,7 +64,7 @@ export async function fetchQuestions(options: {
     where('isActive', '==', true),
   ];
 
-  if (options.exam) constraints.push(where('exam', '==', options.exam));
+  if (options.exam && options.exam !== 'cefr') constraints.push(where('exam', '==', options.exam));
   if (options.part) constraints.push(where('part', '==', options.part));
   if (options.topic) constraints.push(where('topic', '==', options.topic));
   if (options.difficulty) constraints.push(where('difficulty', '==', options.difficulty));
@@ -74,14 +82,28 @@ export async function fetchQuestions(options: {
     });
   } catch (error) {
     if (bundled.length === 0) throw error;
-    console.warn('Using bundled TOEIC question bank because Firestore could not be reached.', error);
+    console.warn('Using the bundled CEFR question bank because Firestore could not be reached.', error);
   }
 
   const merged = new Map<string, Question>();
   bundled.forEach((item) => merged.set(item.id, item));
-  remoteQuestions.forEach((item) => merged.set(item.id, item));
+  remoteQuestions.forEach((item) => merged.set(item.id, {
+    ...item,
+    exam: 'cefr',
+    cefrLevel: isCefrLevel(item.cefrLevel) ? item.cefrLevel : cefrLevelFromDifficulty(item.difficulty),
+  }));
 
-  return shuffleArray(Array.from(merged.values())).slice(0, options.count || 20);
+  const filtered = Array.from(merged.values()).filter((item) => {
+    if (options.exam && options.exam !== 'cefr') return item.exam === options.exam;
+    if (options.cefrLevel && item.cefrLevel !== options.cefrLevel) return false;
+    if (options.part && item.part !== options.part) return false;
+    if (options.topic && item.topic !== options.topic) return false;
+    if (options.difficulty && item.difficulty !== options.difficulty) return false;
+    if (options.type && item.type !== options.type) return false;
+    return true;
+  });
+
+  return shuffleArray(filtered).slice(0, options.count || 20);
 }
 
 function shuffleArray<T>(array: T[]): T[] {
@@ -320,7 +342,20 @@ export async function endStudySession(
 
   const parts = sessionId.split('_');
   const sessionType = (parts[parts.length - 2] || 'quiz') as SessionType;
-  const exam = parts[parts.length - 3] || 'toeic';
+  const exam = parts[parts.length - 3] || 'cefr';
+  let newVocabularyCount = 0;
+  if (sessionType === 'vocabulary') {
+    try {
+      const existingVocabProgress = await getUserVocabProgress(userId);
+      newVocabularyCount = new Set(
+        answers
+          .filter((answer) => answer.isCorrect && !existingVocabProgress.has(answer.questionId))
+          .map((answer) => answer.questionId),
+      ).size;
+    } catch (error) {
+      console.warn('Could not calculate newly learned vocabulary count.', error);
+    }
+  }
 
   const timing = resolveSessionTiming(sessionId, answers, antiCheatData);
   const { activeSeconds, startedAtDate, totalSeconds } = timing;
@@ -392,7 +427,7 @@ export async function endStudySession(
           (sessionType === 'quiz' || sessionType === 'mission' ? totalQuestions : 0),
         wordsLearned:
           progressAfter.wordsLearned +
-          (sessionType === 'vocabulary' ? totalQuestions : 0),
+          (sessionType === 'vocabulary' ? newVocabularyCount : 0),
         activeMinutes: progressAfter.activeMinutes + activeMinutes,
         listeningSetsCompleted:
           progressAfter.listeningSetsCompleted +
@@ -486,7 +521,7 @@ export async function endStudySession(
       };
 
       if (sessionType === 'vocabulary') {
-        userUpdates.vocabularyLearned = (profile.vocabularyLearned || 0) + totalQuestions;
+        userUpdates.vocabularyLearned = (profile.vocabularyLearned || 0) + newVocabularyCount;
       } else {
         userUpdates.totalQuestionsAnswered = (profile.totalQuestionsAnswered || 0) + totalQuestions;
         userUpdates.totalCorrectAnswers = (profile.totalCorrectAnswers || 0) + correctAnswers;
@@ -517,18 +552,15 @@ export async function endStudySession(
   if (transactionResult.isValid && !transactionResult.alreadyProcessed) {
     try {
       if (sessionType === 'vocabulary') {
+        const ratings: ReviewRating[] = ['again', 'hard', 'good', 'easy'];
         const vocabEntries = answers.map((a) => ({
           wordId: a.questionId,
-          isCorrect: true,
-          alreadyKnew: a.selectedAnswer === 1,
+          isCorrect: a.isCorrect,
+          rating: ratings[a.selectedAnswer] ?? (a.isCorrect ? 'good' : 'again'),
         }));
         await batchUpdateVocabProgress(userId, vocabEntries);
-      } else if (sessionType !== 'listening') {
-        const questionEntries = answers.map((a) => ({
-          questionId: a.questionId,
-          isCorrect: a.isCorrect,
-        }));
-        await batchUpdateQuestionProgress(userId, questionEntries);
+      } else {
+        await batchUpdateQuestionProgress(userId, answers);
       }
     } catch (progressErr) {
       console.error('Failed to update item progress:', progressErr);
@@ -571,7 +603,7 @@ export function getMockQuestions(count: number = 10): Question[] {
   const mockQuestions: Question[] = [
     {
       id: 'q1',
-      exam: 'toeic',
+      exam: 'cefr',
       part: 5,
       type: 'mcq',
       topic: 'business',
@@ -590,7 +622,7 @@ export function getMockQuestions(count: number = 10): Question[] {
     },
     {
       id: 'q2',
-      exam: 'toeic',
+      exam: 'cefr',
       part: 5,
       type: 'mcq',
       topic: 'email',
@@ -609,7 +641,7 @@ export function getMockQuestions(count: number = 10): Question[] {
     },
     {
       id: 'q3',
-      exam: 'toeic',
+      exam: 'cefr',
       part: 5,
       type: 'mcq',
       topic: 'office',
@@ -628,7 +660,7 @@ export function getMockQuestions(count: number = 10): Question[] {
     },
     {
       id: 'q4',
-      exam: 'toeic',
+      exam: 'cefr',
       part: 5,
       type: 'mcq',
       topic: 'finance',
@@ -647,7 +679,7 @@ export function getMockQuestions(count: number = 10): Question[] {
     },
     {
       id: 'q5',
-      exam: 'toeic',
+      exam: 'cefr',
       part: 5,
       type: 'mcq',
       topic: 'marketing',
@@ -666,7 +698,7 @@ export function getMockQuestions(count: number = 10): Question[] {
     },
     {
       id: 'q6',
-      exam: 'toeic',
+      exam: 'cefr',
       part: 5,
       type: 'mcq',
       topic: 'meetings',
@@ -685,7 +717,7 @@ export function getMockQuestions(count: number = 10): Question[] {
     },
     {
       id: 'q7',
-      exam: 'toeic',
+      exam: 'cefr',
       part: 5,
       type: 'mcq',
       topic: 'hotel',
@@ -704,7 +736,7 @@ export function getMockQuestions(count: number = 10): Question[] {
     },
     {
       id: 'q8',
-      exam: 'toeic',
+      exam: 'cefr',
       part: 5,
       type: 'mcq',
       topic: 'shipping',
@@ -723,7 +755,7 @@ export function getMockQuestions(count: number = 10): Question[] {
     },
     {
       id: 'q9',
-      exam: 'toeic',
+      exam: 'cefr',
       part: 5,
       type: 'mcq',
       topic: 'airport',
@@ -742,7 +774,7 @@ export function getMockQuestions(count: number = 10): Question[] {
     },
     {
       id: 'q10',
-      exam: 'toeic',
+      exam: 'cefr',
       part: 5,
       type: 'mcq',
       topic: 'business',

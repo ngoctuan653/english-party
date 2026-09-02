@@ -9,7 +9,8 @@ import { AVATARS } from '@/utils/constants';
 import { toast } from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import * as Icons from 'lucide-react';
-import type { ExamType } from '@/types/user';
+import type { CefrLevel } from '@/types/cefr';
+import { CEFR_LEVELS, CEFR_LEVEL_META, compareCefrLevels, getCurrentCefrLevel, getTargetCefrLevel } from '@/types/cefr';
 
 const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY || '';
 
@@ -29,8 +30,8 @@ export default function SettingsPage() {
   const { profile, setProfile } = useAuthStore();
 
   const [displayName, setDisplayName] = useState(profile?.displayName || '');
-  const [targetExam, setTargetExam] = useState<ExamType>(profile?.targetExam || 'toeic');
-  const [targetScore, setTargetScore] = useState(profile?.targetScore || 750);
+  const [currentCefrLevel, setCurrentCefrLevel] = useState<CefrLevel>(() => getCurrentCefrLevel(profile));
+  const [targetCefrLevel, setTargetCefrLevel] = useState<CefrLevel>(() => getTargetCefrLevel(profile));
   const [dailyGoalMinutes, setDailyGoalMinutes] = useState(profile?.dailyGoalMinutes || 30);
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatarUrl || '🦊');
   const [notificationsEnabled, setNotificationsEnabled] = useState(
@@ -202,14 +203,19 @@ export default function SettingsPage() {
       toast.error('Display name cannot be empty');
       return;
     }
+    if (compareCefrLevels(targetCefrLevel, currentCefrLevel) < 0) {
+      toast.error('Target CEFR level must be equal to or higher than your current level.');
+      return;
+    }
 
     setSaving(true);
     try {
       const userRef = doc(db, 'users', profile.uid);
       const updates = {
         displayName,
-        targetExam,
-        targetScore: Number(targetScore),
+        targetExam: 'cefr' as const,
+        currentCefrLevel,
+        targetCefrLevel,
         dailyGoalMinutes: Number(dailyGoalMinutes),
         avatarUrl,
         notificationsEnabled,
@@ -245,7 +251,7 @@ export default function SettingsPage() {
           </span>
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          Customize your profile, target scores, and study notifications
+          Customize your profile, CEFR learning goal, and study notifications
         </p>
       </div>
 
@@ -303,29 +309,27 @@ export default function SettingsPage() {
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Exam selector */}
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-slate-600">Target Exam</label>
+              <label className="block text-sm font-semibold text-slate-600">Current CEFR Level</label>
               <select
-                value={targetExam}
-                onChange={(e) => setTargetExam(e.target.value as ExamType)}
+                value={currentCefrLevel}
+                onChange={(e) => setCurrentCefrLevel(e.target.value as CefrLevel)}
                 className="w-full h-11 px-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0071E3]/25 focus:border-[#0071E3] hover:border-slate-300"
               >
-                <option value="toeic" className="bg-white text-slate-800">TOEIC</option>
-                <option value="ielts" className="bg-white text-slate-800">IELTS</option>
-                <option value="jlpt" className="bg-white text-slate-800">JLPT</option>
-                <option value="sat" className="bg-white text-slate-800">SAT</option>
+                {CEFR_LEVELS.map((level) => <option key={level} value={level}>{level} · {CEFR_LEVEL_META[level].title}</option>)}
               </select>
             </div>
 
-            {/* Target score */}
-            <Input
-              label="Target Score"
-              type="number"
-              value={targetScore}
-              onChange={(e) => setTargetScore(Number(e.target.value))}
-              placeholder="750"
-            />
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-slate-600">Target CEFR Level</label>
+              <select
+                value={targetCefrLevel}
+                onChange={(e) => setTargetCefrLevel(e.target.value as CefrLevel)}
+                className="w-full h-11 px-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0071E3]/25 focus:border-[#0071E3] hover:border-slate-300"
+              >
+                {CEFR_LEVELS.map((level) => <option key={level} value={level}>{level} · {CEFR_LEVEL_META[level].title}</option>)}
+              </select>
+            </div>
 
             {/* Daily study time */}
             <Input

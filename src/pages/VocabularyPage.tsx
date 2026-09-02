@@ -18,7 +18,14 @@ import { toast } from 'react-hot-toast';
 import type { SessionResults } from '@/types/study';
 import type { QuestionAnswer } from '@/types/question';
 import type { VocabProgressRecord } from '@/types/progress';
-import { buildSmartVocabDeck, generateSmartVocabSession } from '@/services/progress';
+import type { CefrLevel } from '@/types/cefr';
+import { CEFR_LEVELS, CEFR_LEVEL_META, cefrLevelFromDifficulty, getCurrentCefrLevel, isCefrLevel } from '@/types/cefr';
+import {
+  buildSmartVocabDeck,
+  calculateReviewSchedule,
+  generateSmartVocabSession,
+  isReviewDue,
+} from '@/services/progress';
 import {
   LearningIntro,
   LearningModuleNav,
@@ -42,6 +49,13 @@ const getTopicMeta = (topic: string) => {
   };
   return meta[topic.toLowerCase()] || { emoji: '📚', tone: 'bg-indigo-600', hoverGlow: 'hover:shadow-indigo-500/10' };
 };
+
+const vocabRatings = [
+  { value: 0, rating: 'again' as const, label: 'Again', icon: Icons.RotateCcw, tone: 'border-rose-200 bg-rose-50 text-rose-700 hover:border-rose-400' },
+  { value: 1, rating: 'hard' as const, label: 'Hard', icon: Icons.Brain, tone: 'border-amber-200 bg-amber-50 text-amber-700 hover:border-amber-400' },
+  { value: 2, rating: 'good' as const, label: 'Good', icon: Icons.Check, tone: 'border-sky-200 bg-sky-50 text-sky-700 hover:border-sky-400' },
+  { value: 3, rating: 'easy' as const, label: 'Easy', icon: Icons.Zap, tone: 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:border-emerald-400' },
+];
 
 const speakText = (text: string, rate: number = 0.9) => {
   if (!('speechSynthesis' in window)) return;
@@ -82,6 +96,7 @@ export default function VocabularyPage() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [autoPlayAudio, setAutoPlayAudio] = useState(true);
   const [topicSearchTerm, setTopicSearchTerm] = useState('');
+  const [activeLevel, setActiveLevel] = useState<CefrLevel>(() => getCurrentCefrLevel(profile));
 
   // Initialize SpeechSynthesis voices early
   useEffect(() => {
@@ -180,15 +195,19 @@ export default function VocabularyPage() {
       return next;
     });
 
-    const record = answersRef.current.find((a) => a.questionId === wordId);
+    const timeSpent = Math.max(0.5, (Date.now() - wordStartTimeRef.current) / 1000);
+    const record = answersRef.current.find((answer) => answer.questionId === wordId);
     if (record) {
       record.selectedAnswer = choice;
-    }
-
-    if (choice === 1) {
-      toast.success('Đã lưu: Đã biết từ này từ trước 🎯');
+      record.isCorrect = choice > 0;
+      record.timeSpent = timeSpent;
     } else {
-      toast.success('Đã lưu: Đã hiểu từ mới này 📖');
+      answersRef.current.push({
+        questionId: wordId,
+        selectedAnswer: choice,
+        isCorrect: choice > 0,
+        timeSpent,
+      });
     }
 
     // Auto-advance after brief delay
@@ -196,7 +215,7 @@ export default function VocabularyPage() {
       setTimeout(() => {
         setIsFlipped(false);
         setCurrentIndex((prev) => prev + 1);
-      }, 400);
+      }, 280);
     }
   };
 
@@ -221,7 +240,13 @@ export default function VocabularyPage() {
         );
         const allWords: VocabWord[] = [];
         snap.forEach((doc) => {
-          allWords.push({ id: doc.id, ...doc.data() } as VocabWord);
+          const data = doc.data() as Omit<VocabWord, 'id'>;
+          allWords.push({
+            id: doc.id,
+            ...data,
+            exam: 'cefr',
+            cefrLevel: isCefrLevel(data.cefrLevel) ? data.cefrLevel : cefrLevelFromDifficulty(data.difficulty),
+          });
         });
 
         const practiceIds = location.state?.practiceIds as string[] | undefined;
@@ -283,21 +308,12 @@ export default function VocabularyPage() {
     async function startSession() {
       if (!profile?.uid || filteredWords.length === 0 || sessionId) return;
       try {
-        const id = await startStudySession(profile.uid, 'toeic', 'vocabulary');
+        const id = await startStudySession(profile.uid, 'cefr', 'vocabulary');
         setSessionId(id);
         wordStartTimeRef.current = Date.now();
-        // Track the first word automatically
         const firstWord = filteredWords[0];
         if (firstWord) {
           setViewedWordIds(new Set([firstWord.id]));
-          answersRef.current = [
-            {
-              questionId: firstWord.id,
-              selectedAnswer: 0,
-              isCorrect: true,
-              timeSpent: 0.1,
-            },
-          ];
         }
       } catch (err) {
         console.error('Failed to start vocabulary session:', err);
@@ -333,13 +349,6 @@ export default function VocabularyPage() {
   // Track word viewing
   const trackWordView = (wordId: string) => {
     if (!wordId) return;
-    
-    // Save time spent on the previous word
-    const timeSpentOnPrev = (Date.now() - wordStartTimeRef.current) / 1000;
-    if (answersRef.current.length > 0) {
-      answersRef.current[answersRef.current.length - 1].timeSpent = Math.max(timeSpentOnPrev, 0.5);
-    }
-    
     wordStartTimeRef.current = Date.now();
 
     if (viewedWordIds.has(wordId)) return;
@@ -350,12 +359,6 @@ export default function VocabularyPage() {
       return next;
     });
 
-    answersRef.current.push({
-      questionId: wordId,
-      selectedAnswer: 0,
-      isCorrect: true,
-      timeSpent: 0.1, // Will be updated on next slide
-    });
   };
 
   useEffect(() => {
@@ -380,20 +383,19 @@ export default function VocabularyPage() {
 
   const handleFinishVocab = async () => {
     if (!sessionId || !profile?.uid || saving) return;
+    if (answersRef.current.length === 0) {
+      toast.error('Hãy tự đánh giá ít nhất một từ trước khi kết thúc.');
+      return;
+    }
     try {
       setSaving(true);
-      // Finalize time spent on the last word
-      const lastTime = (Date.now() - wordStartTimeRef.current) / 1000;
-      if (answersRef.current.length > 0) {
-        answersRef.current[answersRef.current.length - 1].timeSpent = Math.max(lastTime, 0.5);
-      }
-
+      const correctRatings = answersRef.current.filter((answer) => answer.isCorrect).length;
       const sessionResults = await endStudySession(
         sessionId,
         profile.uid,
         answersRef.current,
         profile.currentStreak,
-        { total: viewedWordIds.size, correct: viewedWordIds.size }
+        { total: answersRef.current.length, correct: correctRatings }
       );
       const { progressMap, stats } = await generateSmartVocabSession(profile.uid, words);
       setVocabProgressMap(progressMap);
@@ -429,16 +431,24 @@ export default function VocabularyPage() {
   };
 
   // Unique topics
-  const topics = ['all', ...Array.from(new Set(words.map((w) => w.topic.toLowerCase())))];
+  const levelWords = words.filter((word) => (word.cefrLevel ?? cefrLevelFromDifficulty(word.difficulty)) === activeLevel);
+  const topics = ['all', ...Array.from(new Set(levelWords.map((w) => w.topic.toLowerCase())))];
 
   // Real progress stats (from Firestore subcollection)
-  const masteredCount = progressStats.masteredCount;
-  const learningCount = progressStats.learningCount + progressStats.reviewCount;
-  const remainingCount = progressStats.newCount;
+  const masteredCount = levelWords.filter((word) => vocabProgressMap.get(word.id)?.state === 'mastered').length;
+  const learningCount = levelWords.filter((word) => {
+    const state = vocabProgressMap.get(word.id)?.state;
+    return state === 'learning' || state === 'review';
+  }).length;
+  const remainingCount = levelWords.filter((word) => !vocabProgressMap.has(word.id)).length;
+  const dueCount = levelWords.filter((word) => {
+    const progress = vocabProgressMap.get(word.id);
+    return progress ? isReviewDue(progress) : false;
+  }).length;
 
   const createDeckForTopic = (
     topic: string,
-    sourceWords: VocabWord[] = words,
+    sourceWords: VocabWord[] = levelWords,
     sourceProgressMap: Map<string, VocabProgressRecord> = vocabProgressMap
   ) => {
     const topicWords = topic === 'custom_practice'
@@ -472,6 +482,7 @@ export default function VocabularyPage() {
   const getWordState = (wordId: string): { label: string; emoji: string; color: string } => {
     const prog = vocabProgressMap.get(wordId);
     if (!prog) return { label: 'New', emoji: '🆕', color: 'bg-blue-50 text-blue-700 border-blue-200' };
+    if (isReviewDue(prog)) return { label: 'Due now', emoji: '↻', color: 'bg-amber-50 text-amber-700 border-amber-200' };
     switch (prog.state) {
       case 'mastered': return { label: 'Mastered', emoji: '✅', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
       case 'review': return { label: 'Review', emoji: '🔄', color: 'bg-amber-50 text-amber-700 border-amber-200' };
@@ -489,8 +500,8 @@ export default function VocabularyPage() {
           
           <div className="w-32 h-32 mx-auto rounded-full bg-slate-50 border-4 border-violet-500 flex flex-col justify-center items-center relative overflow-hidden shadow-md shadow-violet-500/5">
             <div className="absolute inset-0 bg-violet-500/3 blur-xl" />
-            <p className="text-3xl font-black text-slate-800 relative z-10">{viewedWordIds.size}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase relative z-10 font-sans">Words Studied</p>
+            <p className="text-3xl font-black text-slate-800 relative z-10">{wordSelections.size}</p>
+            <p className="text-[10px] text-slate-400 font-bold uppercase relative z-10 font-sans">Cards Rated</p>
           </div>
 
           <div className="grid grid-cols-3 gap-3 text-xs pt-4 border-t border-slate-100">
@@ -564,10 +575,10 @@ export default function VocabularyPage() {
   }
 
   if (!selectedTopic) {
-    const uniqueTopics = Array.from(new Set(words.map((w) => w.topic.toLowerCase())));
+    const uniqueTopics = Array.from(new Set(levelWords.map((w) => w.topic.toLowerCase())));
     const searchTerm = topicSearchTerm.trim().toLowerCase();
     const filteredTopics = uniqueTopics.filter((topic) => !searchTerm || topic.includes(searchTerm));
-    const totalWords = words.length;
+    const totalWords = levelWords.length;
     const masteredPercent = totalWords > 0 ? Math.round((masteredCount / totalWords) * 100) : 0;
 
     return (
@@ -576,7 +587,7 @@ export default function VocabularyPage() {
           <LearningModuleNav active="vocabulary" />
 
           <LearningIntro
-            eyebrow="TOEIC Vocabulary"
+            eyebrow={`CEFR ${activeLevel} Vocabulary`}
             title="Vocabulary Library"
             description="Build a practical word bank by topic. Smart sessions prioritize new and weak words, then add a small review sample only when needed."
             icon={Icons.Layers3}
@@ -597,11 +608,35 @@ export default function VocabularyPage() {
             )}
           />
 
+          <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+            <div className="border-b border-slate-200 px-5 py-3">
+              <p className="text-[10px] font-black uppercase text-sky-700">Vocabulary level</p>
+            </div>
+            <div className="grid grid-cols-3 sm:grid-cols-6">
+              {CEFR_LEVELS.map((level) => (
+                <button
+                  key={level}
+                  type="button"
+                  aria-pressed={activeLevel === level}
+                  onClick={() => setActiveLevel(level)}
+                  className={`min-h-16 border-b border-r border-slate-200 px-3 py-2 transition-colors sm:border-b-0 ${
+                    activeLevel === level ? 'bg-sky-600 text-white' : 'text-slate-600 hover:bg-sky-50'
+                  }`}
+                >
+                  <span className="block text-lg font-black">{level}</span>
+                  <span className={`block text-[9px] font-bold ${activeLevel === level ? 'text-sky-100' : 'text-slate-400'}`}>
+                    {CEFR_LEVEL_META[level].title}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </section>
+
           <LearningStats
             items={[
-              { label: 'Word bank', value: totalWords, detail: `${uniqueTopics.length} topics`, icon: Icons.LibraryBig, tone: 'blue' },
-              { label: 'New words', value: remainingCount, detail: 'Ready to learn', icon: Icons.Sparkles, tone: 'violet' },
-              { label: 'In review', value: learningCount, detail: 'Needs reinforcement', icon: Icons.RotateCcw, tone: 'amber' },
+              { label: 'New words', value: remainingCount, detail: `${uniqueTopics.length} topics`, icon: Icons.Sparkles, tone: 'blue' },
+              { label: 'Due now', value: dueCount, detail: 'Scheduled recall', icon: Icons.AlarmClock, tone: 'violet' },
+              { label: 'In review', value: learningCount, detail: 'Building retention', icon: Icons.RotateCcw, tone: 'amber' },
               { label: 'Mastered', value: masteredCount, detail: 'Completed words', icon: Icons.BadgeCheck, tone: 'emerald' },
             ]}
           />
@@ -627,7 +662,7 @@ export default function VocabularyPage() {
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {filteredTopics.map((topic) => {
-              const topicWords = words.filter((w) => w.topic.toLowerCase() === topic);
+              const topicWords = levelWords.filter((w) => w.topic.toLowerCase() === topic);
               const totalCount = topicWords.length;
               const masteredCount = topicWords.filter(
                 (w) => vocabProgressMap.get(w.id)?.state === 'mastered'
@@ -635,6 +670,10 @@ export default function VocabularyPage() {
               const learningCount = topicWords.filter((w) => {
                 const state = vocabProgressMap.get(w.id)?.state;
                 return state === 'learning' || state === 'review';
+              }).length;
+              const topicDueCount = topicWords.filter((word) => {
+                const progress = vocabProgressMap.get(word.id);
+                return progress ? isReviewDue(progress) : false;
               }).length;
 
               const percentMastered = totalCount > 0 ? (masteredCount / totalCount) * 100 : 0;
@@ -670,6 +709,11 @@ export default function VocabularyPage() {
                     </div>
 
                     <div className="flex flex-wrap gap-2 text-[9px] font-bold text-slate-400">
+                      {topicDueCount > 0 && (
+                        <Badge variant="warning" size="sm" dot>
+                          {topicDueCount} due now
+                        </Badge>
+                      )}
                       <Badge variant="purple" size="sm" dot={learningCount > 0}>
                         {learningCount} learning
                       </Badge>
@@ -716,14 +760,14 @@ export default function VocabularyPage() {
           </span>
           <span className="text-slate-300">|</span>
           <span className="text-violet-600 font-bold">
-            {viewedWordIds.size} words studied
+            {wordSelections.size} rated · {viewedWordIds.size} viewed
           </span>
         </div>
 
         {sessionId && (
           <Button
             onClick={handleFinishVocab}
-            disabled={saving}
+            disabled={saving || wordSelections.size === 0}
             size="sm"
             className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] px-3.5 py-1.5 rounded-xl cursor-pointer"
           >
@@ -760,7 +804,7 @@ export default function VocabularyPage() {
               </Button>
             </Link>
           ) : (
-            <p className="text-xs text-slate-400">Ask your admin to upload TOEIC vocabulary lists.</p>
+            <p className="text-xs text-slate-400">Ask your admin to upload CEFR-tagged vocabulary lists.</p>
           )}
         </Card>
       ) : (
@@ -787,7 +831,7 @@ export default function VocabularyPage() {
                 </Badge>
                 {currentWord.difficulty && (
                   <Badge variant="warning" className="absolute left-1/2 -translate-x-1/2 top-4 text-[9px] font-bold">
-                    🎯 Band: {currentWord.difficulty}
+                    CEFR {currentWord.cefrLevel ?? cefrLevelFromDifficulty(currentWord.difficulty)}
                   </Badge>
                 )}
                 {(() => {
@@ -830,7 +874,7 @@ export default function VocabularyPage() {
                 </Badge>
                 {currentWord.difficulty && (
                   <Badge variant="warning" className="absolute left-4 top-4 text-[9px] font-bold">
-                    🎯 Band: {currentWord.difficulty}
+                    CEFR {currentWord.cefrLevel ?? cefrLevelFromDifficulty(currentWord.difficulty)}
                   </Badge>
                 )}
 
@@ -866,36 +910,34 @@ export default function VocabularyPage() {
             </motion.div>
           </div>
 
-          {/* Action buttons for vocabulary status */}
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleMark(currentWord.id, 0);
-              }}
-              className={`py-3 px-4 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                wordSelections.get(currentWord.id) === 0
-                  ? 'bg-emerald-500 border-emerald-600 text-white shadow-md'
-                  : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              <Icons.CheckCircle className="w-4 h-4" />
-              <span>Got it now</span>
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleMark(currentWord.id, 1);
-              }}
-              className={`py-3 px-4 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                wordSelections.get(currentWord.id) === 1
-                  ? 'bg-[#0071E3] border-blue-600 text-white shadow-md'
-                  : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              <Icons.BookmarkCheck className="w-4 h-4" />
-              <span>Already knew it</span>
-            </button>
+          {/* Recall rating controls */}
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {vocabRatings.map((rating) => {
+              const Icon = rating.icon;
+              const selected = wordSelections.get(currentWord.id) === rating.value;
+              const schedule = calculateReviewSchedule(vocabProgressMap.get(currentWord.id), rating.rating);
+              const interval = schedule.intervalDays === 0 ? '10 min' : `${schedule.intervalDays}d`;
+              return (
+                <button
+                  key={rating.value}
+                  type="button"
+                  disabled={!isFlipped}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleMark(currentWord.id, rating.value);
+                  }}
+                  className={`flex min-h-16 items-center justify-center gap-2 rounded-lg border px-3 py-2 text-left transition-all disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-50 disabled:text-slate-300 ${
+                    selected ? 'border-slate-900 bg-slate-950 text-white shadow-sm' : rating.tone
+                  }`}
+                >
+                  <Icon className="h-4 w-4 shrink-0" />
+                  <span>
+                    <span className="block text-xs font-black">{rating.label}</span>
+                    <span className={`block text-[9px] font-bold ${selected ? 'text-slate-300' : 'opacity-70'}`}>{interval}</span>
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Nav Controls */}

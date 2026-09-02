@@ -42,13 +42,13 @@ export default function RegisterPage() {
               and Rank Up.
             </h1>
             <p className="text-slate-500 mt-4 text-lg max-w-lg leading-relaxed">
-              Create your account, select your target score, pick a unique character avatar, and start competing with friends on your learning journey.
+              Create your account, select your target CEFR level, pick a unique character avatar, and start learning with friends.
             </p>
           </motion.div>
 
           <div className="space-y-4">
             {[
-              { emoji: '🎓', title: 'Curated TOEIC 700-800', desc: 'Focus specifically on high-level vocabulary, grammar and listening sets.' },
+              { emoji: '🎓', title: 'CEFR A1-C2 curriculum', desc: 'Practice vocabulary, grammar, reading, and listening at the right level.' },
               { emoji: '🔥', title: 'Streak Accountability', desc: 'Encourage each other to maintain daily streaks. Don\'t break the chain!' },
               { emoji: '🏆', title: 'Weekly Bragging Rights', desc: 'Climb the division leaderboard. Winners get exclusive profile accolades.' },
             ].map((feature, i) => (

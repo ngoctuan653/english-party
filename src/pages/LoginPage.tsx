@@ -36,7 +36,7 @@ export default function LoginPage() {
             <h1 className="text-5xl font-black tracking-tight leading-tight text-slate-900">
               Master{' '}
               <span className="bg-gradient-to-r from-blue-600 to-[#0071E3] bg-clip-text text-transparent">
-                TOEIC 700-800
+                CEFR A1-C2
               </span>
               <br />
               Together with Friends.
@@ -50,7 +50,7 @@ export default function LoginPage() {
             {[
               { emoji: '🔥', title: 'Maintain Streaks', desc: 'Study daily with your friends and build unbeatable study habits.' },
               { emoji: '🔒', title: 'Cheating-Proof', desc: 'Secure anti-cheat session validations ensure fair competition.' },
-              { emoji: '🎧', title: 'TOEIC Listening', desc: 'Practice real full-audio listening sets with interactive feedback.' },
+              { emoji: '🎧', title: 'CEFR Listening', desc: 'Practice level-matched listening sets with interactive feedback.' },
               { emoji: '📈', title: 'Compare Progress', desc: 'Real-time friendly leaderboards and social feed updates.' },
             ].map((feature, i) => (
               <motion.div
@@ -83,7 +83,7 @@ export default function LoginPage() {
           <h1 className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-[#0071E3] bg-clip-text text-transparent">
             EnglishParty
           </h1>
-          <p className="text-xs text-slate-500 mt-1.5">Study TOEIC 700-800 with your friends</p>
+          <p className="text-xs text-slate-500 mt-1.5">Progress from CEFR A1 to C2 with your friends</p>
         </div>
 
         <motion.div

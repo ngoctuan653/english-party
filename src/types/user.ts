@@ -1,7 +1,8 @@
 import { Timestamp } from 'firebase/firestore';
+import type { CefrLevel } from './cefr';
 
 export type UserRole = 'user' | 'admin';
-export type ExamType = 'toeic' | 'ielts' | 'jlpt' | 'sat' | 'custom';
+export type ExamType = 'cefr' | 'custom';
 
 export interface UserProfile {
   uid: string;
@@ -19,6 +20,9 @@ export interface UserProfile {
   totalStudyMinutes: number;
   vocabularyLearned: number;
   targetExam: ExamType;
+  currentCefrLevel?: CefrLevel;
+  targetCefrLevel?: CefrLevel;
+  // Retained for seamless migration of existing accounts.
   targetScore: number;
   currentEstimatedScore: number;
   friendIds: string[];

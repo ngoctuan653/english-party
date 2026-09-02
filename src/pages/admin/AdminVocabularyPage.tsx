@@ -18,6 +18,8 @@ import { toast } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as Icons from 'lucide-react';
 import type { VocabWord } from '@/types/vocabulary';
+import type { CefrLevel } from '@/types/cefr';
+import { CEFR_LEVELS, CEFR_LEVEL_META, cefrLevelFromDifficulty, getCefrDifficulty, isCefrLevel } from '@/types/cefr';
 
 export default function AdminVocabularyPage() {
   const [words, setWords] = useState<VocabWord[]>([]);
@@ -39,6 +41,7 @@ export default function AdminVocabularyPage() {
   const [exampleTranslation, setExampleTranslation] = useState('');
   const [topic, setTopic] = useState('business');
   const [difficulty, setDifficulty] = useState(700);
+  const [cefrLevel, setCefrLevel] = useState<CefrLevel>('B2');
   const [synonymsText, setSynonymsText] = useState('');
 
   async function loadWords() {
@@ -73,6 +76,7 @@ export default function AdminVocabularyPage() {
     setExampleTranslation('');
     setTopic('business');
     setDifficulty(700);
+    setCefrLevel('B2');
     setSynonymsText('');
     setIsModalOpen(true);
   };
@@ -87,7 +91,9 @@ export default function AdminVocabularyPage() {
     setExample(w.example);
     setExampleTranslation(w.exampleTranslation || '');
     setTopic(w.topic);
-    setDifficulty(w.difficulty);
+    const level = isCefrLevel(w.cefrLevel) ? w.cefrLevel : cefrLevelFromDifficulty(w.difficulty);
+    setDifficulty(getCefrDifficulty(level));
+    setCefrLevel(level);
     setSynonymsText(w.synonyms ? w.synonyms.join(', ') : '');
     setIsModalOpen(true);
   };
@@ -115,8 +121,9 @@ export default function AdminVocabularyPage() {
         exampleTranslation: exampleTranslation.trim(),
         topic,
         difficulty: Number(difficulty),
+        cefrLevel,
         synonyms: syns,
-        exam: 'toeic',
+        exam: 'cefr',
         tags: [topic],
         isActive: editingWord ? editingWord.isActive : true,
         updatedAt: serverTimestamp(),
@@ -185,8 +192,8 @@ export default function AdminVocabularyPage() {
     <div className="space-y-6 pb-8 text-slate-800 animate-fade-in">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold sm:text-3xl text-slate-900">Manage TOEIC Vocabulary</h1>
-          <p className="text-sm text-slate-505 mt-1">Add, edit, or delete TOEIC vocabulary words</p>
+          <h1 className="text-2xl font-bold sm:text-3xl text-slate-900">Manage CEFR Vocabulary</h1>
+          <p className="text-sm text-slate-505 mt-1">Manage vocabulary across CEFR A1-C2</p>
         </div>
         <Button
           onClick={openAddModal}
@@ -249,7 +256,7 @@ export default function AdminVocabularyPage() {
                       {w.topic}
                     </Badge>
                     <Badge variant="default" className="text-[10px] font-bold">
-                      {w.difficulty} Level
+                      CEFR {isCefrLevel(w.cefrLevel) ? w.cefrLevel : cefrLevelFromDifficulty(w.difficulty)}
                     </Badge>
                   </div>
                   <p className="text-sm font-medium text-slate-700">{w.definition}</p>
@@ -396,13 +403,20 @@ export default function AdminVocabularyPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Input
-              label="Difficulty Level"
-              type="number"
-              value={difficulty}
-              onChange={(e) => setDifficulty(Number(e.target.value))}
-              placeholder="700"
-            />
+            <div className="space-y-1">
+              <label className="block text-xs font-semibold text-slate-500">CEFR Level</label>
+              <select
+                value={cefrLevel}
+                onChange={(event) => {
+                  const level = event.target.value as CefrLevel;
+                  setCefrLevel(level);
+                  setDifficulty(getCefrDifficulty(level));
+                }}
+                className="w-full h-11 px-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+              >
+                {CEFR_LEVELS.map((level) => <option key={level} value={level}>{level} · {CEFR_LEVEL_META[level].title}</option>)}
+              </select>
+            </div>
             <Input
               label="Synonyms (comma separated)"
               value={synonymsText}
