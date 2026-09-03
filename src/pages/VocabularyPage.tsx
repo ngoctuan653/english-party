@@ -26,6 +26,7 @@ import {
   generateSmartVocabSession,
   isReviewDue,
 } from '@/services/progress';
+import { getBundledVocabulary } from '@/data/questionBank';
 import {
   LearningIntro,
   LearningModuleNav,
@@ -35,19 +36,23 @@ import {
 } from '@/components/study/LearningWorkspace';
 
 const getTopicMeta = (topic: string) => {
-  const meta: Record<string, { emoji: string; tone: string; hoverGlow: string }> = {
-    office: { emoji: '🏢', tone: 'bg-blue-600', hoverGlow: 'hover:shadow-blue-500/10' },
-    travel: { emoji: '✈️', tone: 'bg-cyan-600', hoverGlow: 'hover:shadow-cyan-500/10' },
-    marketing: { emoji: '📊', tone: 'bg-rose-600', hoverGlow: 'hover:shadow-rose-500/10' },
-    finance: { emoji: '💰', tone: 'bg-emerald-600', hoverGlow: 'hover:shadow-emerald-500/10' },
-    technology: { emoji: '💻', tone: 'bg-violet-600', hoverGlow: 'hover:shadow-violet-500/10' },
-    hotel: { emoji: '🏨', tone: 'bg-amber-600', hoverGlow: 'hover:shadow-amber-500/10' },
-    email: { emoji: '✉️', tone: 'bg-sky-600', hoverGlow: 'hover:shadow-sky-500/10' },
-    shipping: { emoji: '📦', tone: 'bg-orange-600', hoverGlow: 'hover:shadow-orange-500/10' },
-    meetings: { emoji: '🤝', tone: 'bg-teal-600', hoverGlow: 'hover:shadow-teal-500/10' },
-    business: { emoji: '💼', tone: 'bg-slate-800', hoverGlow: 'hover:shadow-slate-500/10' },
+  const meta: Record<string, { emoji: string; vi: string; tone: string; hoverGlow: string }> = {
+    'hobbies-leisure': { emoji: '🎨', vi: 'Sở thích & Thể thao', tone: 'bg-pink-600', hoverGlow: 'hover:shadow-pink-500/10' },
+    'travel-transport': { emoji: '✈️', vi: 'Du lịch & Di chuyển', tone: 'bg-cyan-600', hoverGlow: 'hover:shadow-cyan-500/10' },
+    'education-learning': { emoji: '🎓', vi: 'Giáo dục & Học tập', tone: 'bg-blue-600', hoverGlow: 'hover:shadow-blue-500/10' },
+    'work-business': { emoji: '💼', vi: 'Công việc & Kinh doanh', tone: 'bg-slate-800', hoverGlow: 'hover:shadow-slate-500/10' },
+    'health-lifestyle': { emoji: '🌿', vi: 'Sức khỏe & Lối sống', tone: 'bg-emerald-600', hoverGlow: 'hover:shadow-emerald-500/10' },
+    'people-relationships': { emoji: '👥', vi: 'Con người & Mối quan hệ', tone: 'bg-amber-600', hoverGlow: 'hover:shadow-amber-500/10' },
+    'environment-nature': { emoji: '🌍', vi: 'Môi trường & Thiên nhiên', tone: 'bg-green-600', hoverGlow: 'hover:shadow-green-500/10' },
+    'technology-innovation': { emoji: '💻', vi: 'Công nghệ & Kỷ nguyên số', tone: 'bg-violet-600', hoverGlow: 'hover:shadow-violet-500/10' },
+    'media-communication': { emoji: '📰', vi: 'Truyền thông & Báo chí', tone: 'bg-rose-600', hoverGlow: 'hover:shadow-rose-500/10' },
+    'food-nutrition': { emoji: '🥗', vi: 'Ẩm thực & Dinh dưỡng', tone: 'bg-orange-600', hoverGlow: 'hover:shadow-orange-500/10' },
+    'money-finance': { emoji: '💳', vi: 'Tiền tệ & Tài chính', tone: 'bg-teal-600', hoverGlow: 'hover:shadow-teal-500/10' },
+    'science-discovery': { emoji: '🔬', vi: 'Khoa học & Khám phá', tone: 'bg-indigo-600', hoverGlow: 'hover:shadow-indigo-500/10' },
+    'law-justice': { emoji: '⚖️', vi: 'Pháp luật & Công lý', tone: 'bg-purple-600', hoverGlow: 'hover:shadow-purple-500/10' },
+    'housing-urban-life': { emoji: '🏙️', vi: 'Nhà ở & Đô thị hóa', tone: 'bg-sky-600', hoverGlow: 'hover:shadow-sky-500/10' },
   };
-  return meta[topic.toLowerCase()] || { emoji: '📚', tone: 'bg-indigo-600', hoverGlow: 'hover:shadow-indigo-500/10' };
+  return meta[topic.toLowerCase()] || { emoji: '📚', vi: topic, tone: 'bg-indigo-600', hoverGlow: 'hover:shadow-indigo-500/10' };
 };
 
 const vocabRatings = [
@@ -235,19 +240,28 @@ export default function VocabularyPage() {
     async function loadVocab() {
       try {
         setLoading(true);
-        const snap = await getDocs(
-          query(collection(db, 'vocabulary'), where('isActive', '==', true))
-        );
-        const allWords: VocabWord[] = [];
-        snap.forEach((doc) => {
-          const data = doc.data() as Omit<VocabWord, 'id'>;
-          allWords.push({
-            id: doc.id,
-            ...data,
-            exam: 'cefr',
-            cefrLevel: isCefrLevel(data.cefrLevel) ? data.cefrLevel : cefrLevelFromDifficulty(data.difficulty),
+        const bundled = getBundledVocabulary();
+        const mergedMap = new Map<string, VocabWord>();
+        bundled.forEach((w) => mergedMap.set(w.id, w));
+
+        try {
+          const snap = await getDocs(
+            query(collection(db, 'vocabulary'), where('isActive', '==', true))
+          );
+          snap.forEach((doc) => {
+            const data = doc.data() as Omit<VocabWord, 'id'>;
+            mergedMap.set(doc.id, {
+              id: doc.id,
+              ...data,
+              exam: 'cefr',
+              cefrLevel: isCefrLevel(data.cefrLevel) ? data.cefrLevel : cefrLevelFromDifficulty(data.difficulty),
+            });
           });
-        });
+        } catch (error) {
+          console.warn('Using bundled vocabulary bank.', error);
+        }
+
+        const allWords: VocabWord[] = Array.from(mergedMap.values());
 
         const practiceIds = location.state?.practiceIds as string[] | undefined;
         if (practiceIds && practiceIds.length > 0) {
@@ -866,7 +880,7 @@ export default function VocabularyPage() {
 
               {/* Back Side */}
               <div
-                className="absolute inset-0 flex flex-col items-center justify-center rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm"
+                className="absolute inset-0 flex flex-col items-center justify-center rounded-lg border border-slate-200 bg-white p-6 sm:p-8 text-center shadow-sm overflow-y-auto"
                 style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
               >
                 <Badge variant="success" className="absolute right-4 top-4 text-[9px] uppercase font-bold">
@@ -878,12 +892,12 @@ export default function VocabularyPage() {
                   </Badge>
                 )}
 
-                <p className="text-lg font-bold text-slate-900 max-w-sm leading-relaxed">{currentWord.definition}</p>
+                <p className="text-lg font-bold text-slate-900 max-w-sm leading-relaxed mt-2">{currentWord.definition}</p>
                 {currentWord.definitionNative && (
                   <p className="text-sm text-[#0071E3] font-semibold mt-1">{currentWord.definitionNative}</p>
                 )}
 
-                <div className="w-full max-w-sm rounded-xl border border-slate-200 bg-slate-50 p-3.5 mt-5 text-left relative group">
+                <div className="w-full max-w-sm rounded-xl border border-slate-200 bg-slate-50 p-3 mt-3 text-left relative group">
                   <div className="flex justify-between items-center">
                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wide">Usage Example</p>
                     <button
@@ -899,11 +913,24 @@ export default function VocabularyPage() {
                   </div>
                   <p className="text-xs italic text-slate-700 mt-1 leading-relaxed">"{currentWord.example}"</p>
                   {currentWord.exampleTranslation && (
-                    <p className="text-[10px] text-slate-505 mt-0.5">{currentWord.exampleTranslation}</p>
+                    <p className="text-[10px] text-slate-500 mt-0.5">{currentWord.exampleTranslation}</p>
                   )}
                 </div>
 
-                <p className="text-[10px] text-slate-400 mt-4 uppercase font-bold tracking-wider">
+                {currentWord.collocations && currentWord.collocations.length > 0 && (
+                  <div className="w-full max-w-sm mt-2.5 text-left">
+                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wide mb-1">Key Collocations (Cụm từ B2):</p>
+                    <div className="flex flex-wrap gap-1">
+                      {currentWord.collocations.map((col, idx) => (
+                        <span key={idx} className="inline-flex items-center px-2 py-0.5 rounded-md bg-sky-50 border border-sky-100 text-[10px] font-semibold text-sky-800">
+                          {col}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <p className="text-[10px] text-slate-400 mt-3 uppercase font-bold tracking-wider">
                   Tap to Flip Back
                 </p>
               </div>

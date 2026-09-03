@@ -83,7 +83,7 @@ export default function AdminQuestionsPage() {
     setChoices(q.choices);
     setCorrectAnswer(q.correctAnswer);
     setExplanation(q.explanation);
-    setPart(q.part);
+    setPart(q.part ?? 5);
     setTopic(q.topic);
     const level = isCefrLevel(q.cefrLevel) ? q.cefrLevel : cefrLevelFromDifficulty(q.difficulty);
     setDifficulty(getCefrDifficulty(level));
@@ -168,7 +168,7 @@ export default function AdminQuestionsPage() {
 
   const filteredQuestions = questions.filter((q) => {
     const matchesSearch = q.question.toLowerCase().includes(search.toLowerCase());
-    const matchesPart = selectedPart === 'all' || q.part.toString() === selectedPart;
+    const matchesPart = selectedPart === 'all' || (q.part ?? 5).toString() === selectedPart;
     return matchesSearch && matchesPart;
   });
 
@@ -232,7 +232,7 @@ export default function AdminQuestionsPage() {
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center gap-2">
                     <Badge variant="purple" className="text-[10px] font-bold">
-                      {skillLabels[q.part] ?? 'Practice'}
+                      {skillLabels[q.part ?? 5] ?? 'Practice'}
                     </Badge>
                     <Badge variant="info" className="text-[10px] font-bold capitalize">
                       {q.topic}

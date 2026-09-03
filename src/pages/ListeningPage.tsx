@@ -21,26 +21,32 @@ import { getBundledQuestionCount } from '@/data/questionBank';
 import type { CefrLevel } from '@/types/cefr';
 import { CEFR_LEVELS, CEFR_LEVEL_META, getCefrDifficulty, getCurrentCefrLevel } from '@/types/cefr';
 
-type ListeningPart = 3 | 4;
+type ListeningMode = 'conversations' | 'talks';
 
-const listeningParts: Array<{
-  part: ListeningPart;
+const listeningModes: Array<{
+  id: ListeningMode;
+  part: number;
   title: string;
+  viTitle: string;
   description: string;
   icon: typeof Icons.MessagesSquare;
   tone: string;
 }> = [
   {
+    id: 'conversations',
     part: 3,
-    title: 'Conversations',
-    description: 'Listen to workplace conversations and identify details, purpose, and next actions.',
+    title: 'Conversations & Dialogues',
+    viTitle: 'Hội thoại giao tiếp B2',
+    description: 'Listen to authentic multi-speaker conversations and identify details, intent, and conclusions.',
     icon: Icons.MessagesSquare,
     tone: 'bg-sky-50 text-sky-700 border-sky-100',
   },
   {
+    id: 'talks',
     part: 4,
-    title: 'Short Talks',
-    description: 'Practice announcements, updates, schedules, and other practical business messages.',
+    title: 'Talks & Presentations',
+    viTitle: 'Thuyết trình & Bài nói B2',
+    description: 'Practice comprehension with lectures, informative broadcasts, and structured presentations.',
     icon: Icons.Radio,
     tone: 'bg-violet-50 text-violet-700 border-violet-100',
   },
@@ -54,7 +60,7 @@ export default function ListeningPage() {
   const { profile } = useAuthStore();
   const { setStudySessionActive } = useUIStore();
   const [active, setActive] = useState(false);
-  const [selectedPart, setSelectedPart] = useState<ListeningPart>(3);
+  const [selectedPart, setSelectedPart] = useState<number>(3);
   const [activeLevel, setActiveLevel] = useState<CefrLevel>(() => getCurrentCefrLevel(profile));
   const [sessionSize, setSessionSize] = useState<5 | 10 | 20>(10);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -131,7 +137,7 @@ export default function ListeningPage() {
     stopSpeech();
   };
 
-  const startPractice = async (part: ListeningPart, customQuestions?: Question[]) => {
+  const startPractice = async (part: number, customQuestions?: Question[]) => {
     if (!profile?.uid) return;
     try {
       setLoading(true);
@@ -327,11 +333,11 @@ export default function ListeningPage() {
         </section>
 
         <section className="grid gap-3 md:grid-cols-2">
-          {listeningParts.map((item) => {
+          {listeningModes.map((item) => {
             const Icon = item.icon;
             return (
               <button
-                key={item.part}
+                key={item.id}
                 type="button"
                 onClick={() => startPractice(item.part)}
                 disabled={loading}
@@ -344,7 +350,7 @@ export default function ListeningPage() {
                   <span className="text-xs font-bold text-slate-400">{getBundledQuestionCount(item.part, undefined, activeLevel)} questions</span>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold uppercase text-sky-700">CEFR {activeLevel} · Listening</p>
+                  <p className="text-[10px] font-bold uppercase text-sky-700">{item.viTitle}</p>
                   <h2 className="mt-1 text-xl font-black text-slate-950">{item.title}</h2>
                   <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">{item.description}</p>
                   <span className="mt-4 inline-flex items-center gap-1 text-xs font-black text-sky-700">
@@ -364,7 +370,7 @@ export default function ListeningPage() {
       <div className="mx-auto w-full max-w-3xl pb-8 text-slate-800">
         <Card className="space-y-6 rounded-lg border border-slate-200 bg-white p-7 text-center shadow-md">
           <div>
-            <p className="text-[10px] font-bold uppercase text-violet-700">CEFR {activeLevel} · {listeningParts.find((item) => item.part === selectedPart)?.title}</p>
+            <p className="text-[10px] font-bold uppercase text-violet-700">CEFR {activeLevel} · {listeningModes.find((item) => item.part === selectedPart)?.title}</p>
             <h1 className="mt-2 text-2xl font-black text-slate-950">Listening results</h1>
           </div>
           <div className="mx-auto flex h-28 w-28 flex-col items-center justify-center rounded-full border-4 border-violet-500 bg-violet-50">

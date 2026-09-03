@@ -16,7 +16,7 @@ export function AppLayout() {
       <Sidebar />
 
       {/* Header bars */}
-      <Header />
+      {!isStudySessionActive && <Header />}
       {!isStudySessionActive && <MobileHeader />}
 
       {/* Main Content Area */}

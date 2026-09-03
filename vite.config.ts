@@ -11,6 +11,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'icons/*.png'],
+      workbox: {
+        maximumFileSizeToCacheInBytes: 15 * 1024 * 1024,
+      },
       manifest: {
         name: 'EnglishParty - CEFR English Learning',
         short_name: 'EnglishParty',

@@ -12,6 +12,9 @@ export interface VocabWord {
   definitionNative?: string;
   example: string;
   exampleTranslation?: string;
+  collocations?: string[];
+  phrasalVerbs?: string[];
+  antonyms?: string[];
   topic: string;
   difficulty: number;
   audioUrl?: string;

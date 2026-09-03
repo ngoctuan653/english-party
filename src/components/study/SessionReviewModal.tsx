@@ -341,7 +341,7 @@ export default function SessionReviewModal({
                               </span>
 
                               <div className="flex items-center gap-2">
-                                <Badge variant="purple" className="text-[9px] font-bold">Part {q.part || 5}</Badge>
+                                <Badge variant="purple" className="text-[9px] font-bold uppercase">{q.cefrLevel || 'B2'} · {q.skill || 'CEFR'}</Badge>
                                 <Badge variant="info" className="text-[9px] font-bold capitalize">{q.topic}</Badge>
                               </div>
                             </div>
