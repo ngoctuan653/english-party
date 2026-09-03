@@ -11,7 +11,7 @@ import { motion } from 'framer-motion';
 export function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { profile, reset } = useAuthStore();
+  const { profile, reset, isAuthenticated } = useAuthStore();
 
   const handleLogout = async () => {
     try {
@@ -98,9 +98,10 @@ export function Sidebar() {
         )}
       </nav>
 
-      {/* User profile & actions at bottom */}
+      {/* Account actions */}
       <div className="border-t border-slate-100 bg-slate-50/50 p-3">
-        {profile && (
+        {isAuthenticated && profile ? (
+          <>
           <div className="mb-3 flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-2 shadow-sm">
             <Avatar
               fallback={profile.avatarUrl && !profile.avatarUrl.includes('/') ? profile.avatarUrl : undefined}
@@ -123,16 +124,36 @@ export function Sidebar() {
               </div>
             </div>
           </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start gap-3 rounded-lg text-slate-500 hover:bg-rose-50 hover:text-rose-600"
+            onClick={handleLogout}
+          >
+            <Icons.LogOut className="w-5 h-5" />
+            <span>Sign Out</span>
+          </Button>
+          </>
+        ) : (
+          <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
+            <p className="text-xs font-black text-slate-900">Explore before signing in</p>
+            <p className="mt-1 text-[11px] leading-4 text-slate-500">Browse the full CEFR roadmap. An account is only needed when you start learning.</p>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <Link
+                to="/login"
+                className="inline-flex items-center justify-center rounded-md border border-slate-200 px-2 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50"
+              >
+                Sign in
+              </Link>
+              <Link
+                to="/register"
+                className="inline-flex items-center justify-center rounded-md bg-slate-950 px-2 py-2 text-xs font-bold text-white hover:bg-slate-800"
+              >
+                Join free
+              </Link>
+            </div>
+          </div>
         )}
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-full justify-start gap-3 rounded-lg text-slate-500 hover:bg-rose-50 hover:text-rose-600"
-          onClick={handleLogout}
-        >
-          <Icons.LogOut className="w-5 h-5" />
-          <span>Sign Out</span>
-        </Button>
       </div>
     </aside>
   );

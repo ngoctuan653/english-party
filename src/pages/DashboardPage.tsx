@@ -182,18 +182,95 @@ function WeeklyStreak({ profile }: { profile: UserProfile | null }) {
   );
 }
 
+function GuestPreviewAside() {
+  const highlights = [
+    { icon: Icons.Route, title: 'Structured A1-C2 path', copy: 'Move from essential foundations to advanced reading and language use.' },
+    { icon: Icons.BrainCircuit, title: 'Adaptive review', copy: 'Weak answers and due vocabulary return at useful intervals.' },
+    { icon: Icons.ChartNoAxesCombined, title: 'Visible progress', copy: 'Track accuracy, study time, streaks, XP, and level growth.' },
+  ];
+
+  return (
+    <>
+      <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <span className="flex h-10 w-10 items-center justify-center rounded-md bg-sky-100 text-sky-700">
+          <Icons.Sparkles className="h-5 w-5" />
+        </span>
+        <p className="mt-4 text-[10px] font-black uppercase text-sky-700">Guest preview</p>
+        <h2 className="mt-1 text-lg font-black text-slate-950">See the product first</h2>
+        <p className="mt-2 text-xs leading-5 text-slate-500">Browse the complete learning journey without an account. Sign in only when you choose a lesson.</p>
+        <Link
+          to="/register"
+          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-md bg-slate-950 px-4 py-2.5 text-xs font-black text-white transition-colors hover:bg-slate-800"
+        >
+          Create free account <Icons.ArrowRight className="h-4 w-4" />
+        </Link>
+        <Link
+          to="/login"
+          className="mt-2 inline-flex w-full items-center justify-center rounded-md border border-slate-200 px-4 py-2.5 text-xs font-black text-slate-700 transition-colors hover:bg-slate-50"
+        >
+          I already have an account
+        </Link>
+      </section>
+
+      <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="border-b border-slate-200 px-5 py-4">
+          <p className="text-[10px] font-black uppercase text-emerald-700">Inside EnglishParty</p>
+          <h2 className="mt-1 text-sm font-black text-slate-950">A complete practice loop</h2>
+        </div>
+        <div className="divide-y divide-slate-100">
+          {highlights.map(({ icon: Icon, title, copy }) => (
+            <div key={title} className="flex gap-3 px-5 py-4">
+              <Icon className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+              <div className="min-w-0">
+                <p className="text-xs font-black text-slate-800">{title}</p>
+                <p className="mt-1 text-[11px] leading-4 text-slate-500">{copy}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <p className="text-[10px] font-black uppercase text-violet-700">CEFR coverage</p>
+        <div className="mt-3 grid grid-cols-6 gap-1.5">
+          {['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].map((level, index) => (
+            <span
+              key={level}
+              className={`flex aspect-square items-center justify-center rounded-md text-[10px] font-black ${
+                index < 2
+                  ? 'bg-sky-100 text-sky-700'
+                  : index < 4
+                    ? 'bg-emerald-100 text-emerald-700'
+                    : 'bg-violet-100 text-violet-700'
+              }`}
+            >
+              {level}
+            </span>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
 export default function DashboardPage() {
-  const { profile } = useAuthStore();
+  const { profile, isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
   const [dailyProgress, setDailyProgress] = useState<DailyProgress | null>(null);
   const [leaderboard, setLeaderboard] = useState<UserProfile[]>([]);
   const [recentSessions, setRecentSessions] = useState<StudySession[]>([]);
   const [selectedReviewSession, setSelectedReviewSession] = useState<StudySession | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function loadDashboardData() {
-      if (!profile?.uid) return;
+      if (!isAuthenticated || !profile?.uid) {
+        setDailyProgress(null);
+        setLeaderboard([]);
+        setRecentSessions([]);
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       const [progressResult, leaderboardResult, sessionsResult] = await Promise.allSettled([
         getDailyProgress(profile.uid),
@@ -208,10 +285,12 @@ export default function DashboardPage() {
     }
 
     void loadDashboardData();
-  }, [profile?.uid]);
+  }, [isAuthenticated, profile?.uid]);
 
   const learningActions = (profile?.totalQuestionsAnswered ?? 0) + (profile?.vocabularyLearned ?? 0);
-  const completedPathSteps = Math.min(pathNodes.length, Math.floor(learningActions / 10));
+  const completedPathSteps = isAuthenticated
+    ? Math.min(pathNodes.length, Math.floor(learningActions / 10))
+    : 0;
   const currentNode = pathNodes[Math.min(completedPathSteps, pathNodes.length - 1)];
   const dailyGoal = Math.max(5, profile?.dailyGoalMinutes ?? 15);
   const activeMinutes = dailyProgress?.activeMinutes ?? 0;
@@ -236,21 +315,28 @@ export default function DashboardPage() {
       <main className="min-w-0 space-y-5">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-black uppercase text-sky-700">CEFR learning path</p>
+            <p className="text-xs font-black uppercase text-sky-700">{isAuthenticated ? 'CEFR learning path' : 'Explore EnglishParty'}</p>
             <h1 className="mt-1 text-2xl font-black text-slate-950 sm:text-3xl">
-              Keep moving, {profile?.displayName?.split(' ')[0] ?? 'learner'}
+              {isAuthenticated
+                ? `Keep moving, ${profile?.displayName?.split(' ')[0] ?? 'learner'}`
+                : 'Your English journey, from A1 to C2'}
             </h1>
-            <p className="mt-2 text-sm text-slate-500">One focused lesson at a time, with review placed where it helps most.</p>
+            <p className="mt-2 text-sm text-slate-500">
+              {isAuthenticated
+                ? 'One focused lesson at a time, with review placed where it helps most.'
+                : 'Explore the full roadmap now. You only need to sign in when you are ready to begin a lesson.'}
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700 shadow-sm">
               <Icons.Gauge className="h-4 w-4 text-sky-600" />
-              CEFR {currentCefrLevel} → {targetCefrLevel}
+              {isAuthenticated ? `CEFR ${currentCefrLevel} → ${targetCefrLevel}` : 'CEFR A1 → C2 roadmap'}
             </span>
           </div>
         </header>
 
-        <section className="grid grid-cols-3 divide-x divide-slate-200 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm xl:hidden">
+        {isAuthenticated ? (
+          <section className="grid grid-cols-3 divide-x divide-slate-200 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm xl:hidden">
           <Link to="/study" className="flex min-w-0 items-center gap-2 px-3 py-3 transition-colors hover:bg-slate-50">
             <Icons.Target className="h-4 w-4 shrink-0 text-sky-600" />
             <span className="min-w-0">
@@ -272,12 +358,29 @@ export default function DashboardPage() {
               <span className="block text-xs font-black text-slate-900">{completedMissionCount}/{Math.min(3, missions.length)}</span>
             </span>
           </Link>
-        </section>
+          </section>
+        ) : (
+          <section className="grid grid-cols-3 divide-x divide-slate-200 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm xl:hidden">
+            {[
+              { icon: Icons.Languages, label: 'CEFR levels', value: 'A1-C2' },
+              { icon: Icons.LibraryBig, label: 'Learning modes', value: '5 modes' },
+              { icon: Icons.Repeat2, label: 'Review system', value: 'Adaptive' },
+            ].map(({ icon: Icon, label, value }) => (
+              <div key={label} className="flex min-w-0 items-center gap-2 px-3 py-3">
+                <Icon className="h-4 w-4 shrink-0 text-sky-600" />
+                <span className="min-w-0">
+                  <span className="block truncate text-[9px] font-black uppercase text-slate-400">{label}</span>
+                  <span className="block truncate text-xs font-black text-slate-900">{value}</span>
+                </span>
+              </div>
+            ))}
+          </section>
+        )}
 
         <section className="grid overflow-hidden rounded-lg border border-emerald-700 bg-emerald-600 text-white shadow-sm sm:grid-cols-[minmax(0,1fr)_auto]">
           <div className="p-5 sm:p-6">
             <div className="flex items-center gap-2 text-[10px] font-black uppercase text-emerald-100">
-              <Icons.Navigation className="h-4 w-4" /> Next on your path
+              <Icons.Navigation className="h-4 w-4" /> {isAuthenticated ? 'Next on your path' : 'Start when you are ready'}
             </div>
             <h2 className="mt-2 text-xl font-black sm:text-2xl">{currentNode.title}</h2>
             <p className="mt-2 max-w-xl text-sm leading-6 text-emerald-50">{currentNode.description}</p>
@@ -289,7 +392,7 @@ export default function DashboardPage() {
               state={currentNode.state}
               className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-white bg-white px-5 py-3 text-sm font-black text-emerald-700 shadow-[0_4px_0_rgba(6,78,59,0.35)] transition-transform hover:-translate-y-0.5 active:translate-y-1 active:shadow-none sm:w-auto"
             >
-              <Icons.Play className="h-4 w-4 fill-current" /> Continue
+              <Icons.Play className="h-4 w-4 fill-current" /> {isAuthenticated ? 'Continue' : 'Start learning'}
             </Link>
           </div>
         </section>
@@ -300,7 +403,9 @@ export default function DashboardPage() {
               <p className="text-[10px] font-black uppercase text-sky-700">Course map</p>
               <h2 className="mt-1 text-lg font-black text-slate-950">English A1-C2 journey</h2>
             </div>
-            <span className="text-xs font-bold text-slate-500">{completedPathSteps} / {pathNodes.length} steps mastered</span>
+            <span className="text-xs font-bold text-slate-500">
+              {isAuthenticated ? `${completedPathSteps} / ${pathNodes.length} steps mastered` : `${pathNodes.length} learning steps to explore`}
+            </span>
           </div>
           <div className="p-4 sm:p-6">
             {loading ? (
@@ -311,12 +416,13 @@ export default function DashboardPage() {
                 <Skeleton className="mx-auto h-14 w-14 rounded-full" />
               </div>
             ) : (
-              <LearningPath nodes={pathNodes} completedCount={completedPathSteps} />
+              <LearningPath nodes={pathNodes} completedCount={completedPathSteps} previewMode={!isAuthenticated} />
             )}
           </div>
         </section>
 
-        <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        {isAuthenticated ? (
+          <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
           <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
             <div>
               <p className="text-[10px] font-black uppercase text-sky-700">Review</p>
@@ -360,10 +466,33 @@ export default function DashboardPage() {
               ))}
             </div>
           )}
-        </section>
+          </section>
+        ) : (
+          <section className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm xl:hidden">
+            <div className="border-b border-slate-200 px-5 py-4">
+              <p className="text-[10px] font-black uppercase text-emerald-700">How learning works</p>
+              <h2 className="mt-1 text-base font-black text-slate-950">Practice, review, and keep improving</h2>
+            </div>
+            <div className="grid divide-y divide-slate-100 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+              {[
+                { icon: Icons.MousePointerClick, title: 'Choose a skill', copy: 'Start at your CEFR level and focus on one clear objective.' },
+                { icon: Icons.MessageCircleQuestion, title: 'Get feedback', copy: 'See explanations and corrections immediately after each answer.' },
+                { icon: Icons.RefreshCw, title: 'Review smarter', copy: 'Mistakes and vocabulary return when they are useful to recall.' },
+              ].map(({ icon: Icon, title, copy }) => (
+                <div key={title} className="p-5">
+                  <Icon className="h-5 w-5 text-emerald-600" />
+                  <h3 className="mt-3 text-sm font-black text-slate-900">{title}</h3>
+                  <p className="mt-1 text-xs leading-5 text-slate-500">{copy}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
 
       <aside className="hidden space-y-4 xl:sticky xl:top-20 xl:block xl:self-start">
+        {isAuthenticated ? (
+          <>
         <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -463,6 +592,10 @@ export default function DashboardPage() {
             ))}
           </div>
         </section>
+          </>
+        ) : (
+          <GuestPreviewAside />
+        )}
       </aside>
 
       <SessionReviewModal

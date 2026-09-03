@@ -1,11 +1,30 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import * as Icons from 'lucide-react';
 import { NAV_ITEMS } from '@/utils/constants';
 import { motion } from 'framer-motion';
+import { useAuthStore } from '@/stores/authStore';
 
 export function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuthStore();
+
+  if (!isAuthenticated) {
+    return (
+      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-[1fr_auto_auto] items-center gap-2 border-t border-slate-200 bg-white/95 px-3 py-2 backdrop-blur-xl lg:hidden">
+        <Link to="/" className="flex min-w-0 items-center gap-2 px-2 text-sm font-black text-slate-950">
+          <Icons.Map className="h-5 w-5 shrink-0 text-sky-600" />
+          <span className="truncate">Course map</span>
+        </Link>
+        <Link to="/login" className="rounded-md border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700">
+          Sign in
+        </Link>
+        <Link to="/register" className="rounded-md bg-slate-950 px-3 py-2 text-xs font-bold text-white">
+          Join free
+        </Link>
+      </nav>
+    );
+  }
 
   return (
     <nav 

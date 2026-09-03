@@ -1,14 +1,17 @@
 import { LoginForm } from '@/components/auth/LoginForm';
 import { useAuthStore } from '@/stores/authStore';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { getPostAuthDestination } from '@/utils/authRedirect';
 
 export default function LoginPage() {
   const { isAuthenticated } = useAuthStore();
+  const location = useLocation();
 
   // If already logged in, redirect to dashboard
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    const destination = getPostAuthDestination(location.state);
+    return <Navigate to={destination.to} state={destination.state} replace />;
   }
 
   return (

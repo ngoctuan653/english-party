@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { signInWithEmail, signInWithGoogle } from '@/services/firebase/auth';
 import { GoogleButton } from '@/components/auth/GoogleButton';
+import { getPostAuthDestination } from '@/utils/authRedirect';
 
 const container = {
   hidden: { opacity: 0 },
@@ -20,6 +21,7 @@ const item = {
 
 export function LoginForm() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -28,6 +30,11 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
+  const navigateAfterSignIn = () => {
+    const destination = getPostAuthDestination(location.state);
+    navigate(destination.to, { replace: true, state: destination.state });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -35,7 +42,7 @@ export function LoginForm() {
 
     try {
       await signInWithEmail(email, password);
-      navigate('/');
+      navigateAfterSignIn();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to sign in';
       if (message.includes('user-not-found') || message.includes('wrong-password') || message.includes('invalid-credential')) {
@@ -56,7 +63,7 @@ export function LoginForm() {
 
     try {
       await signInWithGoogle();
-      navigate('/');
+      navigateAfterSignIn();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Google sign-in failed';
       if (!message.includes('popup-closed')) {
@@ -197,9 +204,18 @@ export function LoginForm() {
           Don&apos;t have an account?{' '}
           <Link
             to="/register"
+            state={location.state}
             className="text-[#0071E3] hover:text-[#0077ED] font-medium transition-colors"
           >
             Create one
+          </Link>
+        </motion.p>
+        <motion.p variants={item} className="mt-3 text-center text-sm">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 font-medium text-slate-500 transition-colors hover:text-slate-900"
+          >
+            Continue exploring without an account
           </Link>
         </motion.p>
       </div>

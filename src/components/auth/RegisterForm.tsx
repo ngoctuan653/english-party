@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, UserIcon, Check, X } from 'lucide-react';
 import { registerWithEmail, signInWithGoogle } from '@/services/firebase/auth';
 import { GoogleButton } from '@/components/auth/GoogleButton';
 import { AVATARS } from '@/utils/constants';
+import { getPostAuthDestination } from '@/utils/authRedirect';
 
 const container = {
   hidden: { opacity: 0 },
@@ -36,6 +37,7 @@ function getPasswordStrength(password: string): { score: number; label: string; 
 
 export function RegisterForm() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -49,6 +51,11 @@ export function RegisterForm() {
   const passwordStrength = useMemo(() => getPasswordStrength(password), [password]);
   const passwordsMatch = confirmPassword.length > 0 && password === confirmPassword;
   const passwordsMismatch = confirmPassword.length > 0 && password !== confirmPassword;
+
+  const navigateAfterRegistration = () => {
+    const destination = getPostAuthDestination(location.state);
+    navigate(destination.to, { replace: true, state: destination.state });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +80,7 @@ export function RegisterForm() {
 
     try {
       await registerWithEmail(email, password, displayName.trim());
-      navigate('/');
+      navigateAfterRegistration();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Registration failed';
       if (message.includes('email-already-in-use')) {
@@ -96,7 +103,7 @@ export function RegisterForm() {
 
     try {
       await signInWithGoogle();
-      navigate('/');
+      navigateAfterRegistration();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Google sign-in failed';
       if (!message.includes('popup-closed')) {
@@ -333,6 +340,7 @@ export function RegisterForm() {
           Already have an account?{' '}
           <Link
             to="/login"
+            state={location.state}
             className="text-[#0071E3] hover:text-[#0077ED] font-medium transition-colors"
           >
             Sign in

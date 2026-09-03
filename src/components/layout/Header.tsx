@@ -13,7 +13,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 export function Header() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { profile, reset } = useAuthStore();
+  const { profile, reset, isAuthenticated } = useAuthStore();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotificationStore();
 
   const [notifOpen, setNotifOpen] = useState(false);
@@ -39,7 +39,7 @@ export function Header() {
   // Compute page title based on path
   const getPageTitle = () => {
     const path = location.pathname;
-    if (path === '/') return 'Learning Path';
+    if (path === '/') return isAuthenticated ? 'Learning Path' : 'Course Preview';
     if (path.startsWith('/study/vocabulary')) return 'Vocabulary Practice';
     if (path.startsWith('/study/listening')) return 'Listening Comprehension';
     if (path === '/study') return 'Practice Hub';
@@ -75,6 +75,8 @@ export function Header() {
 
       {/* Actions */}
       <div className="flex items-center gap-6">
+        {isAuthenticated ? (
+          <>
         {/* Streak & XP Quick Display */}
         {profile && (
           <div className="flex items-center gap-4 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-600">
@@ -215,6 +217,23 @@ export function Header() {
             )}
           </AnimatePresence>
         </div>
+          </>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Link
+              to="/login"
+              className="inline-flex h-9 items-center justify-center rounded-md px-4 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-100"
+            >
+              Sign in
+            </Link>
+            <Link
+              to="/register"
+              className="inline-flex h-9 items-center justify-center rounded-md bg-slate-950 px-4 text-sm font-bold text-white transition-colors hover:bg-slate-800"
+            >
+              Create account
+            </Link>
+          </div>
+        )}
       </div>
     </header>
   );

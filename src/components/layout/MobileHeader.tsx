@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import * as Icons from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
 import { useNotificationStore } from '@/stores/notificationStore';
@@ -10,7 +10,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 export function MobileHeader() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { profile } = useAuthStore();
+  const { profile, isAuthenticated } = useAuthStore();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotificationStore();
 
   const [notifOpen, setNotifOpen] = useState(false);
@@ -69,6 +69,8 @@ export function MobileHeader() {
 
       {/* Right side: Streak & Notifications */}
       <div className="flex items-center gap-3">
+        {isAuthenticated ? (
+          <>
         {profile && profile.currentStreak > 0 && (
           <div className="flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-600">
             <Icons.Flame className="h-3.5 w-3.5 fill-amber-400" />
@@ -149,6 +151,15 @@ export function MobileHeader() {
             size="sm"
           />
         </div>
+          </>
+        ) : (
+          <Link
+            to="/login"
+            className="inline-flex h-9 items-center justify-center rounded-md bg-slate-950 px-3 text-xs font-bold text-white"
+          >
+            Sign in
+          </Link>
+        )}
       </div>
     </header>
   );

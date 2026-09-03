@@ -22,30 +22,41 @@ const currentToneClasses = {
   amber: 'border-amber-600 bg-amber-400 shadow-[0_6px_0_#d97706]',
 };
 
+const previewToneClasses = {
+  sky: 'border-sky-200 bg-sky-50 text-sky-700 shadow-[0_6px_0_#bae6fd]',
+  emerald: 'border-emerald-200 bg-emerald-50 text-emerald-700 shadow-[0_6px_0_#a7f3d0]',
+  violet: 'border-violet-200 bg-violet-50 text-violet-700 shadow-[0_6px_0_#ddd6fe]',
+  amber: 'border-amber-200 bg-amber-50 text-amber-700 shadow-[0_6px_0_#fde68a]',
+};
+
 export function LearningPath({
   nodes,
   completedCount,
+  previewMode = false,
 }: {
   nodes: LearningPathNode[];
   completedCount: number;
+  previewMode?: boolean;
 }) {
   const currentIndex = Math.min(Math.max(0, completedCount), Math.max(0, nodes.length - 1));
 
   return (
-    <div className="relative mx-auto w-full max-w-2xl pb-4">
-      <div className="absolute bottom-10 left-7 top-20 w-1 -translate-x-1/2 rounded-full bg-slate-200 md:left-1/2" />
+    <div className="relative mx-auto w-full max-w-3xl pb-4">
+      <div className="absolute bottom-10 left-7 top-20 w-1 -translate-x-1/2 rounded-full bg-slate-200 sm:left-8" />
 
       {nodes.map((node, index) => {
         const Icon = node.icon;
-        const isCompleted = index < completedCount;
-        const isCurrent = index === currentIndex && !isCompleted;
-        const isLocked = index > currentIndex;
+        const isCompleted = !previewMode && index < completedCount;
+        const isCurrent = !previewMode && index === currentIndex && !isCompleted;
+        const isLocked = !previewMode && index > currentIndex;
         const showUnit = index === 0 || nodes[index - 1].unit !== node.unit;
         const nodeClasses = isCompleted
           ? 'border-emerald-700 bg-emerald-500 text-white shadow-[0_6px_0_#047857]'
           : isCurrent
             ? `${currentToneClasses[node.tone]} text-white`
-            : 'border-slate-300 bg-slate-200 text-slate-400 shadow-[0_6px_0_#cbd5e1]';
+            : previewMode
+              ? previewToneClasses[node.tone]
+              : 'border-slate-300 bg-slate-200 text-slate-400 shadow-[0_6px_0_#cbd5e1]';
 
         const nodeControl = (
           <span
@@ -58,14 +69,17 @@ export function LearningPath({
         );
 
         const copy = (
-          <div className={`min-w-0 pt-0.5 ${isLocked ? 'opacity-55' : ''}`}>
+          <div className={`min-w-0 pr-1 pt-0.5 sm:pr-4 ${isLocked ? 'opacity-55' : ''}`}>
             <div className="flex flex-wrap items-center gap-2">
-              <p className="text-sm font-black text-slate-950">{node.title}</p>
+              <p className="min-w-0 text-sm font-black leading-5 text-slate-950">{node.title}</p>
               {isCurrent && (
                 <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[9px] font-black uppercase text-sky-700">Next</span>
               )}
               {isCompleted && (
                 <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-black uppercase text-emerald-700">Mastered</span>
+              )}
+              {previewMode && index === 0 && (
+                <span className="rounded-full bg-sky-100 px-2 py-0.5 text-[9px] font-black uppercase text-sky-700">Start here</span>
               )}
             </div>
             <p className="mt-1 text-xs leading-5 text-slate-500">{node.description}</p>
@@ -88,24 +102,19 @@ export function LearningPath({
             )}
 
             {isLocked ? (
-              <div className="relative grid min-h-24 grid-cols-[56px_minmax(0,1fr)] items-start gap-4 py-3 md:grid-cols-[minmax(0,1fr)_72px_minmax(0,1fr)] md:gap-0">
-                <div className={index % 2 === 0 ? 'hidden md:block md:pr-6 md:text-right' : 'hidden'}>
-                  {index % 2 === 0 && copy}
-                </div>
+              <div className="relative grid min-h-24 grid-cols-[56px_minmax(0,1fr)] items-start gap-4 py-3 sm:grid-cols-[64px_minmax(0,1fr)] sm:gap-5">
                 <div className="flex justify-center">{nodeControl}</div>
-                <div className={index % 2 === 0 ? 'md:hidden' : 'md:pl-6'}>{copy}</div>
+                {copy}
               </div>
             ) : (
               <Link
                 to={node.href}
                 state={node.state}
-                className="group relative grid min-h-24 grid-cols-[56px_minmax(0,1fr)] items-start gap-4 py-3 md:grid-cols-[minmax(0,1fr)_72px_minmax(0,1fr)] md:gap-0"
+                aria-label={`${previewMode ? 'Sign in to start' : 'Open'} ${node.title}`}
+                className="group relative grid min-h-24 grid-cols-[56px_minmax(0,1fr)] items-start gap-4 rounded-lg py-3 transition-colors hover:bg-slate-50 sm:grid-cols-[64px_minmax(0,1fr)] sm:gap-5"
               >
-                <div className={index % 2 === 0 ? 'hidden md:block md:pr-6 md:text-right' : 'hidden'}>
-                  {index % 2 === 0 && copy}
-                </div>
                 <div className="flex justify-center">{nodeControl}</div>
-                <div className={index % 2 === 0 ? 'md:hidden' : 'md:pl-6'}>{copy}</div>
+                {copy}
               </Link>
             )}
           </Fragment>

@@ -51,6 +51,9 @@ export default function Router() {
         {/* Public routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<DashboardPage />} />
+        </Route>
 
         {/* Protected routes */}
         <Route
@@ -60,7 +63,6 @@ export default function Router() {
             </AuthGuard>
           }
         >
-          <Route path="/" element={<DashboardPage />} />
           <Route path="/study" element={<StudyPage />} />
           <Route path="/study/vocabulary" element={<VocabularyPage />} />
           <Route path="/study/listening" element={<ListeningPage />} />
