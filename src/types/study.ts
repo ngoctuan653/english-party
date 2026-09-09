@@ -1,7 +1,7 @@
 import type { Timestamp } from 'firebase/firestore';
 import type { QuestionAnswer } from './question';
 
-export type SessionType = 'quiz' | 'vocabulary' | 'listening' | 'mission';
+export type SessionType = 'quiz' | 'vocabulary' | 'listening' | 'mission' | 'speaking';
 
 export type SessionValidationIssue =
   | 'invalid-session-data'

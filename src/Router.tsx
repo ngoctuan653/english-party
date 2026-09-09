@@ -11,6 +11,7 @@ const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
 const StudyPage = lazy(() => import('@/pages/StudyPage'));
 const VocabularyPage = lazy(() => import('@/pages/VocabularyPage'));
 const ListeningPage = lazy(() => import('@/pages/ListeningPage'));
+const SpeakingPage = lazy(() => import('@/pages/SpeakingPage'));
 const MissionsPage = lazy(() => import('@/pages/MissionsPage'));
 const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
 const FriendsPage = lazy(() => import('@/pages/FriendsPage'));
@@ -66,6 +67,7 @@ export default function Router() {
           <Route path="/study" element={<StudyPage />} />
           <Route path="/study/vocabulary" element={<VocabularyPage />} />
           <Route path="/study/listening" element={<ListeningPage />} />
+          <Route path="/study/speaking" element={<SpeakingPage />} />
           <Route path="/missions" element={<MissionsPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/friends" element={<FriendsPage />} />

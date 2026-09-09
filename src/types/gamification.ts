@@ -8,6 +8,7 @@ export interface DailyProgress {
   wordsLearned: number;
   activeMinutes: number;
   listeningSetsCompleted: number;
+  speakingSessionsCompleted?: number;
   xpEarned: number;
   accuracy: number;
   missions: MissionProgress[];
@@ -16,7 +17,7 @@ export interface DailyProgress {
   updatedAt: Timestamp;
 }
 
-export type MissionType = 'questions' | 'words' | 'minutes' | 'listening' | 'accuracy';
+export type MissionType = 'questions' | 'words' | 'minutes' | 'listening' | 'accuracy' | 'speaking';
 
 export interface Mission {
   id: string;

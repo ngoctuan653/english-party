@@ -1,7 +1,7 @@
 import { Timestamp } from 'firebase/firestore';
 import type { CefrLevel } from './cefr';
 
-export type CefrSkill = 'grammar' | 'use-of-english' | 'reading' | 'listening';
+export type CefrSkill = 'grammar' | 'use-of-english' | 'reading' | 'listening' | 'speaking';
 export type QuestionType = 'mcq' | 'fill' | 'listening' | 'reading';
 export type DifficultyLevel = 500 | 600 | 650 | 700 | 800 | 900;
 export type AnswerConfidence = 'low' | 'medium' | 'high';

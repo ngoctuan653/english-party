@@ -15,6 +15,7 @@ import {
   limit,
   Timestamp,
   runTransaction,
+  updateDoc,
 } from 'firebase/firestore';
 import { db } from '@/services/firebase/config';
 import type { Question, QuestionAnswer, CefrSkill } from '@/types/question';
@@ -45,6 +46,7 @@ import {
 import { getBundledQuestions } from '@/data/questionBank';
 import type { CefrLevel } from '@/types/cefr';
 import { cefrLevelFromDifficulty, isCefrLevel } from '@/types/cefr';
+import type { SpeakingHistoryItem } from '@/types/speaking';
 
 // ============================================
 // Fetch Questions
@@ -630,14 +632,63 @@ export async function getRecentSessions(userId: string, count: number = 10): Pro
     limit(count * 3)
   );
 
-  const snapshot = await getDocs(q);
   const sessions: StudySession[] = [];
-  snapshot.forEach((doc) => {
-    const data = doc.data();
-    if (data.questionsAttempted && data.questionsAttempted > 0) {
-      sessions.push({ id: doc.id, ...data } as StudySession);
+  try {
+    const snapshot = await getDocs(q);
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data.questionsAttempted && data.questionsAttempted > 0) {
+        sessions.push({ id: doc.id, ...data } as StudySession);
+      }
+    });
+  } catch (err) {
+    console.warn('[getRecentSessions] Firestore query failed:', err);
+  }
+
+  // Seamlessly merge local speaking history so speaking sessions always appear immediately
+  const localSpeaking = getSpeakingHistory(userId);
+  localSpeaking.forEach((h) => {
+    const existing = sessions.find((s) => s.id === h.id || ((s as any).topicTitle === h.scenarioTitle && Math.abs((s.createdAt?.toMillis?.() || (s.createdAt as any)?.seconds * 1000 || 0) - h.timestamp) < 10000));
+    if (!existing) {
+      sessions.push({
+        id: h.id,
+        userId,
+        exam: 'cefr',
+        type: 'speaking',
+        questionsAttempted: h.turnsCount,
+        questionsCorrect: Math.round((h.overallScore / 10) * h.turnsCount),
+        accuracy: Math.min(100, Math.round((h.overallScore / 10) * 100)),
+        xpEarned: h.xpEarned,
+        baseXP: h.xpEarned,
+        startedAt: Timestamp.fromMillis(h.timestamp),
+        endedAt: Timestamp.fromMillis(h.timestamp + h.durationSeconds * 1000),
+        activeSeconds: h.durationSeconds,
+        totalSeconds: h.durationSeconds,
+        tabSwitches: 0,
+        idleIntervals: 0,
+        interactionCount: h.turnsCount,
+        trackingAvailable: true,
+        isValid: true,
+        answers: [],
+        createdAt: Timestamp.fromMillis(h.timestamp),
+        mode: 'roleplay',
+        topicTitle: h.scenarioTitle,
+        reportData: h.report,
+        scenarioIcon: h.scenarioIcon,
+      } as any);
+    } else if (!(existing as any).reportData && h.report) {
+      (existing as any).reportData = h.report;
+      (existing as any).scenarioIcon = h.scenarioIcon;
     }
   });
+
+  // Sort descending by timestamp / createdAt
+  sessions.sort((a, b) => {
+    const timeA = a.createdAt?.toMillis?.() || (a.createdAt as any)?.seconds * 1000 || (a as any).timestamp || 0;
+    const timeB = b.createdAt?.toMillis?.() || (b.createdAt as any)?.seconds * 1000 || (b as any).timestamp || 0;
+    return timeB - timeA;
+  });
+
   return sessions.slice(0, count);
 }
 
@@ -841,3 +892,212 @@ export function getMockQuestions(count: number = 10): Question[] {
 
   return shuffleArray(mockQuestions).slice(0, count);
 }
+
+// ============================================
+// Speaking Sessions
+// ============================================
+
+export async function recordSpeakingSession(
+  userId: string,
+  options: {
+    mode: 'roleplay' | 'exam';
+    title: string;
+    xpEarned: number;
+    durationSeconds: number;
+    turnsCount?: number;
+    score?: number;
+    reportData?: any;
+    scenarioIcon?: string;
+  }
+): Promise<{ xpAwarded: number }> {
+  const { mode, title, xpEarned, durationSeconds, turnsCount = 1, score = 8, reportData, scenarioIcon } = options;
+  const now = Timestamp.now();
+  const today = getTodayDateString();
+  const sessionId = `speaking_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+  const sessionRef = doc(db, 'study_sessions', sessionId);
+  const userRef = doc(db, 'users', userId);
+  const progressDocId = `${userId}_${today}`;
+  const progressRef = doc(db, 'daily_progress', progressDocId);
+  const activeMinutes = Math.max(1, Math.round(durationSeconds / 60));
+
+  const sessionData: Partial<StudySession> & Record<string, unknown> = {
+    id: sessionId,
+    userId,
+    exam: 'cefr',
+    type: 'speaking',
+    questionsAttempted: turnsCount,
+    questionsCorrect: Math.round((score / 10) * turnsCount),
+    accuracy: Math.min(100, Math.round((score / 10) * 100)),
+    xpEarned,
+    baseXP: xpEarned,
+    startedAt: now,
+    endedAt: now,
+    activeSeconds: durationSeconds,
+    totalSeconds: durationSeconds,
+    tabSwitches: 0,
+    idleIntervals: 0,
+    interactionCount: turnsCount,
+    trackingAvailable: true,
+    isValid: true,
+    answers: [],
+    createdAt: now,
+    mode,
+    topicTitle: title,
+    reportData: reportData || null,
+    scenarioIcon: scenarioIcon || '🗣️',
+  };
+
+  try {
+    await runTransaction(db, async (transaction) => {
+      const [userSnap, progressSnap] = await Promise.all([
+        transaction.get(userRef),
+        transaction.get(progressRef),
+      ]);
+
+      if (!userSnap.exists()) return;
+      const profile = userSnap.data() as UserProfile;
+      const currentXP = profile.xp || 0;
+      const nextXP = currentXP + xpEarned;
+
+      // 1. Write study session record
+      transaction.set(sessionRef, sessionData);
+
+      // 2. Update user profile
+      const userUpdates: Record<string, unknown> = {
+        xp: nextXP,
+        level: calculateLevel(nextXP),
+        totalStudyMinutes: (profile.totalStudyMinutes || 0) + activeMinutes,
+        lastStudyDate: today,
+        updatedAt: now,
+      };
+
+      // Maintain streak
+      const lastStudy = profile.lastStudyDate || '';
+      let newStreak = 1;
+      if (lastStudy === today) {
+        newStreak = profile.currentStreak || 1;
+      } else if (lastStudy === getYesterdayDateString()) {
+        newStreak = (profile.currentStreak || 0) + 1;
+      }
+      userUpdates.currentStreak = newStreak;
+      userUpdates.longestStreak = Math.max(newStreak, profile.longestStreak || 0);
+
+      transaction.update(userRef, userUpdates);
+
+      // 3. Update daily progress
+      if (progressSnap.exists()) {
+        const progress = progressSnap.data() as DailyProgress;
+        transaction.update(progressRef, {
+          xpEarned: (progress.xpEarned || 0) + xpEarned,
+          activeMinutes: (progress.activeMinutes || 0) + activeMinutes,
+          speakingSessionsCompleted: (progress.speakingSessionsCompleted || 0) + 1,
+          updatedAt: now,
+        });
+      } else {
+        const newProgress: DailyProgress = {
+          id: progressDocId,
+          userId,
+          date: today,
+          questionsCompleted: 0,
+          wordsLearned: 0,
+          activeMinutes,
+          listeningSetsCompleted: 0,
+          speakingSessionsCompleted: 1,
+          xpEarned,
+          accuracy: Math.min(100, Math.round((score / 10) * 100)),
+          missions: [],
+          streakMaintained: true,
+          createdAt: now,
+          updatedAt: now,
+        };
+        transaction.set(progressRef, newProgress);
+      }
+    });
+
+    return { xpAwarded: xpEarned };
+  } catch (err) {
+    console.warn('[recordSpeakingSession] Transaction failed, trying direct fallback writes:', err);
+    try {
+      // Direct write fallback
+      await setDoc(sessionRef, sessionData);
+
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const profile = userSnap.data() as UserProfile;
+        const currentXP = profile.xp || 0;
+        const nextXP = currentXP + xpEarned;
+        await updateDoc(userRef, {
+          xp: nextXP,
+          level: calculateLevel(nextXP),
+          totalStudyMinutes: (profile.totalStudyMinutes || 0) + activeMinutes,
+          lastStudyDate: today,
+          updatedAt: now,
+        });
+      }
+
+      await setDoc(
+        progressRef,
+        {
+          id: progressDocId,
+          userId,
+          date: today,
+          activeMinutes,
+          speakingSessionsCompleted: 1,
+          xpEarned,
+          updatedAt: now,
+        },
+        { merge: true }
+      );
+    } catch (fallbackErr) {
+      console.error('[recordSpeakingSession] Direct fallback writes also failed:', fallbackErr);
+    }
+
+    return { xpAwarded: xpEarned };
+  }
+}
+
+// ============================================
+// Speaking History Storage
+// ============================================
+
+const SPEAKING_HISTORY_LOCAL_PREFIX = 'ep_speaking_history_';
+
+export function getSpeakingHistory(userId: string): SpeakingHistoryItem[] {
+  if (!userId) return [];
+  try {
+    const raw = localStorage.getItem(`${SPEAKING_HISTORY_LOCAL_PREFIX}${userId}`);
+    if (!raw) return [];
+    const items = JSON.parse(raw);
+    return Array.isArray(items) ? items : [];
+  } catch (err) {
+    console.warn('[getSpeakingHistory] Failed to parse local storage history:', err);
+    return [];
+  }
+}
+
+export function saveSpeakingHistoryItem(userId: string, item: SpeakingHistoryItem): SpeakingHistoryItem[] {
+  if (!userId) return [];
+  try {
+    const current = getSpeakingHistory(userId);
+    const updated = [item, ...current.filter((i) => i.id !== item.id)].slice(0, 50);
+    localStorage.setItem(`${SPEAKING_HISTORY_LOCAL_PREFIX}${userId}`, JSON.stringify(updated));
+    return updated;
+  } catch (err) {
+    console.warn('[saveSpeakingHistoryItem] Failed to save to local storage:', err);
+    return [];
+  }
+}
+
+export function deleteSpeakingHistoryItem(userId: string, itemId: string): SpeakingHistoryItem[] {
+  if (!userId) return [];
+  try {
+    const current = getSpeakingHistory(userId);
+    const updated = current.filter((i) => i.id !== itemId);
+    localStorage.setItem(`${SPEAKING_HISTORY_LOCAL_PREFIX}${userId}`, JSON.stringify(updated));
+    return updated;
+  } catch (err) {
+    console.warn('[deleteSpeakingHistoryItem] Failed to delete from local storage:', err);
+    return [];
+  }
+}
+

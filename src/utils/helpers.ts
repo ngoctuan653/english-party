@@ -46,6 +46,12 @@ export function getTodayDateString(): string {
   return format(new Date(), 'yyyy-MM-dd');
 }
 
+export function getYesterdayDateString(): string {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return format(yesterday, 'yyyy-MM-dd');
+}
+
 export function classNames(...classes: (string | boolean | undefined | null)[]): string {
   return classes.filter(Boolean).join(' ');
 }

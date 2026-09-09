@@ -14,6 +14,7 @@ import type { StudySession } from '@/types/study';
 import * as Icons from 'lucide-react';
 import { motion } from 'framer-motion';
 import SessionReviewModal from '@/components/study/SessionReviewModal';
+import { SpeakingSessionReviewModal } from '@/components/speaking/SpeakingSessionReviewModal';
 import { getCurrentCefrLevel, getTargetCefrLevel } from '@/types/cefr';
 
 export default function ProfilePage() {
@@ -37,7 +38,7 @@ export default function ProfilePage() {
     async function loadSessions() {
       if (!profile?.uid) return;
       try {
-        const data = await getRecentSessions(profile.uid, 5);
+        const data = await getRecentSessions(profile.uid, 10);
         setSessions(data);
       } catch (err) {
         console.error('Failed to load sessions:', err);
@@ -242,7 +243,9 @@ export default function ProfilePage() {
                       <div className="flex items-center gap-2">
                         <Badge
                           variant={
-                            session.type === 'listening'
+                            session.type === 'speaking'
+                              ? 'info'
+                              : session.type === 'listening'
                               ? 'info'
                               : session.type === 'vocabulary'
                               ? 'purple'
@@ -250,10 +253,12 @@ export default function ProfilePage() {
                           }
                           className="capitalize text-[10px] font-bold"
                         >
-                          {session.type}
+                          {session.type === 'speaking' ? '🗣️ Speaking' : session.type}
                         </Badge>
-                        <span className="text-xs font-semibold text-slate-600">
-                          {session.questionsAttempted} questions
+                        <span className="text-xs font-semibold text-slate-700">
+                          {session.type === 'speaking'
+                            ? `${(session as any).topicTitle || 'Hội thoại'} • ${session.questionsAttempted} câu`
+                            : `${session.questionsAttempted} questions`}
                         </span>
                       </div>
                       <p className="text-[10px] text-slate-400 mt-1">
@@ -339,11 +344,54 @@ export default function ProfilePage() {
         </motion.button>
       </div>
 
-      <SessionReviewModal
-        isOpen={selectedReviewSession !== null}
-        onClose={() => setSelectedReviewSession(null)}
-        session={selectedReviewSession}
-      />
+      {/* Speaking Session Review Modal */}
+      {selectedReviewSession?.type === 'speaking' && (
+        <SpeakingSessionReviewModal
+          isOpen={selectedReviewSession !== null}
+          onClose={() => setSelectedReviewSession(null)}
+          report={
+            (selectedReviewSession as any).reportData || {
+              overall_score: Math.round(((selectedReviewSession.accuracy || 70) / 10) * 10) / 10,
+              scores: {
+                grammar: Math.round(((selectedReviewSession.accuracy || 70) / 10) * 10) / 10,
+                vocabulary: Math.round(((selectedReviewSession.accuracy || 70) / 10) * 10) / 10,
+                coherence: Math.round(((selectedReviewSession.accuracy || 70) / 10) * 10) / 10,
+                pronunciation: 7.5,
+              },
+              summary_feedback: 'Buổi thực hành giao tiếp đã hoàn thành thành công.',
+              detailed_turns: [],
+              xpEarned: selectedReviewSession.xpEarned,
+              turnsCount: selectedReviewSession.questionsAttempted,
+              durationSeconds: selectedReviewSession.totalSeconds,
+            }
+          }
+          scenario={{
+            id: selectedReviewSession.id,
+            title: (selectedReviewSession as any).topicTitle || 'Speaking Session',
+            viTitle: (selectedReviewSession as any).topicTitle || 'Buổi luyện nói Speaking',
+            description: '',
+            icon: (selectedReviewSession as any).scenarioIcon || '🗣️',
+            level: 'B2',
+            category: 'daily',
+            starterPrompt: '',
+            aiPersona: '',
+            suggestedPhrases: [],
+          }}
+          onRetry={() => {
+            setSelectedReviewSession(null);
+            navigate('/speaking');
+          }}
+        />
+      )}
+
+      {/* Standard Quiz/Vocab Session Review Modal */}
+      {selectedReviewSession?.type !== 'speaking' && (
+        <SessionReviewModal
+          isOpen={selectedReviewSession !== null}
+          onClose={() => setSelectedReviewSession(null)}
+          session={selectedReviewSession}
+        />
+      )}
     </div>
   );
 }

@@ -72,6 +72,14 @@ const skillMeta: Record<CefrSkill, { id: CefrSkill; title: string; shortTitle: s
     description: 'Listen to dialogues and talks with authentic pronunciation and question sets.',
     partFallback: 3,
   },
+  speaking: {
+    id: 'speaking',
+    title: 'Speaking Studio',
+    shortTitle: 'Speaking',
+    viTitle: 'Luyện nói AI',
+    description: 'Practice spoken English with real-time AI roleplay and exam simulations.',
+    partFallback: 1,
+  },
 };
 
 const topicLabels: Record<string, string> = {
