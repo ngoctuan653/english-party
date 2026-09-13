@@ -2,7 +2,7 @@ import type { ComponentType, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import * as Icons from 'lucide-react';
 
-type LearningModule = 'grammar' | 'vocabulary' | 'listening' | 'speaking';
+export type LearningModule = 'grammar' | 'toeic' | 'vocabulary' | 'listening' | 'speaking';
 
 const modules: Array<{
   id: LearningModule;
@@ -13,10 +13,17 @@ const modules: Array<{
 }> = [
   {
     id: 'grammar',
-    label: 'Grammar & Reading',
-    description: 'CEFR A1-C2 practice',
+    label: 'CEFR Reading',
+    description: 'CEFR A1-C2 mastery',
     path: '/study',
     icon: Icons.BookOpen,
+  },
+  {
+    id: 'toeic',
+    label: 'TOEIC Reading 2026',
+    description: '10 Tests · 1.000 Q',
+    path: '/study/toeic',
+    icon: Icons.Award,
   },
   {
     id: 'vocabulary',
@@ -45,7 +52,7 @@ export function LearningModuleNav({ active }: { active: LearningModule }) {
   return (
     <nav
       aria-label="Learning modules"
-      className="grid grid-cols-1 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm sm:grid-cols-2 lg:grid-cols-4"
+      className="grid grid-cols-1 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm sm:grid-cols-2 lg:grid-cols-5"
     >
       {modules.map((item) => {
         const Icon = item.icon;

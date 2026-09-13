@@ -245,6 +245,8 @@ export default function ProfilePage() {
                           variant={
                             session.type === 'speaking'
                               ? 'info'
+                              : session.exam === 'toeic-2026'
+                              ? 'purple'
                               : session.type === 'listening'
                               ? 'info'
                               : session.type === 'vocabulary'
@@ -253,11 +255,17 @@ export default function ProfilePage() {
                           }
                           className="capitalize text-[10px] font-bold"
                         >
-                          {session.type === 'speaking' ? '🗣️ Speaking' : session.type}
+                          {session.type === 'speaking'
+                            ? '🗣️ Speaking'
+                            : session.exam === 'toeic-2026'
+                            ? '📘 TOEIC Reading'
+                            : session.type}
                         </Badge>
                         <span className="text-xs font-semibold text-slate-700">
                           {session.type === 'speaking'
                             ? `${(session as any).topicTitle || 'Hội thoại'} • ${session.questionsAttempted} câu`
+                            : session.exam === 'toeic-2026'
+                            ? `${session.questionsAttempted} câu TOEIC`
                             : `${session.questionsAttempted} questions`}
                         </span>
                       </div>

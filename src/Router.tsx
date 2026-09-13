@@ -65,6 +65,7 @@ export default function Router() {
           }
         >
           <Route path="/study" element={<StudyPage />} />
+          <Route path="/study/toeic" element={<StudyPage />} />
           <Route path="/study/vocabulary" element={<VocabularyPage />} />
           <Route path="/study/listening" element={<ListeningPage />} />
           <Route path="/study/speaking" element={<SpeakingPage />} />

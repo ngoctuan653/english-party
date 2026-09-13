@@ -13,6 +13,7 @@ import { Card } from '@/components/ui/Card';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { getBundledQuestions } from '@/data/questionBank';
+import ReadingPassage from '@/components/study/ReadingPassage';
 
 interface SessionReviewModalProps {
   isOpen: boolean;
@@ -130,25 +131,32 @@ export default function SessionReviewModal({
     }
   };
 
-  const parseExplanation = (explanation: string) => {
-    if (!explanation) return { sentenceTranslation: '', viExpl: '' };
+  const parseExplanation = (explanation?: string) => {
+    if (!explanation) return { evidence: '', sentenceTranslation: '', viExpl: '' };
 
-    const parts = explanation.split('|').map((s) => s.trim());
+    // Strip any accidental Chinese characters
+    const cleanExplanation = explanation.replace(/[\u4e00-\u9fa5]/g, '').trim();
+
+    const parts = cleanExplanation.split('|').map((s) => s.trim());
+    let evidence = '';
     let sentenceTranslation = '';
     let viExpl = '';
 
-    // Search for translation and grammar terms
+    const evidencePart = parts.find((p) => p.toLowerCase().startsWith('dẫn chứng:'));
     const translationPart = parts.find((p) => p.toLowerCase().startsWith('dịch nghĩa:'));
     const explanationPart = parts.find((p) => p.toLowerCase().startsWith('giải thích:'));
 
+    if (evidencePart) {
+      evidence = evidencePart.replace(/dẫn chứng:\s*/i, '').trim();
+    }
     if (translationPart) {
-      sentenceTranslation = translationPart.replace(/dịch nghĩa:\s*/i, '');
+      sentenceTranslation = translationPart.replace(/dịch nghĩa:\s*/i, '').trim();
     }
     if (explanationPart) {
-      viExpl = explanationPart.replace(/giải thích:\s*/i, '');
+      viExpl = explanationPart.replace(/giải thích:\s*/i, '').trim();
     }
 
-    if (!sentenceTranslation && !viExpl) {
+    if (!sentenceTranslation && !viExpl && !evidence) {
       if (parts.length > 1) {
         viExpl = parts.slice(1).join(' | ');
       } else {
@@ -156,7 +164,7 @@ export default function SessionReviewModal({
       }
     }
 
-    return { sentenceTranslation, viExpl };
+    return { evidence, sentenceTranslation, viExpl };
   };
 
   return (
@@ -319,7 +327,8 @@ export default function SessionReviewModal({
                         );
                       } else {
                         const q = item as Question;
-                        const { sentenceTranslation, viExpl } = parseExplanation(q.explanation);
+                        const { evidence, sentenceTranslation, viExpl } = parseExplanation(q.explanation);
+                        const isToeicQuestion = q.exam === 'toeic-2026' || session.exam === 'toeic-2026' || q.tags?.includes('toeic-2026');
 
                         return (
                           <Card key={q.id} className={`p-4.5 border-l-4 bg-white space-y-3.5 shadow-sm ${
@@ -341,17 +350,48 @@ export default function SessionReviewModal({
                               </span>
 
                               <div className="flex items-center gap-2">
-                                <Badge variant="purple" className="text-[9px] font-bold uppercase">{q.cefrLevel || 'B2'} · {q.skill || 'CEFR'}</Badge>
-                                <Badge variant="info" className="text-[9px] font-bold capitalize">{q.topic}</Badge>
+                                {isToeicQuestion ? (
+                                  <>
+                                    <Badge variant="purple" className="text-[9px] font-bold uppercase">
+                                      TOEIC 2026 · Part {q.part || 5}
+                                    </Badge>
+                                    <Badge variant="info" className="text-[9px] font-bold capitalize">
+                                      {q.topic || 'Reading'}
+                                    </Badge>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Badge variant="purple" className="text-[9px] font-bold uppercase">
+                                      {q.cefrLevel || 'B2'} · {q.skill || 'CEFR'}
+                                    </Badge>
+                                    <Badge variant="info" className="text-[9px] font-bold capitalize">
+                                      {q.topic}
+                                    </Badge>
+                                  </>
+                                )}
                               </div>
                             </div>
 
-                            {/* Question text */}
+                            {/* Reading passage context if present (Part 6 & Part 7) */}
+                            {q.context && (
+                              <div className="rounded-xl border border-indigo-100 bg-indigo-50/40 p-4 text-xs leading-relaxed text-slate-800 space-y-2">
+                                <p className="flex items-center gap-1.5 font-black text-indigo-700 uppercase text-[10px] tracking-wider">
+                                  <Icons.FileText className="w-3.5 h-3.5" /> Đoạn văn đọc hiểu (Reading Passage)
+                                </p>
+                                <div className="font-serif text-slate-700 bg-white/80 p-3.5 rounded-lg border border-indigo-100/70 leading-6 select-text max-h-60 overflow-y-auto shadow-2xs">
+                                  <ReadingPassage content={q.context} />
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Question transcript if present */}
                             {q.transcript && (
                               <div className="whitespace-pre-line rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs leading-5 text-slate-600">
                                 {q.transcript}
                               </div>
                             )}
+
+                            {/* Question text */}
                             <h4 className="text-sm font-bold leading-relaxed text-slate-800">
                               {q.question}
                             </h4>
@@ -385,19 +425,45 @@ export default function SessionReviewModal({
                               })}
                             </div>
 
-                            {/* Explanation */}
-                            <div className="p-3.5 bg-slate-50/60 rounded-xl border border-slate-200/50 space-y-2 text-xs leading-relaxed text-slate-700">
-                              <p className="font-bold text-[#0071E3] uppercase text-[9px] tracking-wide flex items-center gap-1">
-                                <Icons.Info className="w-3.5 h-3.5" /> Giải thích chi tiết
+                            {/* 3-Section Explanation Card */}
+                            <div className="p-3.5 bg-sky-50/60 rounded-xl border border-sky-100 space-y-2.5 text-xs leading-relaxed text-slate-700">
+                              <p className="font-bold text-[#0071E3] uppercase text-[10px] tracking-wide flex items-center gap-1.5 pb-1 border-b border-sky-200/60">
+                                <Icons.Info className="w-3.5 h-3.5" /> Dẫn chứng & Giải thích chi tiết
                               </p>
-                              {sentenceTranslation && (
-                                <p className="font-bold text-slate-800 pb-2 border-b border-slate-200/60">
-                                  🇻🇳 Dịch câu: <span className="font-medium text-slate-700">{sentenceTranslation}</span>
-                                </p>
+
+                              {/* 1. English Evidence */}
+                              {evidence && (
+                                <div className="rounded-lg border border-amber-200 bg-amber-50/90 p-3 text-amber-950">
+                                  <span className="mb-1 flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-amber-800">
+                                    <Icons.Quote className="h-3.5 w-3.5 text-amber-600" /> Dẫn chứng trong bài (English Evidence)
+                                  </span>
+                                  <p className="text-xs font-semibold italic text-amber-950 leading-relaxed select-text">
+                                    {evidence}
+                                  </p>
+                                </div>
                               )}
+
+                              {/* 2. Vietnamese Explanation */}
                               {viExpl && (
-                                <div className="space-y-1.5">
-                                  <p><span className="font-bold text-slate-805">🇻🇳 Giải thích:</span> {viExpl}</p>
+                                <div className="rounded-lg border border-sky-200/80 bg-white p-3 text-slate-800 shadow-2xs">
+                                  <span className="mb-1 flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-sky-800">
+                                    <Icons.BookOpenCheck className="h-3.5 w-3.5 text-sky-600" /> Giải thích chi tiết (Vietnamese Explanation)
+                                  </span>
+                                  <p className="text-xs font-medium text-slate-800 leading-relaxed select-text whitespace-pre-line">
+                                    {viExpl}
+                                  </p>
+                                </div>
+                              )}
+
+                              {/* 3. Vietnamese Translation */}
+                              {sentenceTranslation && (
+                                <div className="rounded-lg border border-indigo-100 bg-indigo-50/60 p-3 text-slate-800">
+                                  <span className="mb-1 flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-indigo-800">
+                                    <Icons.Languages className="h-3.5 w-3.5 text-indigo-600" /> Dịch nghĩa câu hỏi & đáp án
+                                  </span>
+                                  <p className="text-xs font-medium text-slate-700 leading-relaxed select-text">
+                                    {sentenceTranslation}
+                                  </p>
                                 </div>
                               )}
                             </div>

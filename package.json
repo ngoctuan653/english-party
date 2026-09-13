@@ -30,6 +30,8 @@
     "howler": "^2.2.4",
     "lucide-react": "^1.16.0",
     "papaparse": "^5.5.3",
+    "pdf-lib": "^1.17.1",
+    "pdf-parse": "^2.4.5",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-hot-toast": "^2.6.0",

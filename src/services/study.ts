@@ -60,6 +60,7 @@ export async function fetchQuestions(options: {
   difficulty?: number;
   type?: string;
   cefrLevel?: CefrLevel;
+  tags?: string[];
   count?: number;
 }): Promise<Question[]> {
   const bundled = getBundledQuestions(options);
@@ -68,7 +69,7 @@ export async function fetchQuestions(options: {
     where('isActive', '==', true),
   ];
 
-  if (options.exam && options.exam !== 'cefr') constraints.push(where('exam', '==', options.exam));
+  if (options.exam && options.exam !== 'cefr' && options.exam !== 'all') constraints.push(where('exam', '==', options.exam));
   if (options.part) constraints.push(where('part', '==', options.part));
   if (options.topic) constraints.push(where('topic', '==', options.topic));
   if (options.difficulty) constraints.push(where('difficulty', '==', options.difficulty));
@@ -93,12 +94,17 @@ export async function fetchQuestions(options: {
   bundled.forEach((item) => merged.set(item.id, item));
   remoteQuestions.forEach((item) => merged.set(item.id, {
     ...item,
-    exam: 'cefr',
+    exam: item.exam || 'cefr',
     cefrLevel: isCefrLevel(item.cefrLevel) ? item.cefrLevel : cefrLevelFromDifficulty(item.difficulty),
   }));
 
   const filtered = Array.from(merged.values()).filter((item) => {
-    if (options.exam && options.exam !== 'cefr') return item.exam === options.exam;
+    if (options.exam && options.exam !== 'all') {
+      if (item.exam !== options.exam) return false;
+    }
+    if (options.tags && options.tags.length > 0) {
+      if (!options.tags.every((t) => item.tags?.includes(t))) return false;
+    }
     if (options.cefrLevel && item.cefrLevel !== options.cefrLevel) return false;
     if (options.skill && item.skill !== options.skill) return false;
     if (options.part && item.part !== options.part) return false;
@@ -142,6 +148,23 @@ export function cancelStudySession(sessionId: string | null | undefined): void {
 }
 
 const MAX_SESSION_ITEMS = 200;
+
+export function sanitizeForFirestore<T>(data: T): T {
+  if (data === null || data === undefined) return null as any;
+  if (Array.isArray(data)) {
+    return data.map((item) => sanitizeForFirestore(item)) as any;
+  }
+  if (typeof data === 'object' && !(data instanceof Timestamp) && !(data instanceof Date)) {
+    const cleaned: Record<string, any> = {};
+    for (const [key, value] of Object.entries(data as Record<string, any>)) {
+      if (value !== undefined) {
+        cleaned[key] = sanitizeForFirestore(value);
+      }
+    }
+    return cleaned as T;
+  }
+  return data;
+}
 
 function emptyXP() {
   return { baseXP: 0, streakBonus: 0, perfectBonus: 0, totalXP: 0 };
@@ -348,6 +371,19 @@ export async function endStudySession(
   const parts = sessionId.split('_');
   const sessionType = (parts[parts.length - 2] || 'quiz') as SessionType;
   const exam = parts[parts.length - 3] || 'cefr';
+
+  const cleanedAnswers: QuestionAnswer[] = answers.map((a) => {
+    const item: QuestionAnswer = {
+      questionId: a.questionId,
+      selectedAnswer: a.selectedAnswer,
+      isCorrect: a.isCorrect,
+      timeSpent: a.timeSpent,
+    };
+    if (a.confidence) {
+      item.confidence = a.confidence;
+    }
+    return item;
+  });
   let newVocabularyCount = 0;
   if (sessionType === 'vocabulary') {
     try {
@@ -511,14 +547,14 @@ export async function endStudySession(
         trackingAvailable: antiCheatData.trackingAvailable,
         validationIssues,
         isValid,
-        answers,
+        answers: cleanedAnswers,
         createdAt: startedAt,
       };
 
-      transaction.set(sessionRef, sessionData);
+      transaction.set(sessionRef, sanitizeForFirestore(sessionData));
 
       if (isValid) {
-        transaction.set(progressRef, progressAfter);
+        transaction.set(progressRef, sanitizeForFirestore(progressAfter));
 
         const nextXP = Math.max(0, (profile.xp || 0) + totalAwardedXP);
         const userUpdates: Partial<UserProfile> & Record<string, unknown> = {
@@ -548,7 +584,7 @@ export async function endStudySession(
           userUpdates.longestStreak = Math.max(newStreak, profile.longestStreak || 0);
         }
 
-        transaction.update(userRef, userUpdates);
+        transaction.update(userRef, sanitizeForFirestore(userUpdates));
       }
 
       return {
@@ -583,10 +619,10 @@ export async function endStudySession(
         trackingAvailable: antiCheatData.trackingAvailable,
         validationIssues,
         isValid,
-        answers,
+        answers: cleanedAnswers,
         createdAt: startedAt,
       };
-      await setDoc(sessionRef, fallbackSessionData);
+      await setDoc(sessionRef, sanitizeForFirestore(fallbackSessionData));
       transactionResult = {
         ...buildSessionResults(fallbackSessionData),
         alreadyProcessed: false,

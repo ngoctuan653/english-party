@@ -40,9 +40,11 @@ export function Header() {
   const getPageTitle = () => {
     const path = location.pathname;
     if (path === '/') return isAuthenticated ? 'Learning Path' : 'Course Preview';
+    if (path.startsWith('/study/toeic')) return 'TOEIC Reading 2026';
     if (path.startsWith('/study/vocabulary')) return 'Vocabulary Practice';
     if (path.startsWith('/study/listening')) return 'Listening Comprehension';
-    if (path === '/study') return 'Practice Hub';
+    if (path.startsWith('/study/speaking')) return 'Speaking Studio';
+    if (path === '/study') return 'CEFR Practice Hub';
     if (path === '/missions') return 'Daily Quests';
     if (path === '/leaderboard') return 'Weekly League';
     if (path === '/friends') return 'Friend Circle';
