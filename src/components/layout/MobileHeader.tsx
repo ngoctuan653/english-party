@@ -37,15 +37,17 @@ export function MobileHeader() {
     if (path === '/missions') return 'Quests';
     if (path === '/leaderboard') return 'League';
     if (path === '/friends') return 'Friends';
-    if (path === '/profile') return 'Profile';
-    if (path === '/settings') return 'Settings';
+    if (path.startsWith('/profile')) return 'Profile';
+    if (path.startsWith('/settings')) return 'Settings';
+    if (path.startsWith('/chinese/pinyin')) return 'Pinyin & Tones';
+    if (path.startsWith('/chinese')) return 'Chinese HSK';
     if (path.startsWith('/admin')) return 'Admin';
     return 'EnglishParty';
   };
 
   const showBackButton = () => {
     const path = location.pathname;
-    return path.startsWith('/study/') || path === '/settings' || path.startsWith('/admin/');
+    return path.startsWith('/study/') || path.startsWith('/chinese/') || path === '/settings' || path.startsWith('/admin/');
   };
 
   return (

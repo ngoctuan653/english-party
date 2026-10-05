@@ -68,6 +68,34 @@ export function Sidebar() {
           );
         })}
 
+        {/* Chinese Course Link */}
+        <div className="pt-3 pb-1">
+          <div className="px-3 text-[10px] font-black uppercase tracking-wider text-slate-400">
+            Khóa học mới
+          </div>
+        </div>
+        <Link
+          to="/chinese"
+          className={`group relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 transition-colors ${
+            location.pathname.startsWith('/chinese')
+              ? 'border border-rose-900/40 bg-slate-950 font-semibold text-white'
+              : 'border border-transparent text-slate-600 hover:bg-rose-50 hover:text-slate-950'
+          }`}
+        >
+          {location.pathname.startsWith('/chinese') && (
+            <motion.div
+              layoutId="active-nav-indicator"
+              className="absolute left-0 h-6 w-0.5 bg-rose-500"
+              transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+            />
+          )}
+          <span className="text-base leading-none">🇨🇳</span>
+          <span className="flex-1">Tiếng Trung HSK</span>
+          <Badge variant="default" className="text-[10px] px-1.5 py-0 bg-rose-50 text-rose-600 border-rose-200">
+            0→4
+          </Badge>
+        </Link>
+
         {/* Admin Link if role is admin */}
         {profile?.role === 'admin' && (
           <Link

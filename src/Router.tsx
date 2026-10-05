@@ -24,6 +24,10 @@ const AdminQuestionsPage = lazy(() => import('@/pages/admin/AdminQuestionsPage')
 const AdminVocabularyPage = lazy(() => import('@/pages/admin/AdminVocabularyPage'));
 const AdminImportPage = lazy(() => import('@/pages/admin/AdminImportPage'));
 
+// Chinese module pages
+const ChineseDashboardPage = lazy(() => import('@/pages/chinese/ChineseDashboardPage'));
+const PinyinTrainerPage = lazy(() => import('@/pages/chinese/PinyinTrainerPage'));
+
 function LoadingScreen() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0F172A]">
@@ -54,6 +58,8 @@ export default function Router() {
         <Route path="/register" element={<RegisterPage />} />
         <Route element={<AppLayout />}>
           <Route path="/" element={<DashboardPage />} />
+          <Route path="/chinese" element={<ChineseDashboardPage />} />
+          <Route path="/chinese/pinyin" element={<PinyinTrainerPage />} />
         </Route>
 
         {/* Protected routes */}

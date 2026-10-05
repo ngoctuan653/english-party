@@ -16,6 +16,10 @@ export function BottomNav() {
           <Icons.Map className="h-5 w-5 shrink-0 text-sky-600" />
           <span className="truncate">Course map</span>
         </Link>
+        <Link to="/chinese" className="rounded-md border border-rose-200 bg-rose-50 px-2 py-1.5 text-xs font-bold text-rose-700 flex items-center gap-1">
+          <span>🇨🇳</span>
+          <span>HSK</span>
+        </Link>
         <Link to="/login" className="rounded-md border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700">
           Sign in
         </Link>
