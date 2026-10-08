@@ -27,6 +27,13 @@ const AdminImportPage = lazy(() => import('@/pages/admin/AdminImportPage'));
 // Chinese module pages
 const ChineseDashboardPage = lazy(() => import('@/pages/chinese/ChineseDashboardPage'));
 const PinyinTrainerPage = lazy(() => import('@/pages/chinese/PinyinTrainerPage'));
+const ChineseVocabPage = lazy(() => import('@/pages/chinese/ChineseVocabPage'));
+const ChineseGrammarPage = lazy(() => import('@/pages/chinese/ChineseGrammarPage'));
+const ChineseListeningPage = lazy(() => import('@/pages/chinese/ChineseListeningPage'));
+const ChineseSpeakingPage = lazy(() => import('@/pages/chinese/ChineseSpeakingPage'));
+const ChineseReadingPage = lazy(() => import('@/pages/chinese/ChineseReadingPage'));
+const HskMockExamPage = lazy(() => import('@/pages/chinese/HskMockExamPage'));
+const HanziWritingPage = lazy(() => import('@/pages/chinese/HanziWritingPage'));
 
 function LoadingScreen() {
   return (
@@ -60,6 +67,13 @@ export default function Router() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="/chinese" element={<ChineseDashboardPage />} />
           <Route path="/chinese/pinyin" element={<PinyinTrainerPage />} />
+          <Route path="/chinese/vocab" element={<ChineseVocabPage />} />
+          <Route path="/chinese/grammar" element={<ChineseGrammarPage />} />
+          <Route path="/chinese/listening" element={<ChineseListeningPage />} />
+          <Route path="/chinese/speaking" element={<ChineseSpeakingPage />} />
+          <Route path="/chinese/reading" element={<ChineseReadingPage />} />
+          <Route path="/chinese/mock" element={<HskMockExamPage />} />
+          <Route path="/chinese/writing" element={<HanziWritingPage />} />
         </Route>
 
         {/* Protected routes */}

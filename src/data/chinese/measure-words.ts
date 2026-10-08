@@ -191,5 +191,101 @@ export const CHINESE_MEASURE_WORDS: ChineseMeasureWord[] = [
       { phrase: '一家饭馆', pinyin: 'yì jiā fànguǎn', meaningVi: 'một nhà hàng' },
       { phrase: '一家银行', pinyin: 'yì jiā yínháng', meaningVi: 'một ngân hàng' }
     ]
+  },
+  {
+    id: 'mw_shuang',
+    hanzi: '双',
+    pinyin: 'shuāng',
+    meaningVi: 'đôi',
+    usedFor: 'Dùng cho đồ vật đi liền theo cặp đôi: giày, dép, tất, đũa, mắt, tay.',
+    hskLevel: 'hsk2',
+    examples: [
+      { phrase: '一双鞋', pinyin: 'yì shuāng xié', meaningVi: 'một đôi giày' },
+      { phrase: '一双筷子', pinyin: 'yì shuāng kuàizi', meaningVi: 'một đôi đũa' }
+    ]
+  },
+  {
+    id: 'mw_tai',
+    hanzi: '台',
+    pinyin: 'tái',
+    meaningVi: 'chiếc, cái (máy móc)',
+    usedFor: 'Dùng cho thiết bị điện tử, máy móc cơ khí: máy vi tính, tivi, máy giặt.',
+    hskLevel: 'hsk3',
+    examples: [
+      { phrase: '一台电脑', pinyin: 'yì tái diànnǎo', meaningVi: 'một chiếc máy tính' },
+      { phrase: '一台电视', pinyin: 'yì tái diànshì', meaningVi: 'một chiếc tivi' }
+    ]
+  },
+  {
+    id: 'mw_ping',
+    hanzi: '瓶',
+    pinyin: 'píng',
+    meaningVi: 'chai, lọ, bình',
+    usedFor: 'Dùng cho chất lỏng đựng trong bình, chai: nước ngọt, rượu, bia, dầu ăn.',
+    hskLevel: 'hsk2',
+    examples: [
+      { phrase: '一瓶水', pinyin: 'yì píng shuǐ', meaningVi: 'một chai nước' },
+      { phrase: '一瓶可乐', pinyin: 'yì píng kělè', meaningVi: 'một chai coca' }
+    ]
+  },
+  {
+    id: 'mw_feng',
+    hanzi: '封',
+    pinyin: 'fēng',
+    meaningVi: 'bức, lá (thư)',
+    usedFor: 'Dùng cho thư từ, bưu thiếp, email điện tử.',
+    hskLevel: 'hsk3',
+    examples: [
+      { phrase: '一封信', pinyin: 'yì fēng xìn', meaningVi: 'một bức thư' },
+      { phrase: '一封电子邮件', pinyin: 'yì fēng diànzǐ yóujiàn', meaningVi: 'một lá email' }
+    ]
+  },
+  {
+    id: 'mw_ke',
+    hanzi: '棵',
+    pinyin: 'kē',
+    meaningVi: 'cây, gốc',
+    usedFor: 'Dùng cho thực vật, cây cối, hoa màu.',
+    hskLevel: 'hsk3',
+    examples: [
+      { phrase: '一棵大树', pinyin: 'yì kē dà shù', meaningVi: 'một cây đại thụ' }
+    ]
+  },
+  {
+    id: 'mw_suo',
+    hanzi: '所',
+    pinyin: 'suǒ',
+    meaningVi: 'ngôi, tòa (trường học, bệnh viện)',
+    usedFor: 'Dùng cho các tổ chức công cộng, tòa nhà cơ quan: trường học, viện nghiên cứu, bệnh viện.',
+    hskLevel: 'hsk4',
+    examples: [
+      { phrase: '一所大学', pinyin: 'yì suǒ dàxué', meaningVi: 'một trường đại học' },
+      { phrase: '一所医院', pinyin: 'yì suǒ yīyuàn', meaningVi: 'một bệnh viện' }
+    ]
+  },
+  {
+    id: 'mw_fen',
+    hanzi: '份',
+    pinyin: 'fèn',
+    meaningVi: 'bản, phần, suất',
+    usedFor: 'Dùng cho phần ăn, báo chí, hợp đồng tài liệu, công việc hoặc món quà.',
+    hskLevel: 'hsk3',
+    examples: [
+      { phrase: '一份报纸', pinyin: 'yí fèn bàozhǐ', meaningVi: 'một tờ báo' },
+      { phrase: '一份工作', pinyin: 'yí fèn gōngzuò', meaningVi: 'một công việc' },
+      { phrase: '一份礼物', pinyin: 'yí fèn lǐwù', meaningVi: 'một món quà' }
+    ]
+  },
+  {
+    id: 'mw_ju',
+    hanzi: '句',
+    pinyin: 'jù',
+    meaningVi: 'câu (lời nói)',
+    usedFor: 'Dùng cho câu văn, lời nói, câu nói nổi tiếng.',
+    hskLevel: 'hsk2',
+    examples: [
+      { phrase: '一句话', pinyin: 'yí jù huà', meaningVi: 'một câu nói' },
+      { phrase: '一句诗', pinyin: 'yí jù shī', meaningVi: 'một câu thơ' }
+    ]
   }
 ];

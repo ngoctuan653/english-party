@@ -108,6 +108,7 @@ export interface ChineseVocabWord {
   hanzi: string;
   pinyin: string;
   meaningVi: string;
+  sinoVietnamese?: string;
   meaningEn: string;
   hskLevel: HSKLevel;
   partOfSpeech: string; // 'noun' | 'verb' | 'adjective' | 'pronoun' | etc.
@@ -138,7 +139,7 @@ export interface ChineseGrammarPattern {
     meaningVi: string;
     breakdown?: string;
   }>;
-  exercises: Array<{
+  exercises?: Array<{
     type: 'reorder' | 'multiple_choice' | 'fill_blank';
     question: string;
     options?: string[];

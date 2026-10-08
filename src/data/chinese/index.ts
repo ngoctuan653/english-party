@@ -2,6 +2,8 @@ export * from './pinyin';
 export * from './tones';
 export * from './hsk1-vocab';
 export * from './hsk2-vocab';
+export * from './hsk3-vocab';
+export * from './hsk4-vocab';
 export * from './radicals';
 export * from './measure-words';
 export * from './grammar-patterns';

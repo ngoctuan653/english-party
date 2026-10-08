@@ -30,6 +30,9 @@ export interface ChineseReadingPassage {
 }
 
 export const CHINESE_READING_PASSAGES: ChineseReadingPassage[] = [
+  // ==========================================
+  // HSK 1 PASSAGES
+  // ==========================================
   {
     id: 'read_hsk1_daily',
     title: '我的每一天 (My Day)',
@@ -59,38 +62,33 @@ export const CHINESE_READING_PASSAGES: ChineseReadingPassage[] = [
       {
         hanzi: '我喜欢我的汉语老师，她很友好。',
         pinyin: 'Wǒ xǐhuan wǒ de Hànyǔ lǎoshī, tā hěn yǒuhǎo.',
-        meaningVi: 'Tôi thích giáo viên tiếng Trung của tôi, cô ấy rất thân thiện.'
+        meaningVi: 'Tôi rất thích cô giáo tiếng Trung của tôi, cô ấy rất thân thiện.'
       },
       {
         hanzi: '下午我和朋友一起喝茶，听音乐。',
         pinyin: 'Xiàwǔ wǒ hé péngyou yìqǐ hē chá, tīng yīnyuè.',
-        meaningVi: 'Buổi chiều tôi cùng bạn bè uống trà, nghe nhạc.'
+        meaningVi: 'Buổi chiều tôi cùng bạn bè uống trà và nghe nhạc.'
       },
       {
         hanzi: '晚上我回家看书，十点睡觉。',
         pinyin: 'Wǎnshang wǒ huí jiā kàn shū, shí diǎn shuìjiào.',
-        meaningVi: 'Buổi tối tôi về nhà đọc sách, 10 giờ đi ngủ.'
+        meaningVi: 'Buổi tối tôi về nhà đọc sách và đi ngủ lúc 10 giờ.'
       }
     ],
     questions: [
       {
         id: 'q1',
-        question: '李明早上几点起床？(Lý Minh thức dậy lúc mấy giờ?)',
-        options: ['六点 (6:00)', '七点 (7:00)', '八点 (8:00)', '九点 (9:00)'],
+        question: '李明几点起床？ (Lý Minh thức dậy lúc mấy giờ?)',
+        options: ['六点 (6 giờ)', '七点 (7 giờ)', '八点 (8 giờ)'],
         correctAnswerIndex: 1,
-        explanationVi: 'Trong bài có câu: "我每天早上七点起床" (Tôi thức dậy lúc 7 giờ sáng).'
+        explanationVi: 'Bài đọc nêu rõ: "我每天早上七点起床".'
       },
       {
         id: 'q2',
-        question: '下午李明做什么？(Buổi chiều Lý Minh làm gì?)',
-        options: [
-          '去学校学习 (Đi trường học)',
-          '去医院看医生 (Đi viện khám)',
-          '和朋友喝茶听音乐 (Cùng bạn uống trà nghe nhạc)',
-          '睡觉 (Ngủ)'
-        ],
-        correctAnswerIndex: 2,
-        explanationVi: 'Câu văn: "下午我和朋友一起喝茶，听音乐".'
+        question: '下午李明做什么？ (Buổi chiều Lý Minh làm gì?)',
+        options: ['学习汉语', '和朋友喝茶听音乐', '去学校'],
+        correctAnswerIndex: 1,
+        explanationVi: 'Bài đọc nêu: "下午我和朋友一起喝茶，听音乐".'
       }
     ],
     vocabulary: [
@@ -101,111 +99,199 @@ export const CHINESE_READING_PASSAGES: ChineseReadingPassage[] = [
     ]
   },
   {
-    id: 'read_hsk2_market',
-    title: '在中国超市买东西 (Shopping in China)',
-    titleVi: 'Đi siêu thị tại Trung Quốc',
-    hskLevel: 'hsk2',
-    difficulty: 'medium',
-    topic: 'Mua sắm & Đời sống',
-    content: '今天星期六，超市里的人很多。我和妈妈一起去买水果和蔬菜。那里的苹果又大又甜，一斤五块钱。妈妈买了三斤苹果，还买了两瓶牛奶。现在的中国超市很方便，我们用手机扫码就可以付款，不需要带现金。',
-    pinyinContent: 'Jīntiān xīngqīliù, chāoshì lǐ de rén hěn duō. Wǒ hé māma yìqǐ qù mǎi shuǐguǒ hé shūcài. Nàlǐ de píngguǒ yòu dà yòu tián, yì jīn wǔ kuài qián. Māma mǎi le sān jīn píngguǒ, hái mǎi le liǎng píng niúnǎi. Xiànzài de Zhōngguó chāoshì hěn fāngbiàn, wǒmen yòng shǒujī sǎomǎ jiù kěyǐ fùkuǎn, bù xūyào dài xiànjīn.',
-    translationVi: 'Hôm nay là thứ Bảy, người trong siêu thị rất đông. Tôi cùng mẹ đi mua hoa quả và rau củ. Táo ở đó vừa to vừa ngọt, một cân (nửa kg) 5 tệ. Mẹ tôi mua 3 cân táo, còn mua thêm 2 chai sữa tươi. Siêu thị Trung Quốc hiện nay rất tiện lợi, chúng tôi quét mã bằng điện thoại là có thể thanh toán, không cần mang theo tiền mặt.',
+    id: 'read_hsk1_restaurant',
+    title: '去中国饭馆 (At Chinese Restaurant)',
+    titleVi: 'Đến nhà hàng Trung Hoa',
+    hskLevel: 'hsk1',
+    difficulty: 'easy',
+    topic: 'Ẩm thực & Gọi món',
+    content: '今天是星期天。我和我的中国朋友去饭馆吃饭。饭馆里的人很多。我们点了三个菜：米饭、牛肉和西红柿炒鸡蛋。中国菜很好吃，我们都很高兴。',
+    pinyinContent: 'Jīntiān shì xīngqītiān. Wǒ hé wǒ de Zhōngguó péngyou qù fànguǎn chīfàn. Fànguǎn lǐ de rén hěn duō. Wǒmen diǎn le sān ge cài: mǐfàn, niúròu hé xīhóngshì chǎo jīdàn. Zhōngguó cài hěn hǎochī, wǒmen dōu hěn gāoxìng.',
+    translationVi: 'Hôm nay là Chủ Nhật. Tôi cùng người bạn Trung Quốc đến nhà hàng ăn cơm. Người trong quán rất đông. Chúng tôi gọi ba món: cơm trắng, thịt bò và trứng xào cà chua. Món ăn Trung Quốc rất ngon, chúng tôi đều rất vui.',
     sentences: [
       {
-        hanzi: '今天星期六，超市里的人很多。',
-        pinyin: 'Jīntiān xīngqīliù, chāoshì lǐ de rén hěn duō.',
-        meaningVi: 'Hôm nay là thứ Bảy, người trong siêu thị rất đông.'
+        hanzi: '今天是星期天。',
+        pinyin: 'Jīntiān shì xīngqītiān.',
+        meaningVi: 'Hôm nay là Chủ Nhật.'
       },
       {
-        hanzi: '我和妈妈一起去买水果和蔬菜。',
-        pinyin: 'Wǒ hé māma yìqǐ qù mǎi shuǐguǒ hé shūcài.',
-        meaningVi: 'Tôi cùng mẹ đi mua hoa quả và rau củ.'
+        hanzi: '我和我的中国朋友去饭馆吃饭。',
+        pinyin: 'Wǒ hé wǒ de Zhōngguó péngyou qù fànguǎn chīfàn.',
+        meaningVi: 'Tôi cùng bạn Trung Quốc đến quán ăn cơm.'
       },
       {
-        hanzi: '那里的苹果又大又甜，一斤五块钱。',
-        pinyin: 'Nàlǐ de píngguǒ yòu dà yòu tián, yì jīn wǔ kuài qián.',
-        meaningVi: 'Táo ở đó vừa to vừa ngọt, một cân (500g) 5 tệ.'
+        hanzi: '饭馆里的人很多。',
+        pinyin: 'Fànguǎn lǐ de rén hěn duō.',
+        meaningVi: 'Người trong quán ăn rất đông.'
       },
       {
-        hanzi: '妈妈买了三斤苹果，还买了两瓶牛奶。',
-        pinyin: 'Māma mǎi le sān jīn píngguǒ, hái mǎi le liǎng píng niúnǎi.',
-        meaningVi: 'Mẹ mua 3 cân táo, còn mua thêm 2 chai sữa bò.'
+        hanzi: '我们点了三个菜：米饭、牛肉和西红柿炒鸡蛋。',
+        pinyin: 'Wǒmen diǎn le sān ge cài: mǐfàn, niúròu hé xīhóngshì chǎo jīdàn.',
+        meaningVi: 'Chúng tôi gọi ba món: cơm, thịt bò và trứng xào cà chua.'
       },
       {
-        hanzi: '现在的中国超市很方便，我们用手机扫码就可以付款。',
-        pinyin: 'Xiànzài de Zhōngguó chāoshì hěn fāngbiàn, wǒmen yòng shǒujī sǎomǎ jiù kěyǐ fùkuǎn.',
-        meaningVi: 'Siêu thị Trung Quốc bây giờ rất tiện lợi, chúng tôi dùng điện thoại quét mã là trả tiền được.'
+        hanzi: '中国菜很好吃，我们都很高兴。',
+        pinyin: 'Zhōngguó cài hěn hǎochī, wǒmen dōu hěn gāoxìng.',
+        meaningVi: 'Món ăn Trung Quốc rất ngon, chúng tôi đều rất vui vẻ.'
       }
     ],
     questions: [
       {
-        id: 'q1',
-        question: '苹果多少钱一斤？(Táo bao nhiêu tiền một cân?)',
-        options: ['三块 (3 tệ)', '四块 (4 tệ)', '五块 (5 tệ)', '六块 (6 tệ)'],
-        correctAnswerIndex: 2,
-        explanationVi: 'Bài viết nêu rõ: "一斤五块钱" (Một cân 5 tệ).'
-      },
-      {
-        id: 'q2',
-        question: '他们怎么付款？(Họ thanh toán bằng cách nào?)',
-        options: [
-          '用现金 (Dùng tiền mặt)',
-          '用手机扫码 (Dùng điện thoại quét mã)',
-          '刷信用卡 (Quẹt thẻ tín dụng)',
-          '别人帮忙付 (Nhờ người khác trả)'
-        ],
+        id: 'q_res_1',
+        question: '他们哪天去饭馆？ (Họ đi nhà hàng vào ngày nào?)',
+        options: ['星期六 (Thứ Bảy)', '星期天 (Chủ Nhật)', '星期五 (Thứ Sáu)'],
         correctAnswerIndex: 1,
-        explanationVi: '"用手机扫码就可以付款" (Dùng điện thoại quét mã là thanh toán được).'
+        explanationVi: 'Bài đọc: "今天是星期天" (Hôm nay là Chủ Nhật).'
       }
     ],
     vocabulary: [
-      { hanzi: '超市', pinyin: 'chāoshì', meaningVi: 'siêu thị' },
-      { hanzi: '方便', pinyin: 'fāngbiàn', meaningVi: 'tiện lợi' },
-      { hanzi: '付款', pinyin: 'fùkuǎn', meaningVi: 'thanh toán tiền' },
-      { hanzi: '现金', pinyin: 'xiànjīn', meaningVi: 'tiền mặt' }
+      { hanzi: '饭馆', pinyin: 'fànguǎn', meaningVi: 'nhà hàng, quán ăn' },
+      { hanzi: '好吃', pinyin: 'hǎochī', meaningVi: 'ngon miệng' },
+      { hanzi: '点菜', pinyin: 'diǎncài', meaningVi: 'gọi món' }
     ]
   },
+
+  // ==========================================
+  // HSK 2 PASSAGES
+  // ==========================================
   {
-    id: 'read_hsk3_travel',
-    title: '乘坐高铁去上海 (High-speed Rail to Shanghai)',
-    titleVi: 'Trải nghiệm tàu cao tốc đi Thượng Hải',
-    hskLevel: 'hsk3',
-    difficulty: 'hard',
-    topic: 'Du lịch & Giao thông',
-    content: '中国的高铁速度非常快，每小时可以跑三百多公里。以前从北京到上海坐普通火车需要十几个小时，现在乘坐复兴号高铁只需要四个半小时。车厢里不仅干净舒服，而且还有免费的Wi-Fi和充电插座。虽然高铁票比普通火车票贵一些，但是能节约很多宝贵的时间。',
-    pinyinContent: 'Zhōngguó de gāotiě sùdù fēicháng kuài, měi xiǎoshí kěyǐ pǎo sān bǎi duō gōnglǐ. Yǐqián cóng Běijīng dào Shànghǎi zuò pǔtōng huǒchē xūyào shí jǐ gè xiǎoshí, xiànzài chéngzuò Fùxīnghào gāotiě zhǐ xūyào sì gè bàn xiǎoshí. Chēxiāng lǐ bùjǐn gānjìng shūfu, érqiě hái yǒu miǎnfèi de Wi-Fi hé chōngdiàn chāzuò. Suīrán gāotiě piào bǐ pǔtōng huǒchē piào guì yìxiē, dànshì néng jiéyuē hěn duō bǎoguì de shíjiān.',
-    translationVi: 'Tàu cao tốc Trung Quốc có tốc độ vô cùng nhanh, mỗi giờ có thể chạy hơn 300 km. Trước đây từ Bắc Kinh đến Thượng Hải đi tàu hỏa thông thường mất hơn 10 tiếng, hiện nay ngồi tàu cao tốc Phục Hưng chỉ cần 4 tiếng rưỡi. Toa tàu không những sạch sẽ, thoải mái mà còn có Wi-Fi miễn phí và ổ cắm sạc pin. Mặc dù vé tàu cao tốc đắt hơn vé tàu thường một chút, nhưng tiết kiệm được rất nhiều thời gian quý báu.',
+    id: 'read_hsk2_travel',
+    title: '去北京旅游 (A Trip to Beijing)',
+    titleVi: 'Chuyến du lịch Bắc Kinh',
+    hskLevel: 'hsk2',
+    difficulty: 'medium',
+    topic: 'Du lịch & Trải nghiệm',
+    content: '去年秋天，我和家人坐飞机去北京旅游。北京的天气比我想象的要冷一些，但是风景非常美丽。我们去了故宫和长城。长城很长，爬上去虽然有点儿累，但是看到壮丽的风景，大家觉得非常值得。',
+    pinyinContent: 'Qùnián qiūtiān, wǒ hé jiārén zuò fēijī qù Běijīng lǚyóu. Běijīng de tiānqì bǐ wǒ xiǎngxiàng de yào lěng yìxiē, dànshì fēngjǐng fēicháng měilì. Wǒmen qù le Gùgōng hé Chángchéng. Chángchéng hěn cháng, pá shàngqu suīrán yǒudiǎnr lèi, dànshì kàndào zhuànglì de fēngjǐng, dàjiā juéde fēicháng zhídé.',
+    translationVi: 'Mùa thu năm ngoái, tôi cùng gia đình đi máy bay đến Bắc Kinh du lịch. Thời tiết ở Bắc Kinh lạnh hơn một chút so với tôi tưởng tượng, nhưng phong cảnh vô cùng tươi đẹp. Chúng tôi đã đến Cố Cung và Vạn Lý Trường Thành. Trường Thành rất dài, leo lên tuy có chút mệt mỏi, nhưng khi nhìn ngắm cảnh tượng hùng vĩ, mọi người đều cảm thấy rất xứng đáng.',
     sentences: [
       {
-        hanzi: '中国的高铁速度非常快，每小时可以跑三百多公里。',
-        pinyin: 'Zhōngguó de gāotiě sùdù fēicháng kuài, měi xiǎoshí kěyǐ pǎo sān bǎi duō gōnglǐ.',
-        meaningVi: 'Tàu cao tốc Trung Quốc tốc độ rất nhanh, mỗi giờ có thể chạy hơn 300 km.'
+        hanzi: '去年秋天，我和家人坐飞机去北京旅游。',
+        pinyin: 'Qùnián qiūtiān, wǒ hé jiārén zuò fēijī qù Běijīng lǚyóu.',
+        meaningVi: 'Mùa thu năm ngoái, tôi và người nhà đi máy bay đến Bắc Kinh du lịch.'
       },
       {
-        hanzi: '现在乘坐复兴号高铁只需要四个半小时。',
-        pinyin: 'Xiànzài chéngzuò Fùxīnghào gāotiě zhǐ xūyào sì gè bàn xiǎoshí.',
-        meaningVi: 'Hiện nay đi tàu cao tốc Phục Hưng chỉ mất 4 tiếng rưỡi.'
+        hanzi: '北京的天气比我想象的要冷一些，但是风景非常美丽。',
+        pinyin: 'Běijīng de tiānqì bǐ wǒ xiǎngxiàng de yào lěng yìxiē, dànshì fēngjǐng fēicháng měilì.',
+        meaningVi: 'Thời tiết Bắc Kinh lạnh hơn một chút so với tôi tưởng tượng, nhưng phong cảnh rất đẹp.'
       },
       {
-        hanzi: '虽然高铁票比普通火车票贵一些，但是能节约很多宝贵的时间。',
-        pinyin: 'Suīrán gāotiě piào bǐ pǔtōng huǒchē piào guì yìxiē, dànshì néng jiéyuē hěn duō bǎoguì de shíjiān.',
-        meaningVi: 'Mặc dù vé tàu cao tốc đắt hơn vé tàu thường một chút, nhưng tiết kiệm được rất nhiều thời gian quý báu.'
+        hanzi: '我们去了故宫和长城。',
+        pinyin: 'Wǒmen qù le Gùgōng hé Chángchéng.',
+        meaningVi: 'Chúng tôi đã đi Cố Cung và Vạn Lý Trường Thành.'
+      },
+      {
+        hanzi: '长城很长，爬上去虽然有点儿累，但是看到壮丽的风景，大家觉得非常值得。',
+        pinyin: 'Chángchéng hěn cháng, pá shàngqu suīrán yǒudiǎnr lèi, dànshì kàndào zhuànglì de fēngjǐng, dàjiā juéde fēicháng zhídé.',
+        meaningVi: 'Trường Thành rất dài, leo lên dù có chút mệt, nhưng ngắm cảnh hùng vĩ ai cũng thấy rất xứng đáng.'
       }
     ],
     questions: [
       {
-        id: 'q1',
-        question: '从北京到上海坐复兴号高铁需要多长时间？(Từ Bắc Kinh đến Thượng Hải đi tàu Phục Hưng mất bao lâu?)',
-        options: ['三个小时 (3 tiếng)', '四个半小时 (4.5 tiếng)', '六个小时 (6 tiếng)', '十个小时 (10 tiếng)'],
+        id: 'q_bj_1',
+        question: '他们怎么去北京？ (Họ đến Bắc Kinh bằng cách nào?)',
+        options: ['坐火车 (Đi tàu hỏa)', '坐飞机 (Đi máy bay)', '开车 (Lái xe hơi)'],
         correctAnswerIndex: 1,
-        explanationVi: '"现在乘坐复兴号高铁只需要四个半小时" (Chỉ cần 4 tiếng rưỡi).'
+        explanationVi: 'Bài đọc: "我和家人坐飞机去北京旅游".'
       }
     ],
     vocabulary: [
-      { hanzi: '高铁', pinyin: 'gāotiě', meaningVi: 'tàu cao tốc' },
-      { hanzi: '速度', pinyin: 'sùdù', meaningVi: 'tốc độ' },
-      { hanzi: '节约', pinyin: 'jiéyuē', meaningVi: 'tiết kiệm' },
-      { hanzi: '宝贵', pinyin: 'bǎoguì', meaningVi: 'quý báu' }
+      { hanzi: '旅游', pinyin: 'lǚyóu', meaningVi: 'du lịch' },
+      { hanzi: '风景', pinyin: 'fēngjǐng', meaningVi: 'phong cảnh' },
+      { hanzi: '值得', pinyin: 'zhídé', meaningVi: 'xứng đáng' }
+    ]
+  },
+
+  // ==========================================
+  // HSK 3 PASSAGES
+  // ==========================================
+  {
+    id: 'read_hsk3_healthy_living',
+    title: '健康的生活方式 (Healthy Lifestyle)',
+    titleVi: 'Lối sống lành mạnh',
+    hskLevel: 'hsk3',
+    difficulty: 'medium',
+    topic: 'Sức khỏe & Đời sống',
+    content: '现代人的生活节奏越来越快，工作压力也越来越大。为了保持身体健康，很多年轻人开始重视运动和饮食。医生建议我们，每天应该坚持锻炼半个小时以上，比如慢跑或者游泳。此外，我们要把早饭吃好，少吃油腻的食物，并且尽量在晚上十一点之前睡觉。只有身体好，我们才能更好地工作和学习。',
+    pinyinContent: 'Xiàndàirén de shēnghuó jiézòu yuè lái yuè kuài, gōngzuò yālì yě yuè lái yuè dà. Wèile bǎochí shēntǐ jiànkāng, hěn duō niánqīngrén kāishǐ zhòngshì yùndòng hé yǐnshí. Yīshēng jiànyì wǒmen, měitiān yīnggāi jiānchí duànliàn bàn ge xiǎoshí yǐshàng, bǐrú mànpǎo huòzhě yóuyǒng. Cǐwài, wǒmen yào bǎ zǎofàn chī hǎo, shǎo chī yóunì de shíwù, bìngqiě jǐnliàng zài wǎnshang shíyī diǎn zhīqián shuìjiào. Zhǐyǒu shēntǐ hǎo, wǒmen cái néng gèng hǎo de gōngzuò hé xuéxí.',
+    translationVi: 'Nhịp sống của con người hiện đại ngày càng nhanh, áp lực công việc cũng ngày càng lớn. Để duy trì sức khỏe thể chất, nhiều bạn trẻ đã bắt đầu chú trọng đến vận động và ăn uống. Bác sĩ khuyên chúng ta mỗi ngày nên kiên trì rèn luyện trên nửa tiếng đồng hồ, chẳng hạn như chạy bộ chậm hoặc bơi lội. Ngoài ra, chúng ta phải ăn bữa sáng thật tốt, hạn chế ăn đồ nhiều dầu mỡ, và cố gắng đi ngủ trước 11 giờ đêm. Chỉ khi cơ thể khỏe mạnh, chúng ta mới có thể làm việc và học tập tốt hơn.',
+    sentences: [
+      {
+        hanzi: '现代人的生活节奏越来越快，工作压力也越来越大。',
+        pinyin: 'Xiàndàirén de shēnghuó jiézòu yuè lái yuè kuài, gōngzuò yālì yě yuè lái yuè dà.',
+        meaningVi: 'Nhịp sống của người hiện đại ngày càng nhanh, áp lực công việc cũng ngày một lớn.'
+      },
+      {
+        hanzi: '为了保持身体健康，很多年轻人开始重视运动和饮食。',
+        pinyin: 'Wèile bǎochí shēntǐ jiànkāng, hěn duō niánqīngrén kāishǐ zhòngshì yùndòng hé yǐnshí.',
+        meaningVi: 'Để duy trì sức khỏe, nhiều bạn trẻ bắt đầu chú trọng rèn luyện thể thao và dinh dưỡng.'
+      },
+      {
+        hanzi: '医生建议我们，每天应该坚持锻炼半个小时以上。',
+        pinyin: 'Yīshēng jiànyì wǒmen, měitiān yīnggāi jiānchí duànliàn bàn ge xiǎoshí yǐshàng.',
+        meaningVi: 'Bác sĩ khuyên chúng ta mỗi ngày nên kiên trì tập luyện từ nửa tiếng trở lên.'
+      }
+    ],
+    questions: [
+      {
+        id: 'q_hsk3_1',
+        question: '医生建议每天锻炼多长时间？ (Bác sĩ khuyên tập thể dục bao lâu mỗi ngày?)',
+        options: ['十分钟 (10 phút)', '半个小时以上 (Hơn nửa tiếng)', '两小时 (2 tiếng)'],
+        correctAnswerIndex: 1,
+        explanationVi: 'Bài đọc: "坚持锻炼半个小时以上".'
+      }
+    ],
+    vocabulary: [
+      { hanzi: '节奏', pinyin: 'jiézòu', meaningVi: 'tiết tấu, nhịp điệu' },
+      { hanzi: '压力', pinyin: 'yālì', meaningVi: 'áp lực' },
+      { hanzi: '建议', pinyin: 'jiànyì', meaningVi: 'đề xuất, khuyên' },
+      { hanzi: '坚持', pinyin: 'jiānchí', meaningVi: 'kiên trì' }
+    ]
+  },
+
+  // ==========================================
+  // HSK 4 PASSAGES
+  // ==========================================
+  {
+    id: 'read_hsk4_environment',
+    title: '保护环境，从我做起 (Environmental Protection)',
+    titleVi: 'Bảo vệ môi trường, bắt đầu từ chính tôi',
+    hskLevel: 'hsk4',
+    difficulty: 'hard',
+    topic: 'Môi trường & Xã hội',
+    content: '随着经济的高速发展，环境污染问题逐渐引起了全社会的关注。塑料垃圾、空气污染以及水资源短缺，正在对我们的日常生活产生深远的影响。很多人以为保护环境是大科学家或者政府的事情，其实不然。对于普通人来说，只要我们从生活中的小事做起，就能为地球贡献一份力量。比如出门尽量乘坐公共交通工具，减少使用一次性塑料袋，离开房间时随手关灯节约用电。不仅如此，我们还可以向身边的亲朋好友宣传环保知识。保护环境，就是保护我们共同的家园。',
+    pinyinContent: 'Suízhe jīngjì de gāosù fāzhǎn, huánjìng wūrǎn wèntí zhújiàn yǐnqǐ le quán shèhuì de guānzhù. Sùliào lājī, kōngqì wūrǎn yǐjí shuǐ zīyuán duǎnquē, zhèngzài duì wǒmen de rìcháng shēnghuó chǎnshēng shēnyuǎn de yǐngxiǎng. Hěn duō rén yǐwéi bǎohù huánjìng shì dà kēxuéjiā huòzhě zhèngfǔ de shìqing, qíshí bùrán. Duìyú pǔtōngrén láishuō, zhǐyào wǒmen cóng shēnghuó zhōng de xiǎoshì zuòqǐ, jiù néng wèi dìqiú gòngxiàn yí fèn lìliang. Bǐrú chūmén jǐnliàng chéngzuò gōnggòng jiāotōng gōngjù, jiǎnshǎo shǐyòng yícìxìng sùliàodài, líkāi fángjiān shí suíshǒu guāndēng jiéyuē yòngdiàn. Bùjǐn rúcǐ, wǒmen hái kěyǐ xiàng shēnbiān de qīnpéng hǎoyǒu xuānchuán huánbǎo zhīshi. Bǎohù huánjìng, jiù shì bǎohù wǒmen gòngtóng de jiāyuán.',
+    translationVi: 'Cùng với sự phát triển thần tốc của nền kinh tế, vấn đề ô nhiễm môi trường dần dần thu hút sự quan tâm của toàn xã hội. Rác thải nhựa, ô nhiễm không khí cũng như sự khan hiếm nguồn nước đang tạo ra những tác động sâu sắc đến đời sống thường nhật của chúng ta. Nhiều người cho rằng bảo vệ môi trường là trách nhiệm của các nhà khoa học lớn hoặc chính phủ, nhưng thực ra không phải như vậy. Đối với người bình thường, chỉ cần chúng ta bắt đầu từ những việc nhỏ trong cuộc sống là đã có thể đóng góp một phần sức mạnh cho Trái Đất. Chẳng hạn như ra ngoài cố gắng đi phương tiện giao thông công cộng, giảm bớt việc dùng túi nilon dùng một lần, tắt đèn khi rời phòng để tiết kiệm điện. Không chỉ có vậy, chúng ta còn có thể tuyên truyền kiến thức bảo vệ môi trường đến bạn bè và người thân xung quanh. Bảo vệ môi trường chính là bảo vệ mái nhà chung của tất cả chúng ta.',
+    sentences: [
+      {
+        hanzi: '随着经济的高速发展，环境污染问题逐渐引起了全社会的关注。',
+        pinyin: 'Suízhe jīngjì de gāosù fāzhǎn, huánjìng wūrǎn wèntí zhújiàn yǐnqǐ le quán shèhuì de guānzhù.',
+        meaningVi: 'Cùng với phát triển kinh tế nhanh chóng, ô nhiễm môi trường dần gây chú ý toàn xã hội.'
+      },
+      {
+        hanzi: '对于普通人来说，只要我们从生活中的小事做起，就能为地球贡献一份力量。',
+        pinyin: 'Duìyú pǔtōngrén láishuō, zhǐyào wǒmen cóng shēnghuó zhōng de xiǎoshì zuòqǐ, jiù néng wèi dìqiú gòngxiàn yí fèn lìliang.',
+        meaningVi: 'Đối với người bình thường, chỉ cần bắt đầu từ việc nhỏ là đã góp sức cho Trái Đất.'
+      }
+    ],
+    questions: [
+      {
+        id: 'q_hsk4_1',
+        question: '普通人可以通过什么方式保护环境？ (Người bình thường bảo vệ môi trường bằng cách nào?)',
+        options: [
+          'A. 乘坐公共交通、少用塑料袋、随手关灯',
+          'B. Đợi các nhà khoa học xử lý',
+          'C. Không quan tâm vì việc quá lớn'
+        ],
+        correctAnswerIndex: 0,
+        explanationVi: 'Bài đọc nêu ví dụ: "乘坐公共交通工具，减少使用一次性塑料袋，离开房间时随手关灯".'
+      }
+    ],
+    vocabulary: [
+      { hanzi: '逐渐', pinyin: 'zhújiàn', meaningVi: 'dần dần' },
+      { hanzi: '污染', pinyin: 'wūrǎn', meaningVi: 'ô nhiễm' },
+      { hanzi: '贡献', pinyin: 'gòngxiàn', meaningVi: 'đóng góp, cống hiến' },
+      { hanzi: '宣传', pinyin: 'xuānchuán', meaningVi: 'tuyên truyền' }
     ]
   }
 ];

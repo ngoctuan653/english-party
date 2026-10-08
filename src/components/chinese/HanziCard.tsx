@@ -83,8 +83,13 @@ export const HanziCard: React.FC<HanziCardProps> = ({
           <div className="my-auto space-y-4 py-2">
             <div className="text-center">
               <div className="text-4xl font-black text-white">{word.hanzi}</div>
-              <div className="mt-1">
+              <div className="mt-1 flex items-center justify-center gap-2">
                 <ToneColorText pinyin={word.pinyin} className="text-xl font-bold font-mono" />
+                {word.sinoVietnamese && (
+                  <span className="px-2 py-0.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold">
+                    HV: {word.sinoVietnamese}
+                  </span>
+                )}
               </div>
             </div>
 
