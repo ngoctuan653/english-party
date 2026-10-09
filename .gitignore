@@ -1,27 +1,44 @@
-# Logs
+# Logs & Environment
 logs
 *.log
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+.env
+.env.local
+.env.*.local
+.firebase
 
-node_modules
-dist
-dist-ssr
+# Dependency & Build Artifacts
+node_modules/
+dist/
+dist-ssr/
+dev-dist/
 *.local
 
-# Editor directories and files
+# Editor directories and OS files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-.env
-.firebase
+
+# Data Dumps & Non-source Documents
+*.csv
+*.tsv
+*.xlsx
+*.pdf
+scratch/
+temp/
+tmp/
 *.backup.json
+
+# Tooling Archive (Scripts cào/sửa dữ liệu một lần)
+scripts/archive/
+scripts/scratch/
