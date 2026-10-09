@@ -37,12 +37,12 @@ const HanziWritingPage = lazy(() => import('@/pages/chinese/HanziWritingPage'));
 
 function LoadingScreen() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0F172A]">
+    <div className="min-h-screen flex items-center justify-center bg-surface-base">
       <div className="text-center">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-violet-600 to-blue-500 flex items-center justify-center animate-pulse">
-          <span className="text-2xl">🎉</span>
+        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-rose-500 to-amber-500 flex items-center justify-center shadow-lg shadow-rose-200/50 animate-pulse">
+          <span className="text-2xl">🇨🇳</span>
         </div>
-        <div className="text-white/60 text-sm">Loading...</div>
+        <div className="text-slate-500 text-sm font-medium">Đang tải dữ liệu học tập...</div>
       </div>
     </div>
   );

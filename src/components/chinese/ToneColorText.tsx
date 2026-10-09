@@ -75,7 +75,7 @@ export const ToneColorText: React.FC<ToneColorTextProps> = ({
                     {syl}
                   </rt>
                 )}
-                <span className={`text-xl font-bold font-sans text-slate-100 ${hanziClassName}`}>
+                <span className={`text-xl font-bold font-sans text-slate-900 ${hanziClassName}`}>
                   {char}
                 </span>
               </ruby>
@@ -96,7 +96,7 @@ export const ToneColorText: React.FC<ToneColorTextProps> = ({
             {pinyin}
           </span>
         )}
-        <span className={`text-xl font-bold text-slate-100 ${hanziClassName}`}>
+        <span className={`text-xl font-bold text-slate-900 ${hanziClassName}`}>
           {hanzi}
         </span>
       </span>
@@ -105,7 +105,7 @@ export const ToneColorText: React.FC<ToneColorTextProps> = ({
 
   // If only hanzi
   return (
-    <span className={`font-bold text-slate-100 ${hanziClassName} ${className}`} onClick={onClick}>
+    <span className={`font-bold text-slate-900 ${hanziClassName} ${className}`} onClick={onClick}>
       {hanzi}
     </span>
   );

@@ -163,3 +163,5 @@ export interface ChineseProgress {
   lastStudyDate: string;
   totalXp: number;
 }
+
+export type { HskMockExam, HskMockQuestion } from '@/data/chinese/mock-exams';
