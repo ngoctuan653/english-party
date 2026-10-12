@@ -49,10 +49,13 @@ import { ExamScoreCard } from '@/components/speaking/ExamScoreCard';
 import { ApiKeyModal } from '@/components/speaking/ApiKeyModal';
 import { SpeakingSessionReviewModal } from '@/components/speaking/SpeakingSessionReviewModal';
 import { SpeakingHistoryModal } from '@/components/speaking/SpeakingHistoryModal';
+import { useSpeakingQuota } from '@/hooks/useSpeakingQuota';
+import { SpeakingQuotaWidget } from '@/components/payment/SpeakingQuotaWidget';
 
 export default function SpeakingPage() {
   const { profile, setProfile } = useAuthStore();
   const { setStudySessionActive } = useUIStore();
+  const { canSpeak, consumeTurn, openUpgradeModal } = useSpeakingQuota();
 
   // Mode & Navigation State
   const [activeTab, setActiveTab] = useState<SpeakingMode>('roleplay');
@@ -371,6 +374,16 @@ export default function SpeakingPage() {
   // ============================================
 
   const handleStartScenario = (scenario: SpeakingScenario) => {
+    // Check Speaking Quota Guard
+    if (!canSpeak) {
+      toast.error('Bạn đã dùng hết số lượt nói AI hôm nay! Vui lòng nâng cấp VIP hoặc nhập Voucher để tiếp tục.');
+      openUpgradeModal();
+      return;
+    }
+
+    // Deduct 1 turn for free tier
+    consumeTurn('english');
+
     setActiveScenario(scenario);
     resetTranscript();
     setSessionReport(null);
@@ -615,6 +628,16 @@ export default function SpeakingPage() {
   // ============================================
 
   const handleStartExamPrep = (q: SpeakingExamQuestion) => {
+    // Check Speaking Quota Guard
+    if (!canSpeak) {
+      toast.error('Bạn đã dùng hết số lượt thi nói hôm nay! Vui lòng nâng cấp VIP hoặc nhập Voucher để tiếp tục.');
+      openUpgradeModal();
+      return;
+    }
+
+    // Deduct 1 turn for free tier
+    consumeTurn('english');
+
     setSelectedExamQuestion(q);
     setPrepSecondsLeft(q.prepTimeSeconds);
     setSpeakingSecondsLeft(q.speakingTimeSeconds);
@@ -683,6 +706,9 @@ export default function SpeakingPage() {
     <div className="space-y-6 pb-14">
       {/* 1. Module Navigation */}
       <LearningModuleNav active="speaking" />
+
+      {/* Quota Guard & VIP Status Banner */}
+      <SpeakingQuotaWidget language="english" />
 
       {/* 2. Intro Section (Hidden during active session to maximize chat vertical room) */}
       {!activeScenario && examPhase === 'select' && (

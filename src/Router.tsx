@@ -34,6 +34,7 @@ const ChineseSpeakingPage = lazy(() => import('@/pages/chinese/ChineseSpeakingPa
 const ChineseReadingPage = lazy(() => import('@/pages/chinese/ChineseReadingPage'));
 const HskMockExamPage = lazy(() => import('@/pages/chinese/HskMockExamPage'));
 const HanziWritingPage = lazy(() => import('@/pages/chinese/HanziWritingPage'));
+const VnPayReturnPage = lazy(() => import('@/pages/payment/VnPayReturnPage'));
 
 function LoadingScreen() {
   return (
@@ -74,6 +75,7 @@ export default function Router() {
           <Route path="/chinese/reading" element={<ChineseReadingPage />} />
           <Route path="/chinese/mock" element={<HskMockExamPage />} />
           <Route path="/chinese/writing" element={<HanziWritingPage />} />
+          <Route path="/payment/vnpay-return" element={<VnPayReturnPage />} />
         </Route>
 
         {/* Protected routes */}

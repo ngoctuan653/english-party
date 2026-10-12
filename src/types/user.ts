@@ -1,5 +1,6 @@
 import { Timestamp } from 'firebase/firestore';
 import type { CefrLevel } from './cefr';
+import type { UserPremiumInfo } from './payment';
 
 export type UserRole = 'user' | 'admin';
 export type ExamType = 'cefr' | 'custom';
@@ -31,6 +32,7 @@ export interface UserProfile {
   lastActiveAt: Timestamp | null;
   dailyGoalMinutes: number;
   notificationsEnabled: boolean;
+  premium?: UserPremiumInfo;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }

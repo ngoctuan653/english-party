@@ -6,12 +6,15 @@ import { useNotificationStore } from '@/stores/notificationStore';
 import { Avatar } from '@/components/ui/Avatar';
 import { formatTimeAgo } from '@/utils/helpers';
 import { AnimatePresence, motion } from 'framer-motion';
+import { usePremiumStore } from '@/stores/premiumStore';
 
 export function MobileHeader() {
   const location = useLocation();
   const navigate = useNavigate();
   const { profile, isAuthenticated } = useAuthStore();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotificationStore();
+  const isPremium = usePremiumStore((state) => state.isUserPremium());
+  const openUpgradeModal = usePremiumStore((state) => state.openUpgradeModal);
 
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
@@ -71,8 +74,22 @@ export function MobileHeader() {
         <h1 className="text-base font-bold text-slate-800 tracking-wide">{getPageTitle()}</h1>
       </div>
 
-      {/* Right side: Streak & Notifications */}
-      <div className="flex items-center gap-3">
+      {/* Right side: VIP, Streak & Notifications */}
+      <div className="flex items-center gap-2">
+        {/* VIP Button */}
+        <button
+          onClick={() => openUpgradeModal()}
+          className={`flex h-7 items-center gap-1 rounded-full px-2 text-[10px] font-bold shadow-sm transition-all cursor-pointer ${
+            isPremium
+              ? 'border border-amber-300 bg-amber-50 text-amber-900'
+              : 'border border-amber-500/30 bg-gradient-to-r from-amber-500 to-orange-500 text-white'
+          }`}
+          title={isPremium ? 'VIP Active' : 'Nâng cấp VIP'}
+        >
+          <Icons.Crown className="h-3 w-3" />
+          <span>{isPremium ? 'VIP' : 'VIP'}</span>
+        </button>
+
         {isAuthenticated ? (
           <>
             {profile && profile.currentStreak > 0 && (

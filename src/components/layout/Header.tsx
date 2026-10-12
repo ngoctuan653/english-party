@@ -9,12 +9,15 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { formatTimeAgo } from '@/utils/helpers';
 import { AnimatePresence, motion } from 'framer-motion';
+import { usePremiumStore } from '@/stores/premiumStore';
 
 export function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const { profile, reset, isAuthenticated } = useAuthStore();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotificationStore();
+  const isPremium = usePremiumStore((state) => state.isUserPremium());
+  const openUpgradeModal = usePremiumStore((state) => state.openUpgradeModal);
 
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -76,7 +79,21 @@ export function Header() {
       <h2 className="text-base font-black text-slate-900">{getPageTitle()}</h2>
 
       {/* Actions */}
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-4">
+        {/* VIP Status Button */}
+        <button
+          onClick={() => openUpgradeModal()}
+          className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition-all shadow-sm cursor-pointer ${
+            isPremium
+              ? 'border border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100'
+              : 'border border-amber-500/30 bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:opacity-95'
+          }`}
+          title={isPremium ? 'Tài khoản VIP đang hoạt động' : 'Nâng cấp VIP / Nhập Voucher'}
+        >
+          <Icons.Crown className="h-3.5 w-3.5" />
+          <span>{isPremium ? 'VIP Active' : 'Nâng cấp VIP'}</span>
+        </button>
+
         {isAuthenticated ? (
           <>
         {/* Streak & XP Quick Display */}

@@ -5,6 +5,7 @@ import { Header } from './Header';
 import { MobileHeader } from './MobileHeader';
 import { useUIStore } from '@/stores/uiStore';
 import { AnimatePresence, motion } from 'framer-motion';
+import { UpgradePremiumModal } from '@/components/payment/UpgradePremiumModal';
 
 export function AppLayout() {
   const location = useLocation();
@@ -39,6 +40,9 @@ export function AppLayout() {
 
       {/* Mobile Bottom Navigation */}
       {!isStudySessionActive && <BottomNav />}
+
+      {/* Global Upgrade Premium Modal */}
+      <UpgradePremiumModal />
     </div>
   );
 }

@@ -13,10 +13,13 @@ import {
   RotateCcw,
   CheckCircle2
 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import { CHINESE_SPEAKING_SCENARIOS } from '@/data/chinese/speaking-scenarios';
 import type { ChineseSpeakingScenario } from '@/data/chinese/speaking-scenarios';
 import { sendChineseSpeakingMessage, type ChineseRoleplayReply } from '@/services/chineseGemini';
 import { speakChineseText } from '@/utils/chineseSpeech';
+import { useSpeakingQuota } from '@/hooks/useSpeakingQuota';
+import { SpeakingQuotaWidget } from '@/components/payment/SpeakingQuotaWidget';
 
 interface ChatMessage {
   id: string;
@@ -33,6 +36,8 @@ interface ChatMessage {
 }
 
 export default function ChineseSpeakingPage() {
+  const { canSpeak, consumeTurn, openUpgradeModal } = useSpeakingQuota();
+
   const [selectedScenarioId, setSelectedScenarioId] = useState<string>(
     CHINESE_SPEAKING_SCENARIOS[0].id
   );
@@ -118,6 +123,16 @@ export default function ChineseSpeakingPage() {
     const textToSend = (customText || inputText).trim();
     if (!textToSend || isLoadingReply) return;
 
+    // Check Quota Guard
+    if (!canSpeak) {
+      toast.error('Bạn đã dùng hết số lượt nói AI miễn phí hôm nay! Vui lòng nâng cấp VIP hoặc nhập Voucher để tiếp tục.');
+      openUpgradeModal();
+      return;
+    }
+
+    // Consume 1 turn if free user
+    consumeTurn('chinese');
+
     const userMsg: ChatMessage = {
       id: `user_${Date.now()}`,
       sender: 'user',
@@ -143,13 +158,16 @@ export default function ChineseSpeakingPage() {
       });
 
       // Attach evaluation to user message
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === userMsg.id ? { ...msg, evaluation: reply.evaluation } : msg
-        )
-      );
+      if (reply.evaluation) {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === userMsg.id ? { ...m, evaluation: reply.evaluation } : m
+          )
+        );
+      }
 
-      const aiMsg: ChatMessage = {
+      // Add AI reply message
+      const aiReplyMsg: ChatMessage = {
         id: `ai_${Date.now()}`,
         sender: 'ai',
         hanzi: reply.aiMessageHanzi,
@@ -157,13 +175,28 @@ export default function ChineseSpeakingPage() {
         meaningVi: reply.aiMessageMeaningVi,
       };
 
-      setMessages((prev) => [...prev, aiMsg]);
+      setMessages((prev) => [...prev, aiReplyMsg]);
+
+      // Speak AI message
       speakChineseText(reply.aiMessageHanzi, { rate: 0.85 });
-    } catch {
-      // ignore
+    } catch (err) {
+      console.error('Error getting AI reply:', err);
     } finally {
       setIsLoadingReply(false);
     }
+  };
+
+  const handleReset = () => {
+    setMessages([
+      {
+        id: 'init_ai',
+        sender: 'ai',
+        hanzi: currentScenario.initialAiMessage.hanzi,
+        pinyin: currentScenario.initialAiMessage.pinyin,
+        meaningVi: currentScenario.initialAiMessage.meaningVi,
+      },
+    ]);
+    setInputText('');
   };
 
   const handlePlayAudio = (text: string) => {
@@ -201,6 +234,9 @@ export default function ChineseSpeakingPage() {
           ))}
         </select>
       </div>
+
+      {/* Speaking Quota VIP Widget */}
+      <SpeakingQuotaWidget language="chinese" />
 
       {/* Scenario Info Card */}
       <div className="p-4 rounded-2xl bg-white border border-slate-200/80 text-xs text-slate-600 flex items-center justify-between gap-4 shadow-sm">

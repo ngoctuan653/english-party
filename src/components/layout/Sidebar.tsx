@@ -7,11 +7,14 @@ import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { motion } from 'framer-motion';
+import { usePremiumStore } from '@/stores/premiumStore';
 
 export function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { profile, reset, isAuthenticated } = useAuthStore();
+  const isPremium = usePremiumStore((state) => state.isUserPremium());
+  const openUpgradeModal = usePremiumStore((state) => state.openUpgradeModal);
 
   const handleLogout = async () => {
     try {
@@ -95,6 +98,54 @@ export function Sidebar() {
             0→4
           </Badge>
         </Link>
+
+        {/* VIP Membership Card */}
+        <div className="pt-3 pb-1">
+          <div className="px-3 text-[10px] font-black uppercase tracking-wider text-slate-400">
+            Hội viên AI
+          </div>
+        </div>
+        <button
+          onClick={() => openUpgradeModal()}
+          className={`group relative flex w-full items-center gap-3 overflow-hidden rounded-xl p-2.5 text-left transition-all border ${
+            isPremium
+              ? 'border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 text-amber-950 shadow-sm'
+              : 'border-slate-800 bg-slate-950 text-white hover:bg-slate-900 shadow-sm'
+          }`}
+        >
+          <div
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
+              isPremium
+                ? 'bg-amber-400 text-amber-950 shadow-sm'
+                : 'bg-gradient-to-br from-amber-400 to-orange-500 text-white'
+            }`}
+          >
+            <Icons.Crown className="h-4 w-4" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-black tracking-tight">
+                {isPremium ? 'VIP MEMBER' : 'Nâng cấp VIP'}
+              </span>
+              <span
+                className={`rounded px-1 text-[9px] font-extrabold ${
+                  isPremium
+                    ? 'bg-amber-200/80 text-amber-900'
+                    : 'bg-amber-400 text-slate-950'
+                }`}
+              >
+                PRO
+              </span>
+            </div>
+            <p
+              className={`truncate text-[10px] ${
+                isPremium ? 'text-amber-800' : 'text-slate-300'
+              }`}
+            >
+              {isPremium ? 'Mở khóa toàn bộ AI' : 'Luyện nói AI không giới hạn'}
+            </p>
+          </div>
+        </button>
 
         {/* Admin Link if role is admin */}
         {profile?.role === 'admin' && (
