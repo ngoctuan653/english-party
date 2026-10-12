@@ -132,14 +132,6 @@ export const UpgradePremiumModal: React.FC = () => {
 
   // VNPay Sandbox redirect
   const handlePayWithVNPay = async () => {
-    const currentCfg = getVNPayConfig();
-    if (currentCfg.tmnCode === 'DEMOVNP1') {
-      const proceed = window.confirm(
-        "⚠️ LƯU Ý TỪ CỔNG VNPAY:\n\nCổng VNPay Sandbox yêu cầu mã Merchant (TmnCode) đã đăng ký với VNPay tại https://sandbox.vnpayment.vn/devreg.\n\nNếu tiếp tục với mã mẫu DEMOVNP1, VNPay sẽ báo 'Không tìm thấy website'.\n\n• Nhấn OK: Tiếp tục chuyển hướng đến VNPay Sandbox.\n• Nhấn Cancel: Ở lại để dùng 'Test Simulator (1-Click)' hoặc nhập mã TmnCode của bạn."
-      );
-      if (!proceed) return;
-    }
-
     try {
       setIsLoading(true);
       const orderId = `EP_${Date.now()}`;
@@ -412,16 +404,29 @@ export const UpgradePremiumModal: React.FC = () => {
               2. Chọn phương thức thanh toán / thử nghiệm:
             </h3>
 
-            {/* VNPay Sandbox Guidance Notice */}
-            <div className="rounded-2xl border border-amber-200/90 bg-amber-50/70 p-4 text-xs text-amber-900 space-y-2.5">
-              <div className="flex items-center gap-2 font-bold text-amber-950">
-                <AlertCircle className="h-4 w-4 text-amber-600 shrink-0" />
-                <span>Giải thích về Cổng VNPay Sandbox & Khuyên dùng:</span>
+            {/* VNPay Sandbox Connected Notice */}
+            <div className="rounded-2xl border border-emerald-200/90 bg-emerald-50/70 p-4 text-xs text-emerald-950 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 font-bold text-emerald-950">
+                  <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Cổng VNPay Sandbox đã kết nối:</span>
+                  <span className="font-mono text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded text-[11px] font-black">
+                    CYEGVN8B
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowConfig(!showConfig)}
+                  className="text-[11px] text-emerald-800 hover:underline font-semibold cursor-pointer flex items-center gap-1"
+                >
+                  <Settings className="h-3 w-3" />
+                  <span>{showConfig ? 'Đóng cấu hình' : 'Tùy chỉnh TmnCode'}</span>
+                </button>
               </div>
-              <p className="text-[11px] leading-relaxed text-amber-800">
-                Cổng VNPay Sandbox thật yêu cầu mã <strong>TmnCode</strong> được VNPay cấp qua email sau khi đăng ký tại <a href="https://sandbox.vnpayment.vn/devreg/" target="_blank" rel="noreferrer" className="underline font-bold text-amber-900">sandbox.vnpayment.vn/devreg</a> (mã mẫu chưa đăng ký sẽ bị VNPay hiển thị thông báo <em>"Không tìm thấy website"</em>).
+              <p className="text-[11px] leading-relaxed text-emerald-800">
+                Khi nhấn <strong>"Cổng VNPay Sandbox"</strong>, bạn sẽ được chuyển đến trang VNPay thật. Sử dụng thẻ <strong>NCB</strong> trong ngăn kéo bên dưới (số thẻ: <code>9704198526191432198</code>, OTP: <code>123456</code>) để hoàn tất.
               </p>
-              <div className="flex flex-wrap items-center gap-2 pt-1">
+              <div className="flex flex-wrap items-center gap-2 pt-0.5">
                 <button
                   type="button"
                   onClick={() => handleSandboxSimulate('success')}
@@ -429,15 +434,7 @@ export const UpgradePremiumModal: React.FC = () => {
                   className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <Zap className="h-3.5 w-3.5 fill-white text-white" />
-                  <span>Khuyên dùng: Bấm Test 1-Click (Kích hoạt VIP ngay)</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowConfig(!showConfig)}
-                  className="px-3 py-1.5 rounded-xl bg-white border border-amber-300 text-amber-900 font-bold text-[11px] shadow-2xs hover:bg-amber-100 transition-all cursor-pointer flex items-center gap-1.5"
-                >
-                  <Settings className="h-3.5 w-3.5 text-amber-700" />
-                  <span>{showConfig ? 'Đóng cấu hình TmnCode' : 'Cấu hình TmnCode của bạn'}</span>
+                  <span>Test nhanh 1-Click (Không cần qua cổng)</span>
                 </button>
               </div>
 

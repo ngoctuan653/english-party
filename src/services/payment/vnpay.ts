@@ -2,8 +2,8 @@ import type { VNPayConfig, VNPayTestCard } from '@/types/payment';
 
 // VNPay Sandbox default credentials (configurable via Vite env)
 export const VNPAY_SANDBOX_CONFIG: VNPayConfig = {
-  tmnCode: import.meta.env.VITE_VNPAY_TMN_CODE || 'DEMOVNP1',
-  hashSecret: import.meta.env.VITE_VNPAY_HASH_SECRET || 'SECRETKEYDEMOVNPAY123456789ABCDEF',
+  tmnCode: import.meta.env.VITE_VNPAY_TMN_CODE || 'CYEGVN8B',
+  hashSecret: import.meta.env.VITE_VNPAY_HASH_SECRET || 'KWWVLMWDKVAIEMKXFRSTSPUNYMSBKZQI',
   paymentUrl: 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html',
   returnUrl:
     typeof window !== 'undefined'
@@ -149,9 +149,9 @@ export async function createVNPayPaymentUrl(
   for (const key of sortedKeys) {
     const value = vnpParams[key];
     if (value !== undefined && value !== null && value !== '') {
-      queryStringParts.push(
-        `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
-      );
+      const encodedKey = encodeURIComponent(key);
+      const encodedVal = encodeURIComponent(String(value)).replace(/%20/g, '+');
+      queryStringParts.push(`${encodedKey}=${encodedVal}`);
     }
   }
 
@@ -206,9 +206,9 @@ export async function verifyVNPayReturn(
   for (const key of sortedKeys) {
     const value = returnParams[key];
     if (value !== undefined && value !== null && value !== '') {
-      queryStringParts.push(
-        `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
-      );
+      const encodedKey = encodeURIComponent(key);
+      const encodedVal = encodeURIComponent(String(value)).replace(/%20/g, '+');
+      queryStringParts.push(`${encodedKey}=${encodedVal}`);
     }
   }
 
