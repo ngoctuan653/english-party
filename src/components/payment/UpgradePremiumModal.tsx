@@ -12,7 +12,8 @@ import {
   Check,
   AlertCircle,
   ShieldCheck,
-  RotateCcw
+  RotateCcw,
+  Settings
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { usePremiumStore } from '@/stores/premiumStore';
@@ -24,7 +25,10 @@ import {
 } from '@/services/payment/voucher';
 import {
   createVNPayPaymentUrl,
-  VNPAY_TEST_CARDS
+  VNPAY_TEST_CARDS,
+  getVNPayConfig,
+  saveCustomVNPayConfig,
+  clearCustomVNPayConfig
 } from '@/services/payment/vnpay';
 import { simulateSandboxPayment } from '@/services/payment/sandbox';
 import type { PremiumTier } from '@/types/payment';
@@ -41,6 +45,33 @@ export const UpgradePremiumModal: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [showTestCardInfo, setShowTestCardInfo] = useState(false);
+  const [showConfig, setShowConfig] = useState(false);
+  const [customTmnCode, setCustomTmnCode] = useState(() => {
+    const cfg = getVNPayConfig();
+    return cfg.tmnCode !== 'DEMOVNP1' ? cfg.tmnCode : '';
+  });
+  const [customHashSecret, setCustomHashSecret] = useState(() => {
+    const cfg = getVNPayConfig();
+    return cfg.tmnCode !== 'DEMOVNP1' ? cfg.hashSecret : '';
+  });
+
+  const handleSaveConfig = () => {
+    if (!customTmnCode.trim() || !customHashSecret.trim()) {
+      toast.error('Vui lòng nhập cả TmnCode và HashSecret!');
+      return;
+    }
+    saveCustomVNPayConfig(customTmnCode, customHashSecret);
+    toast.success('Đã lưu cấu hình Merchant VNPay Sandbox thành công!');
+    setShowConfig(false);
+  };
+
+  const handleResetConfig = () => {
+    clearCustomVNPayConfig();
+    setCustomTmnCode('');
+    setCustomHashSecret('');
+    toast.success('Đã khôi phục cấu hình VNPay về mặc định.');
+    setShowConfig(false);
+  };
 
   if (!isModalOpen) return null;
 
@@ -101,6 +132,14 @@ export const UpgradePremiumModal: React.FC = () => {
 
   // VNPay Sandbox redirect
   const handlePayWithVNPay = async () => {
+    const currentCfg = getVNPayConfig();
+    if (currentCfg.tmnCode === 'DEMOVNP1') {
+      const proceed = window.confirm(
+        "⚠️ LƯU Ý TỪ CỔNG VNPAY:\n\nCổng VNPay Sandbox yêu cầu mã Merchant (TmnCode) đã đăng ký với VNPay tại https://sandbox.vnpayment.vn/devreg.\n\nNếu tiếp tục với mã mẫu DEMOVNP1, VNPay sẽ báo 'Không tìm thấy website'.\n\n• Nhấn OK: Tiếp tục chuyển hướng đến VNPay Sandbox.\n• Nhấn Cancel: Ở lại để dùng 'Test Simulator (1-Click)' hoặc nhập mã TmnCode của bạn."
+      );
+      if (!proceed) return;
+    }
+
     try {
       setIsLoading(true);
       const orderId = `EP_${Date.now()}`;
@@ -372,6 +411,87 @@ export const UpgradePremiumModal: React.FC = () => {
             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
               2. Chọn phương thức thanh toán / thử nghiệm:
             </h3>
+
+            {/* VNPay Sandbox Guidance Notice */}
+            <div className="rounded-2xl border border-amber-200/90 bg-amber-50/70 p-4 text-xs text-amber-900 space-y-2.5">
+              <div className="flex items-center gap-2 font-bold text-amber-950">
+                <AlertCircle className="h-4 w-4 text-amber-600 shrink-0" />
+                <span>Giải thích về Cổng VNPay Sandbox & Khuyên dùng:</span>
+              </div>
+              <p className="text-[11px] leading-relaxed text-amber-800">
+                Cổng VNPay Sandbox thật yêu cầu mã <strong>TmnCode</strong> được VNPay cấp qua email sau khi đăng ký tại <a href="https://sandbox.vnpayment.vn/devreg/" target="_blank" rel="noreferrer" className="underline font-bold text-amber-900">sandbox.vnpayment.vn/devreg</a> (mã mẫu chưa đăng ký sẽ bị VNPay hiển thị thông báo <em>"Không tìm thấy website"</em>).
+              </p>
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => handleSandboxSimulate('success')}
+                  disabled={isLoading}
+                  className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] shadow-sm transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <Zap className="h-3.5 w-3.5 fill-white text-white" />
+                  <span>Khuyên dùng: Bấm Test 1-Click (Kích hoạt VIP ngay)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowConfig(!showConfig)}
+                  className="px-3 py-1.5 rounded-xl bg-white border border-amber-300 text-amber-900 font-bold text-[11px] shadow-2xs hover:bg-amber-100 transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <Settings className="h-3.5 w-3.5 text-amber-700" />
+                  <span>{showConfig ? 'Đóng cấu hình TmnCode' : 'Cấu hình TmnCode của bạn'}</span>
+                </button>
+              </div>
+
+              {/* Collapsible custom config form */}
+              {showConfig && (
+                <div className="mt-3 p-3.5 bg-white rounded-xl border border-amber-200/80 space-y-2.5 shadow-sm">
+                  <div className="font-bold text-slate-800 text-xs">
+                    Nhập thông tin tài khoản VNPay Sandbox bạn đã đăng ký:
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-500 block mb-1">
+                        vnp_TmnCode (Mã website Merchant):
+                      </label>
+                      <input
+                        type="text"
+                        value={customTmnCode}
+                        onChange={(e) => setCustomTmnCode(e.target.value)}
+                        placeholder="Ví dụ: 2QXUI4J4..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-amber-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-500 block mb-1">
+                        vnp_HashSecret (Chuỗi khóa bí mật):
+                      </label>
+                      <input
+                        type="text"
+                        value={customHashSecret}
+                        onChange={(e) => setCustomHashSecret(e.target.value)}
+                        placeholder="Chuỗi Secret Key..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-amber-500"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={handleSaveConfig}
+                      className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-colors cursor-pointer"
+                    >
+                      Lưu cấu hình
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleResetConfig}
+                      className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 font-bold text-xs transition-colors cursor-pointer"
+                    >
+                      Khôi phục mặc định
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* VNPay Gateway Button */}

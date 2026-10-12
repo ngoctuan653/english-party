@@ -11,6 +11,49 @@ export const VNPAY_SANDBOX_CONFIG: VNPayConfig = {
       : 'https://english-party.web.app/payment/vnpay-return',
 };
 
+export function getVNPayConfig(): VNPayConfig {
+  if (typeof window !== 'undefined') {
+    const custom = localStorage.getItem('ep_vnpay_custom_config');
+    if (custom) {
+      try {
+        const parsed = JSON.parse(custom);
+        if (parsed.tmnCode && parsed.hashSecret) {
+          return {
+            ...VNPAY_SANDBOX_CONFIG,
+            tmnCode: parsed.tmnCode.trim(),
+            hashSecret: parsed.hashSecret.trim(),
+            returnUrl: `${window.location.origin}/payment/vnpay-return`,
+          };
+        }
+      } catch (e) {
+        console.error('Failed to parse custom VNPay config', e);
+      }
+    }
+  }
+  return {
+    ...VNPAY_SANDBOX_CONFIG,
+    returnUrl:
+      typeof window !== 'undefined'
+        ? `${window.location.origin}/payment/vnpay-return`
+        : 'https://english-party.web.app/payment/vnpay-return',
+  };
+}
+
+export function saveCustomVNPayConfig(tmnCode: string, hashSecret: string): void {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(
+      'ep_vnpay_custom_config',
+      JSON.stringify({ tmnCode: tmnCode.trim(), hashSecret: hashSecret.trim() })
+    );
+  }
+}
+
+export function clearCustomVNPayConfig(): void {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('ep_vnpay_custom_config');
+  }
+}
+
 export const VNPAY_TEST_CARDS: VNPayTestCard[] = [
   {
     bank: 'NCB (Ngân hàng Quốc Dân - Phổ biến nhất)',
@@ -76,7 +119,7 @@ export async function createVNPayPaymentUrl(
   params: CreateVNPayUrlParams,
   customConfig?: Partial<VNPayConfig>
 ): Promise<string> {
-  const config = { ...VNPAY_SANDBOX_CONFIG, ...customConfig };
+  const config = { ...getVNPayConfig(), ...customConfig };
   const now = new Date();
   const createDate = formatVNPayDate(now);
 
@@ -140,7 +183,7 @@ export async function verifyVNPayReturn(
   searchParams: URLSearchParams,
   customConfig?: Partial<VNPayConfig>
 ): Promise<ParsedVNPayReturn> {
-  const config = { ...VNPAY_SANDBOX_CONFIG, ...customConfig };
+  const config = { ...getVNPayConfig(), ...customConfig };
 
   const secureHash = searchParams.get('vnp_SecureHash') || '';
   const responseCode = searchParams.get('vnp_ResponseCode') || '';
